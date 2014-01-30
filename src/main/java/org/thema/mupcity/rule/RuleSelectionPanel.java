@@ -109,21 +109,22 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(table);
 
-        ahpButton.setText("Define coef by AHP");
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/thema/mupcity/rule/Bundle"); // NOI18N
+        ahpButton.setText(bundle.getString("RuleSelectionPanel.ahpButton.text")); // NOI18N
         ahpButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ahpButtonActionPerformed(evt);
             }
         });
 
-        importButton.setText("Import");
+        importButton.setText(bundle.getString("RuleSelectionPanel.importButton.text")); // NOI18N
         importButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importButtonActionPerformed(evt);
             }
         });
 
-        meanCheckBox.setText("mean");
+        meanCheckBox.setText(bundle.getString("RuleSelectionPanel.meanCheckBox.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
