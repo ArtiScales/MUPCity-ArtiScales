@@ -78,30 +78,30 @@ import org.thema.mupcity.evaluation.NbNearWhiteEvaluator;
  */
 public class Project extends AbstractTreeNode {
 
-    public static final String LEVEL_FIELD = "level";
-    public static final String TYPE_FIELD = "type";
-    public static final String SPEED_FIELD = "speed";
+    public static final String LEVEL_FIELD = "level"; //NOI18N
+    public static final String TYPE_FIELD = "type"; //NOI18N
+    public static final String SPEED_FIELD = "speed"; //NOI18N
     
     public enum Layers {
         BUILD, ROAD, TRAIN_STATION, BUS_STATION, FACILITY, LEISURE, RESTRICT
     }
     
     public static final List<LayerDef> LAYERS = Arrays.asList(
-        new LayerDef(Layers.BUILD, "Buildings", new FeatureStyle(Color.gray, Color.black)),
-        new LayerDef(Layers.ROAD, "Road network", new LineStyle(Color.black), SPEED_FIELD, Number.class),
-        new LayerDef(Layers.BUS_STATION, "Bus stations", new PointStyle(Color.black, Color.red)), 
-        new LayerDef(Layers.TRAIN_STATION, "Train stations", new PointStyle(Color.black, Color.red)), 
-        new LayerDef(Layers.FACILITY, "Facilities", new PointStyle(Color.yellow.darker()), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
-        new LayerDef(Layers.LEISURE, "Leisure", new PointStyle(Color.blue), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
+        new LayerDef(Layers.BUILD, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("BUILDINGS"), new FeatureStyle(Color.gray, Color.black)),
+        new LayerDef(Layers.ROAD, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("ROAD NETWORK"), new LineStyle(Color.black), SPEED_FIELD, Number.class),
+        new LayerDef(Layers.BUS_STATION, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("BUS STATIONS"), new PointStyle(Color.black, Color.red)), 
+        new LayerDef(Layers.TRAIN_STATION, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("TRAIN STATIONS"), new PointStyle(Color.black, Color.red)), 
+        new LayerDef(Layers.FACILITY, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Facilities"), new PointStyle(Color.yellow.darker()), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
+        new LayerDef(Layers.LEISURE, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("LEISURE"), new PointStyle(Color.blue), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
 //        new LayerDef(Layers.GREEN, "Green areas", new FeatureStyle(new Color(118, 179, 0), new Color(170, 203, 0))),
 //        new LayerDef(Layers.WORK, "Working areas", new FeatureStyle(Color.DARK_GRAY, Color.gray), "job", Number.class),
-        new LayerDef(Layers.RESTRICT, "Restricted areas", new FeatureStyle(Color.orange, Color.gray))
+        new LayerDef(Layers.RESTRICT, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("non-developable area"), new FeatureStyle(Color.orange, Color.gray))
 //        new LayerDef(Layers.WATER, "Water", new FeatureStyle(new Color(1, 155, 255), new Color(1, 155, 255))),
 //        new LayerDef(Layers.AGRICULTURE, "Agriculture", new FeatureStyle(Color.YELLOW.darker(), Color.gray))
         );
     
-    public static final String BUILD = "build";
-    public static final String BUILD_DENS = "build_dens";
+    public static final String BUILD = "build"; //NOI18N
+    public static final String BUILD_DENS = "build_dens"; //NOI18N
     public static final String MORPHO_RULE = "morpho";
     
     public static final String ZONE = "zone";
