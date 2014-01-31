@@ -63,13 +63,7 @@ import org.thema.drawshape.style.table.UniqueColorTable;
 import org.thema.graph.SpatialGraph;
 import org.thema.msca.*;
 import org.thema.msca.operation.*;
-import org.thema.mupcity.evaluation.DistEnvelopeEvaluator;
-import org.thema.mupcity.evaluation.DistMinAmenEvaluator;
-import org.thema.mupcity.evaluation.Evaluator;
-import org.thema.mupcity.evaluation.MeanWhiteEvaluator;
-import org.thema.mupcity.evaluation.NbAmenEvaluator;
-import org.thema.mupcity.evaluation.NbCellOnEnvelopeEvaluator;
-import org.thema.mupcity.evaluation.NbNearWhiteEvaluator;
+import org.thema.mupcity.evaluation.*;
 
 
 /**
@@ -481,7 +475,9 @@ public class Project extends AbstractTreeNode {
                     new DistMinAmenEvaluator(this, Layers.FACILITY, 1), new DistMinAmenEvaluator(this, Layers.FACILITY, 2),
                     new DistMinAmenEvaluator(this, Layers.LEISURE, 1), new DistMinAmenEvaluator(this, Layers.LEISURE, 2), new DistMinAmenEvaluator(this, Layers.LEISURE, 3),
                     new NbAmenEvaluator(this, Layers.FACILITY, 1, 400), new NbAmenEvaluator(this, Layers.FACILITY, 2, 2000),
-                    new NbAmenEvaluator(this, Layers.LEISURE, 1, 400), new NbAmenEvaluator(this, Layers.LEISURE, 2, 2000));
+                    new NbAmenEvaluator(this, Layers.LEISURE, 1, 400), new NbAmenEvaluator(this, Layers.LEISURE, 2, 2000),
+                    new NbStationsEvaluator(this,400)
+                    );
         return evaluators;
     }
 

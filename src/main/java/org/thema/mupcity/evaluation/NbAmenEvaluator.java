@@ -7,16 +7,11 @@ package org.thema.mupcity.evaluation;
 
 
 import java.io.IOException;
-import java.util.List;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.common.fuzzy.MembershipFunction;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.parallel.TaskMonitor;
 import org.thema.common.param.XMLParams;
 import org.thema.graph.SpatialGraph;
 import org.thema.msca.Cell;
-import org.thema.msca.SquareGrid;
-import org.thema.msca.operation.AbstractAgregateOperation;
 import org.thema.mupcity.Project;
 
 /**
@@ -65,6 +60,7 @@ public class NbAmenEvaluator extends Evaluator {
     
     public void setGraph(SpatialGraph graph) {
         this.graph = graph;
+        distAmen = null;
     }
     
     private synchronized DistAmenities getDistAmen() {

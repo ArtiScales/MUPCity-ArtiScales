@@ -6,7 +6,6 @@
 package org.thema.mupcity.evaluation;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.io.IOException;
 import java.util.ArrayList;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.drawshape.feature.DefaultFeature;

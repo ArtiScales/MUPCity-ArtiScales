@@ -19,18 +19,13 @@ import java.awt.Frame;
 import java.awt.image.DataBuffer;
 import java.beans.PropertyVetoException;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import org.thema.mupcity.AHP;
 import org.thema.GlobalDataStore;
 import org.thema.common.parallel.BufferForkJoinTask;
 import org.thema.common.parallel.TaskMonitor;
@@ -40,10 +35,8 @@ import org.thema.msca.SquareGrid;
 import org.thema.msca.SquareGridExtent;
 import org.thema.msca.operation.AbstractLayerOperation;
 import org.thema.msca.operation.SimpleGeomOperation;
-import org.thema.mupcity.scenario.ScenarioAuto;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.parallel.BufferTask;
 import org.thema.drawshape.feature.Feature;
 import org.thema.drawshape.feature.FeatureCoverage;
 import org.thema.drawshape.feature.FeatureFilter;
@@ -342,6 +335,9 @@ public class EvaluationDialog extends javax.swing.JDialog {
                                 ((DistEnvelopeEvaluator)evaluator).setGraph(graph);
                                 ((DistEnvelopeEvaluator)evaluator).setNetGeom(netGeom);
                             }
+                            else if(evaluator instanceof NbStationsEvaluator)
+                                ((NbStationsEvaluator)evaluator).setGraph(graph);
+                            
                         }
                     }
                     
@@ -533,7 +529,7 @@ public class EvaluationDialog extends javax.swing.JDialog {
 //
 //                    monitor.close();
 //                    JOptionPane.showMessageDialog(null, new JScrollPane(new JTextArea(res.toString(), 20, 50)));
-
+                    monitor.close();
                     setVisible(false);
                     dispose();
                 } catch (Exception ex) {

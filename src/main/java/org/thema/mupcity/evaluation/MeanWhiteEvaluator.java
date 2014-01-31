@@ -8,11 +8,7 @@ package org.thema.mupcity.evaluation;
 import java.util.List;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.mupcity.scenario.ScenarioAuto;
-import org.thema.common.parallel.TaskMonitor;
 import org.thema.msca.Cell;
-import org.thema.msca.SquareGrid;
-import org.thema.msca.operation.AbstractAgregateOperation;
 
 /**
  *

@@ -6,13 +6,10 @@
 package org.thema.mupcity.evaluation;
 
 import java.awt.image.DataBuffer;
-import java.util.HashMap;
-import java.util.List;
 import org.thema.common.fuzzy.MembershipFunction;
 import org.thema.mupcity.scenario.Scenario;
 import org.thema.msca.Cell;
 import org.thema.common.parallel.TaskMonitor;
-import org.thema.common.param.XMLParams;
 import org.thema.msca.SquareGrid;
 import org.thema.msca.operation.AbstractLayerOperation;
 

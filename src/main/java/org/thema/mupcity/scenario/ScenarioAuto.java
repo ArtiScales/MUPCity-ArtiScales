@@ -358,8 +358,8 @@ public class ScenarioAuto extends Scenario {
             }
         } else {
             layers.addLayerFirst(Project.getProject().createLayer(getResultLayerName(), new UniqueColorTable(Project.colorMap),
-                    name + "-" + java.util.ResourceBundle.getBundle("mupcity/Bundle").getString("scenario")));
-            layers.addLayerLast(Project.getProject().createLayer(getEvalLayerName(), null,  name + "-" + java.util.ResourceBundle.getBundle("mupcity/Bundle").getString("interest")));
+                    name + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario")));
+            layers.addLayerLast(Project.getProject().createLayer(getEvalLayerName(), null,  name + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest")));
         }
 
     }

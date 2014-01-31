@@ -7,7 +7,6 @@ package org.thema.mupcity.evaluation;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.awt.image.DataBuffer;
-import java.io.IOException;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.msca.Cell;
 import org.thema.msca.SquareGrid;

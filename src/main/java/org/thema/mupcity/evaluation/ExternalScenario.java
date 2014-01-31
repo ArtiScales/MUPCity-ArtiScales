@@ -4,7 +4,6 @@
  */
 package org.thema.mupcity.evaluation;
 
-import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
