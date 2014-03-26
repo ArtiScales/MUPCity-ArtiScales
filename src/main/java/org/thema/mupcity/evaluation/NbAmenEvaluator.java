@@ -35,8 +35,8 @@ public class NbAmenEvaluator extends Evaluator {
     
     double distMax;
 
-    public NbAmenEvaluator(Project project, Project.Layers layer, int level, double distMax) {
-        super(new DiscreteFunction(new double[] {0, 10}, new double[] {0, 1}));
+    public NbAmenEvaluator(Project project, Project.Layers layer, int level, double distMax, double[] x, double[] y ) {
+        super(new DiscreteFunction(x, y));
         this.distMax = distMax;
         this.project = project;
         this.layer = layer;
@@ -66,7 +66,7 @@ public class NbAmenEvaluator extends Evaluator {
     private synchronized DistAmenities getDistAmen() {
         if(distAmen == null)
             try {
-                if(graph == null)
+                if(graph == null ||level != 1)
                     distAmen = new DistAmenities(project, layer, level);
                 else
                     distAmen = new DistAmenities(project, layer, level, graph);

@@ -50,8 +50,9 @@ public class DistMinTypeAmenEvaluator extends Evaluator {
     private transient SpatialGraph graph;
     
      
-    public DistMinTypeAmenEvaluator(Project project, Project.Layers layer, int level) {
-        super(new DiscreteFunction(new double[] {0, 10000}, new double[] {0, 1}));
+    public DistMinTypeAmenEvaluator(Project project, Project.Layers layer, int level, double[] x, double[] y ) {
+        
+        super(new DiscreteFunction(x, y));
         this.project = project;
         this.layer = layer;
         this.level = level;
@@ -116,7 +117,7 @@ public class DistMinTypeAmenEvaluator extends Evaluator {
     }
     
       public void getGraph() {
-          if (graph == null){
+          if (graph == null || level != 1){
               graph = project.getSpatialGraph();
           }
                   

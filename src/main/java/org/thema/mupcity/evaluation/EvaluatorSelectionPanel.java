@@ -26,6 +26,7 @@ public class EvaluatorSelectionPanel extends javax.swing.JPanel {
             for(Evaluator eval : Project.getProject().getEvaluators())
                 if(eval.isUsable())
                     model.addRow(new Object[]{eval, true, 1.0});
+        String  toto= "java" ; 
     }
     
     public EvaluatorSelectionPanel(Map<String, Double> coefEvaluators) {

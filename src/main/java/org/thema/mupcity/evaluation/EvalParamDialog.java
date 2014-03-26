@@ -44,7 +44,7 @@ public class EvalParamDialog extends javax.swing.JDialog {
         paramPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Rule parameter");
+        setTitle("Evaluator parameter");
 
         cancelButton.setText("Close");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
@@ -87,6 +87,9 @@ public class EvalParamDialog extends javax.swing.JDialog {
                 .add(cancelButton)
                 .add(8, 8, 8))
         );
+
+        getAccessibleContext().setAccessibleName("Evaluator parameter");
+        getAccessibleContext().setAccessibleDescription("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

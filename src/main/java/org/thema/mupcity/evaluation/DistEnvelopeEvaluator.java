@@ -32,7 +32,7 @@ public class DistEnvelopeEvaluator extends Evaluator {
     transient DistAmenities distAmenities;
 
     public DistEnvelopeEvaluator() {
-        super(new DiscreteFunction(new double[] {0, 1000}, new double[] {0, 1}));
+        super(new DiscreteFunction(new double[] {0.0, 200}, new double[] {1.0, 0.001}));
     }
 
     @Override

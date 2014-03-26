@@ -472,11 +472,29 @@ public class Project extends AbstractTreeNode {
         if(evaluators == null)
             evaluators = Arrays.asList((Evaluator)new MeanWhiteEvaluator(), new NbNearWhiteEvaluator(), 
                     new NbCellOnEnvelopeEvaluator(), new DistEnvelopeEvaluator(),
-                    new DistMinAmenEvaluator(this, Layers.FACILITY, 1), new DistMinAmenEvaluator(this, Layers.FACILITY, 2),
-                    new DistMinAmenEvaluator(this, Layers.LEISURE, 1), new DistMinAmenEvaluator(this, Layers.LEISURE, 2), new DistMinAmenEvaluator(this, Layers.LEISURE, 3),
-                    new NbAmenEvaluator(this, Layers.FACILITY, 1, 400), new NbAmenEvaluator(this, Layers.FACILITY, 2, 2000),
-                    new NbAmenEvaluator(this, Layers.LEISURE, 1, 400), new NbAmenEvaluator(this, Layers.LEISURE, 2, 2000),
-                    new NbStationsEvaluator(this,400)
+                    
+                    new DistMinAmenEvaluator(this, Layers.FACILITY, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}), 
+                    new DistMinAmenEvaluator(this, Layers.FACILITY, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001}), 
+                    
+                    new DistMinAmenEvaluator(this, Layers.LEISURE, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}), 
+                    new DistMinAmenEvaluator(this, Layers.LEISURE, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001}),
+                    new DistMinAmenEvaluator(this, Layers.LEISURE, 3, new double[] {0.0, 5000.0}, new double[] {1.0, 0.001}),
+                    
+                    new NbAmenEvaluator(this, Layers.FACILITY, 1, 1000, new double[] {0.0, 5}, new double[] {0.001, 1.0}),
+                    new NbAmenEvaluator(this, Layers.FACILITY, 2, 2000, new double[] {0.0, 10}, new double[] {0.001, 1.0}),
+                    
+                    new NbAmenEvaluator(this, Layers.LEISURE, 1, 1000, new double[] {0.0, 2}, new double[] {0.001, 1.0}),
+                    new NbAmenEvaluator(this, Layers.LEISURE, 2, 2000, new double[] {0.0, 5}, new double[] {0.001, 1.0}),
+                    
+                    new NbAmenEvaluator(this, Layers.BUS_STATION, -1, 2000, new double[] {0.0, 5}, new double[] {0.001, 1.0}),
+                    new DistMinAmenEvaluator(this, Layers.TRAIN_STATION, -1, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001}),
+                    
+                    new DistMinTypeAmenEvaluator(this, Layers.FACILITY, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}),
+                    new DistMinTypeAmenEvaluator(this, Layers.FACILITY, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001}),
+                    new DistMinTypeAmenEvaluator(this, Layers.FACILITY, 3, new double[] {0.0, 5000.0}, new double[] {1.0, 0.001}),
+                    
+                    new DistMinTypeAmenEvaluator(this, Layers.LEISURE, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}),
+                    new DistMinTypeAmenEvaluator(this, Layers.LEISURE, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001})
                     );
         return evaluators;
     }

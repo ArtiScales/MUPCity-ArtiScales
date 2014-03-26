@@ -18,7 +18,7 @@ public class MeanWhiteEvaluator extends Evaluator {
 
 
     public MeanWhiteEvaluator() {
-        super(new DiscreteFunction(new double[] {0, 8}, new double[] {0, 1}));
+        super(new DiscreteFunction(new double[] {0.0, 8.0}, new double[] {0.001, 1.0}));
 
     }
 

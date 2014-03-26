@@ -24,7 +24,7 @@ public class NbCellOnEnvelopeEvaluator extends Evaluator {
     transient Geometry urbanBorder;
     
     public NbCellOnEnvelopeEvaluator() {
-        super(new DiscreteFunction(new double[] {0, 1}, new double[] {0, 1}));
+        super(new DiscreteFunction(new double[] {0.0, 1.0}, new double[] {0.001, 1}));
     }
 
     @Override

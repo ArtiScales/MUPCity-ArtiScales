@@ -53,7 +53,8 @@ public abstract class Evaluator {
         // créé une nouvelle couche pour stocker l'évaluation
         grid.addLayer(getEvalLayerName(scenario), DataBuffer.TYPE_FLOAT, Float.NaN);
         // lance le calcul d'évaluation sur chaque cellule
-        grid.execute(new AbstractLayerOperation(4) {
+        //executethreaded permet de paralleliser
+        grid.executeThreaded(new AbstractLayerOperation(4) {
             @Override
             public void perform(Cell cell) {
                 double eval;

@@ -32,8 +32,9 @@ public class DistMinAmenEvaluator extends Evaluator {
     @XMLParams.NoParam
     private transient SpatialGraph graph;
 
-    public DistMinAmenEvaluator(Project project, Project.Layers layer, int level) {
-        super(new DiscreteFunction(new double[] {0, 10000}, new double[] {0, 1}));
+    public DistMinAmenEvaluator(Project project, Project.Layers layer, int level, double[] x, double[] y ) {
+ 
+        super(new DiscreteFunction(x, y));
         this.project = project;
         this.layer = layer;
         this.level = level;
@@ -57,7 +58,7 @@ public class DistMinAmenEvaluator extends Evaluator {
     private synchronized DistAmenities getDistAmen() {
         if(distAmen == null)
             try {
-                if(graph == null)
+                if(graph == null || level != 1)
                     distAmen = new DistAmenities(project, layer, level);
                 else
                     distAmen = new DistAmenities(project, layer, level, graph);

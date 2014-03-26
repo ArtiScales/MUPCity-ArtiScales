@@ -21,6 +21,7 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +41,7 @@ import org.thema.mupcity.scenario.Scenario;
 import org.thema.drawshape.feature.Feature;
 import org.thema.drawshape.feature.FeatureCoverage;
 import org.thema.drawshape.feature.FeatureFilter;
+import org.thema.drawshape.layer.RasterLayer;
 import org.thema.drawshape.ui.MapInternalFrame;
 import org.thema.graph.SpatialGraph;
 import org.thema.msca.GridFeatureCoverage;
@@ -93,6 +95,8 @@ public class EvaluationDialog extends javax.swing.JDialog {
         scenarioComboBox = new javax.swing.JComboBox();
         externScenarioRadioButton = new javax.swing.JRadioButton();
         evalSelectionPanel = new org.thema.mupcity.evaluation.EvaluatorSelectionPanel();
+        jLabel5 = new javax.swing.JLabel();
+        nameTextField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/thema/mupcity/evaluation/Bundle"); // NOI18N
@@ -156,87 +160,108 @@ public class EvaluationDialog extends javax.swing.JDialog {
         buttonGroup1.add(externScenarioRadioButton);
         externScenarioRadioButton.setText(bundle.getString("EvaluationDialog.externScenarioRadioButton.text")); // NOI18N
 
+        jLabel5.setText(bundle.getString("EvaluationDialog.jLabel5.text")); // NOI18N
+
+        nameTextField.setText(bundle.getString("EvaluationDialog.nameTextField.text")); // NOI18N
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(seuilSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(0, 0, Short.MAX_VALUE)
-                                .add(okButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 67, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(cancelButton))
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel4)
-                                    .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 335, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(0, 0, Short.MAX_VALUE))
-                            .add(layout.createSequentialGroup()
-                                .add(externScenarioRadioButton)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addContainerGap())
+                        .add(19, 19, 19)
+                        .add(jLabel5)
+                        .add(4, 4, 4)
+                        .add(nameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 154, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 547, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(jLabel4))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 547, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 335, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 547, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(31, 31, 31)
+                        .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 398, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(63, 63, 63)
+                        .add(seuilSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(evalParamButton))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 547, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
+                        .add(scenarioRadioButton)
+                        .add(2, 2, 2)
+                        .add(scenarioComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 152, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(19, 19, 19)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(evalParamButton)
-                                .add(18, 18, 18)
-                                .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(scenarioRadioButton)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(scenarioComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 152, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 547, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(0, 0, Short.MAX_VALUE))))
+                            .add(externScenarioRadioButton)
+                            .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 539, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(layout.createSequentialGroup()
+                        .add(418, 418, 418)
+                        .add(okButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 67, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(6, 6, 6)
+                        .add(cancelButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 67, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(70, Short.MAX_VALUE))
         );
-
-        layout.linkSize(new java.awt.Component[] {cancelButton, okButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+            .add(layout.createSequentialGroup()
+                .add(11, 11, 11)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(3, 3, 3)
+                        .add(jLabel5))
+                    .add(nameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(6, 6, 6)
                 .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
+                .add(6, 6, 6)
                 .add(jLabel4)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(6, 6, 6)
                 .add(netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(18, 18, 18)
                 .add(jLabel6)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(1, 1, 1)
                 .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(seuilSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(11, 11, 11)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(evalParamButton)
-                    .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 63, Short.MAX_VALUE)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(layout.createSequentialGroup()
+                        .add(3, 3, 3)
+                        .add(jLabel1))
+                    .add(seuilSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(11, 11, 11)
+                .add(evalParamButton)
+                .add(18, 18, 18)
+                .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 165, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(scenarioRadioButton)
-                    .add(scenarioComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(1, 1, 1)
+                        .add(scenarioComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(externScenarioRadioButton))
-                .add(18, 18, 18)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cancelButton)
-                    .add(okButton))
-                .addContainerGap())
+                    .add(externScenarioRadioButton)
+                    .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(6, 6, 6)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(okButton)
+                    .add(cancelButton))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -282,7 +307,7 @@ public class EvaluationDialog extends javax.swing.JDialog {
 
                     // récupère la grille à la résolution la plus fine
                     SquareGrid grid = msGrid.getGrid(msGrid.getResolutions().last());
-                    
+
                     Geometry totBuildBuf = null;
                     if(buildTotselectFilePanel.getSelectedFile() != null) {
                         // chargement du bati total
@@ -362,7 +387,34 @@ public class EvaluationDialog extends javax.swing.JDialog {
                     
                     try {
                         MapInternalFrame frm = new MapInternalFrame();
-                        frm.getMapViewer().setRootLayer(new GridGroupLayer("grid", grid, null));
+                        GridGroupLayer gridGroupLayer = new GridGroupLayer("grid", grid, null);
+                        
+                        //new File(nameTextField + "/" + scenario.getName() + "_eval_agreg")
+                        // création des sous répertoires 
+                        File rep = new File (project.getDirectory().getAbsolutePath(), nameTextField.getText());
+                        rep.mkdir();
+                        File fichier = new File(rep.getAbsolutePath(), scenario.getName() + "_eval_agreg.tif");
+                        ((RasterLayer)gridGroupLayer.getLayer(scenario.getName() + "_eval_agreg")).saveRaster(fichier);
+                        
+                     
+                        List <Evaluator> listSelectEvaluator = new ArrayList<Evaluator>();
+                        // boucler sur chaque evaluator et enregistrer le tif correspondant
+                        for(Evaluator evaluator : project.getEvaluators()) {
+                            // sélectionne uniquement les evaluators
+                            if(!coefEvaluators.containsKey(evaluator.getShortName()))
+                            continue;
+                            listSelectEvaluator.add(evaluator);
+                            fichier = new File(rep.getAbsolutePath(),  evaluator.getShortName() + ".tif");
+                            ((RasterLayer)gridGroupLayer.getLayer(evaluator.getEvalLayerName(scenario))).saveRaster(fichier);
+                        }
+                        
+                        // enregistrement en fichier xml des evaluators et ahp
+                        EvaluatorSerialisation eval = new EvaluatorSerialisation(listSelectEvaluator, evalSelectionPanel.getAHP(), coefEvaluators);
+                        eval.save(rep);
+                        
+                        
+                        gridGroupLayer.setExpanded(true);
+                        frm.getMapViewer().setRootLayer(gridGroupLayer);
                         frm.setTitle("Evaluation - " + scenario.getName());
                         ((MainFrame)getParent()).getDesktopPane().add(frm);
                         frm.setMaximum(true);
@@ -564,7 +616,9 @@ public class EvaluationDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton externScenarioRadioButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JTextField nameTextField;
     private org.thema.common.swing.SelectFilePanel netN1SelectFilePanel;
     private javax.swing.JButton okButton;
     private javax.swing.JComboBox scenarioComboBox;
