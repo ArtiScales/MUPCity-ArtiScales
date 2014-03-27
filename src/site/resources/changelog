@@ -1,3 +1,6 @@
+Version 1.1
+- pb sur evauation des distances par type
+- possibilité d'agrandir les fenêtres d'évaluations
 version 1.0
 - pb enregistrement dans le projet des couches additionnelles
 - passage à maven sur le serveur dev
