@@ -99,7 +99,12 @@ public class DistMinTypeAmenEvaluator extends Evaluator {
             });
                               
         for(Feature fac : facCov.getFeatures()) {
-            double dist = origDistance.getTimeDistance((Point)fac.getGeometry());
+            
+            // getTimeDistance  Calcul le temps de parcours utiliser pour "the average time-distance"
+            //double dist = origDistance.getTimeDistance((Point)fac.getGeometry());
+            
+            // the average distance 
+            double dist = origDistance.getDistance((Point)fac.getGeometry());
             Object type = fac.getAttribute(Project.TYPE_FIELD);
             if(minDist.containsKey(type)) {
                 double min = minDist.get(type);

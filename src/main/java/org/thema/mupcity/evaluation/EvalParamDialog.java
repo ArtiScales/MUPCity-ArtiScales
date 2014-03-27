@@ -112,7 +112,9 @@ public class EvalParamDialog extends javax.swing.JDialog {
         currentEditor = new DefaultParamEditor<>(evaluator);
         paramPanel.add(currentEditor, BorderLayout.CENTER);
         
-        pack();
+        // permet de redimensionner et de ne pas perdre l'evenement sur click difference avec pack
+        validate();
+        //pack();
     }//GEN-LAST:event_evalListValueChanged
 
    
