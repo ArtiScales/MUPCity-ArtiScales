@@ -174,7 +174,7 @@ public class EvaluationDialog extends javax.swing.JDialog {
                         .add(19, 19, 19)
                         .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(4, 4, 4)
-                        .add(nameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE))
+                        .add(nameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(19, 19, 19)
                         .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
@@ -205,18 +205,18 @@ public class EvaluationDialog extends javax.swing.JDialog {
                         .add(19, 19, 19)
                         .add(scenarioRadioButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(2, 2, 2)
-                        .add(scenarioComboBox, 0, 396, Short.MAX_VALUE))
+                        .add(scenarioComboBox, 0, 477, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(19, 19, 19)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(externScenarioRadioButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .add(externScenarioRadioButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(418, 418, 418)
                         .add(okButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
                         .add(6, 6, 6)
                         .add(cancelButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
-                .addContainerGap(70, Short.MAX_VALUE))
+                .add(70, 70, 70))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -263,6 +263,9 @@ public class EvaluationDialog extends javax.swing.JDialog {
                     .add(cancelButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
+
+        externScenarioRadioButton.getAccessibleContext().setAccessibleName(bundle.getString("EvaluationDialog.externScenarioRadioButton.AccessibleContext.accessibleName")); // NOI18N
+        externScenarioRadioButton.getAccessibleContext().setAccessibleDescription(bundle.getString("EvaluationDialog.externScenarioRadioButton.AccessibleContext.accessibleDescription")); // NOI18N
 
         bindingGroup.bind();
 

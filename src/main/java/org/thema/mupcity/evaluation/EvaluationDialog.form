@@ -35,7 +35,7 @@
                       <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
                       <Component id="jLabel5" max="32767" attributes="0"/>
                       <EmptySpace min="4" pref="4" max="-2" attributes="0"/>
-                      <Component id="nameTextField" pref="425" max="32767" attributes="0"/>
+                      <Component id="nameTextField" pref="515" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
@@ -75,14 +75,13 @@
                       <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
                       <Component id="scenarioRadioButton" max="32767" attributes="0"/>
                       <EmptySpace min="2" pref="2" max="-2" attributes="0"/>
-                      <Component id="scenarioComboBox" pref="396" max="32767" attributes="0"/>
+                      <Component id="scenarioComboBox" pref="477" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="externScenarioRadioButton" max="32767" attributes="0"/>
-                          <Component id="extScenarioSelectFilePanel" max="32767" attributes="0"/>
-                      </Group>
+                      <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                      <Component id="externScenarioRadioButton" min="-2" pref="19" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="extScenarioSelectFilePanel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <EmptySpace min="418" pref="418" max="-2" attributes="0"/>
@@ -91,7 +90,7 @@
                       <Component id="cancelButton" pref="71" max="32767" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="70" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -295,6 +294,14 @@
           <ResourceString bundle="org/thema/mupcity/evaluation/Bundle.properties" key="EvaluationDialog.externScenarioRadioButton.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
+      <AccessibilityProperties>
+        <Property name="AccessibleContext.accessibleName" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/thema/mupcity/evaluation/Bundle.properties" key="EvaluationDialog.externScenarioRadioButton.AccessibleContext.accessibleName" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+        <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="org/thema/mupcity/evaluation/Bundle.properties" key="EvaluationDialog.externScenarioRadioButton.AccessibleContext.accessibleDescription" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </AccessibilityProperties>
     </Component>
     <Component class="org.thema.mupcity.evaluation.EvaluatorSelectionPanel" name="evalSelectionPanel">
     </Component>
