@@ -8,13 +8,13 @@ package org.thema.mupcity.evaluation;
 import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.drawshape.feature.DefaultFeature;
-import org.thema.drawshape.feature.Feature;
+import org.thema.data.feature.DefaultFeature;
+import org.thema.data.feature.Feature;
 import org.thema.graph.SpatialGraph;
 import org.thema.msca.SquareGrid;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.parallel.TaskMonitor;
-import org.thema.drawshape.feature.DefaultFeatureCoverage;
+import org.thema.common.swing.TaskMonitor;
+import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.msca.Cell;
 
 /**

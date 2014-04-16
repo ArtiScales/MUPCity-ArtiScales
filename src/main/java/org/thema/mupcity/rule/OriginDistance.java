@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.thema.mupcity.Project;
 import org.geotools.graph.structure.Edge;
-import org.thema.drawshape.feature.Feature;
+import org.thema.data.feature.Feature;
 import org.thema.graph.GraphLocation;
 import org.thema.graph.SpatialGraph;
 import org.thema.graph.Util;

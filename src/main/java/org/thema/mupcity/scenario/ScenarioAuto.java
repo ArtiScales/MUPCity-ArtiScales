@@ -15,7 +15,7 @@ import javax.swing.ProgressMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.thema.common.parallel.TaskMonitor;
+import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.image.RasterShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
 import org.thema.drawshape.layer.RasterLayer;

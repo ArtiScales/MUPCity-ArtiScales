@@ -13,7 +13,7 @@ import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.thema.common.io.IOImage;
+import org.thema.data.IOImage;
 import org.thema.drawshape.image.RasterShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
 import org.thema.drawshape.layer.RasterLayer;

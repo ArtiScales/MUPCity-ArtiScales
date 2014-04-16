@@ -9,7 +9,7 @@ import Jama.Matrix;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.thema.common.HashMap2D;
+import org.thema.common.collection.HashMap2D;
 
 /**
  *

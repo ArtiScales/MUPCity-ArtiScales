@@ -7,9 +7,9 @@ package org.thema.mupcity.scenario;
 
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
-import org.thema.drawshape.feature.Feature;
-import org.thema.drawshape.feature.FeatureFilter;
-import org.thema.drawshape.feature.WritableFeature;
+import org.thema.data.feature.Feature;
+import org.thema.data.feature.FeatureFilter;
+import org.thema.data.feature.WritableFeature;
 import org.thema.drawshape.layer.DefaultGroupLayer;
 import org.thema.drawshape.layer.FeatureLayer;
 import org.thema.msca.*;

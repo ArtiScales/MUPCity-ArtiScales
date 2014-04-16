@@ -12,7 +12,7 @@ import org.thema.msca.Cell;
 import org.thema.msca.SquareGrid;
 import org.thema.msca.operation.SimpleGeomOperation;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.parallel.TaskMonitor;
+import org.thema.common.swing.TaskMonitor;
 import org.thema.mupcity.Project;
 
 /**

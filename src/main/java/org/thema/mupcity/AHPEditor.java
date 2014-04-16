@@ -6,7 +6,7 @@ package org.thema.mupcity;
 
 import java.util.*;
 import javax.swing.table.AbstractTableModel;
-import org.thema.common.HashMap2D;
+import org.thema.common.collection.HashMap2D;
 import org.thema.common.param.ParamEditor;
 
 /**

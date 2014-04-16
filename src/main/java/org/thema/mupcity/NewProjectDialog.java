@@ -15,7 +15,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.thema.common.Config;
 import org.thema.common.JFileFilter;
-import org.thema.common.parallel.TaskMonitor;
+import org.thema.common.swing.TaskMonitor;
 
 /**
  *

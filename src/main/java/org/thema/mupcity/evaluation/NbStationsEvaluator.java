@@ -8,11 +8,11 @@ package org.thema.mupcity.evaluation;
 import java.util.ArrayList;
 import java.util.List;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.drawshape.feature.DefaultFeature;
+import org.thema.data.feature.DefaultFeature;
 import org.thema.graph.SpatialGraph;
 import org.thema.mupcity.scenario.Scenario;
 import org.thema.common.param.XMLParams;
-import org.thema.drawshape.feature.DefaultFeatureCoverage;
+import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.msca.Cell;
 import org.thema.mupcity.Project;
 
