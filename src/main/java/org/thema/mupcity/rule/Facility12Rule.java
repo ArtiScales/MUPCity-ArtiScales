@@ -12,7 +12,7 @@ import org.thema.mupcity.Project.Layers;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.fuzzy.MembershipFunction;
 import org.thema.common.parallel.BufferTask;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.AbstractFeature;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.data.feature.DefaultFeatureCoverage;
@@ -26,20 +26,20 @@ import org.thema.msca.operation.AbstractLayerOperation;
  */
 public class Facility12Rule extends AbstractRule {
 
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     int level;
     
     double maxDistClust;
     
-    @XMLParams.Name("Distance max between facility")
+    @ReflectObject.Name("Distance max between facility")
     double distClust = 200;
     
-    @XMLParams.Name("Diversity function")
+    @ReflectObject.Name("Diversity function")
     MembershipFunction diversity;
-    @XMLParams.Name("Count function")
+    @ReflectObject.Name("Count function")
     MembershipFunction count;
-    @XMLParams.Name("Distance function")
-    @XMLParams.Comment("Last entry must be 0")
+    @ReflectObject.Name("Distance function")
+    @ReflectObject.Comment("Last entry must be 0")
     DiscreteFunction distance;
     
     public Facility12Rule(int level) {

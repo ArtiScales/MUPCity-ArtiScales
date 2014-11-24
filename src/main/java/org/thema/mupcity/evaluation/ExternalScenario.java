@@ -36,7 +36,7 @@ public class ExternalScenario extends Scenario {
         WritableRaster raster = (WritableRaster) cov.getRenderedImage().getData();
         MSGridBuilder<SquareGridExtent> msGrid = Project.getProject().getMSGrid();
         SquareGridExtent grid = msGrid.getGrid(msGrid.getResolutions().last());
-        MSGridBuilder.invertRaster(raster);
+        RasterLayer.invertRaster(raster);
         grid.addLayer(getResultLayerName(), raster);
     }
     

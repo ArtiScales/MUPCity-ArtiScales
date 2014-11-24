@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -11,7 +8,7 @@ import java.util.Arrays;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.Project.Layers;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
@@ -20,18 +17,18 @@ import org.thema.msca.operation.AbstractLayerOperation;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class PTRule extends AbstractRule {
 
-    @XMLParams.Name("Distance max for bus")
-    double maxDistBus = 400;
+    @ReflectObject.Name("Distance max for bus")
+    private double maxDistBus = 400;
     
-    @XMLParams.Name("Bus station count function")
-    DiscreteFunction stationCount = new DiscreteFunction(new double[]{0.0, 4.0}, new double []{0.0, 1.0});
+    @ReflectObject.Name("Bus station count function")
+    private DiscreteFunction stationCount = new DiscreteFunction(new double[]{0.0, 4.0}, new double []{0.0, 1.0});
     
-    @XMLParams.Name("Distance train station function")
-    DiscreteFunction distanceStation = new DiscreteFunction(new double[]{0.0, 3000.0}, new double []{1.0, 0.0});
+    @ReflectObject.Name("Distance train station function")
+    private DiscreteFunction distanceStation = new DiscreteFunction(new double[]{0.0, 3000.0}, new double []{1.0, 0.0});
     
     public PTRule() {
         super(Arrays.asList(Layers.BUS_STATION, Layers.TRAIN_STATION));
@@ -55,17 +52,19 @@ public class PTRule extends AbstractRule {
                 Envelope envMax = new Envelope(cell.getGeometry().getEnvelopeInternal());
                 envMax.expandBy(maxDistBus);
                 int nbStation = 0;
-                for(Feature f : busCov.getFeatures(envMax)) 
-                    if(origDistance.getDistance((Point)f.getGeometry()) <= maxDistBus)
+                for(Feature f : busCov.getFeatures(envMax))  {
+                    if(origDistance.getDistance((Point)f.getGeometry()) <= maxDistBus) {
                         nbStation++;
-                            
+                    }
+                }           
                 envMax = new Envelope(cell.getGeometry().getEnvelopeInternal());
                 envMax.expandBy(distanceStation.getPoints().lastKey());
                 double distMinTrain = Double.MAX_VALUE;
                 for(Feature f : trainCov.getFeatures(envMax)) {
                     double d = origDistance.getDistance((Point)f.getGeometry());
-                    if(d < distMinTrain)
+                    if(d < distMinTrain) {
                         distMinTrain = d;
+                    }
                 }
                 cell.setLayerValue(getName(), Math.max(stationCount.getValue(nbStation), distanceStation.getValue(distMinTrain)));
               

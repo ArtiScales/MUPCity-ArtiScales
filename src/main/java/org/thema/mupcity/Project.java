@@ -209,7 +209,7 @@ public class Project extends AbstractTreeNode {
         msGrid.addDynamicLayer(ZONE, new DistBorderOperation(4));
         monitor.setNote("Create grid... build");
         msGrid.addLayer(BUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
-        msGrid.execute(new SimpleCoverageOperation(SimpleGeomOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
+        msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
         msGrid.addLayer(BUILD, DataBuffer.TYPE_SHORT, 0.0);
         msGrid.execute(new AbstractLayerOperation() {
             public void perform(Cell cell) {
@@ -231,7 +231,7 @@ public class Project extends AbstractTreeNode {
             monitor.incProgress(1);
             monitor.setNote("Create grid... restrict");
             project.getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
-            project.getMSGrid().execute(new SimpleCoverageOperation(SimpleGeomOperation.DENSITY, NOBUILD_DENS, project.getCoverage(Layers.RESTRICT)), true);
+            project.getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, project.getCoverage(Layers.RESTRICT)), true);
         }
 
         long t = System.currentTimeMillis();

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.Project.Layers;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
 import org.thema.msca.operation.SimpleCoverageOperation;
@@ -23,7 +23,7 @@ public class RoadRule extends AbstractRule {
 
     public static final String HAS_ROAD = "has_road";
 
-    @XMLParams.Name("Cell distance functions")
+    @ReflectObject.Name("Cell distance functions")
     private TreeMap<Double, DiscreteFunction>  cellDistance;
     
     public RoadRule() {

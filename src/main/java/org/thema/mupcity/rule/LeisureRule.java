@@ -15,7 +15,7 @@ import java.util.HashSet;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.Project.Layers;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
@@ -28,11 +28,11 @@ import org.thema.msca.operation.AbstractLayerOperation;
  */
 public class LeisureRule extends AbstractRule {
 
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     int level;
     
-    @XMLParams.Name("Distance function")
-    @XMLParams.Comment("Last Y value must be 0 and funcion must be monotone decrease")
+    @ReflectObject.Name("Distance function")
+    @ReflectObject.Comment("Last Y value must be 0 and function must be monotone decreasing")
     DiscreteFunction distance;
     
     public LeisureRule(int level) {

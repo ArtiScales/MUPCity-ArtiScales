@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity;
-
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -16,7 +11,7 @@ import javax.swing.KeyStroke;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class AHPDialog extends javax.swing.JDialog {
 
@@ -35,12 +30,13 @@ public class AHPDialog extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }
         });
         
-        ahpEditor.setParam(ahp);
+        ahpEditor.setValue(ahp);
     }
 
 
@@ -107,7 +103,7 @@ public class AHPDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        ahp = ahpEditor.getParam();
+        ahp = ahpEditor.getValue();
         isOk = true;
         doClose();
     }//GEN-LAST:event_okButtonActionPerformed

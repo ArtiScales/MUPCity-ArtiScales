@@ -7,7 +7,7 @@ package org.thema.mupcity.rule;
 import java.util.List;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.Project.Layers;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 
 /**
  *
@@ -15,7 +15,7 @@ import org.thema.common.param.XMLParams;
  */
 public abstract class AbstractRule implements Rule {
     
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     protected List<Layers> usedLayers;
 
     public AbstractRule(List<Layers> usedLayers) {

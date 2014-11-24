@@ -30,12 +30,13 @@ import javax.swing.JOptionPane;
 import org.thema.data.GlobalDataStore;
 import org.thema.common.parallel.BufferForkJoinTask;
 import org.thema.common.swing.TaskMonitor;
+import org.thema.data.feature.DefaultFeature;
+import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.msca.Cell;
 import org.thema.msca.MSGridBuilder;
 import org.thema.msca.SquareGrid;
 import org.thema.msca.SquareGridExtent;
 import org.thema.msca.operation.AbstractLayerOperation;
-import org.thema.msca.operation.SimpleGeomOperation;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
 import org.thema.data.feature.Feature;
@@ -47,6 +48,7 @@ import org.thema.graph.SpatialGraph;
 import org.thema.msca.GridFeatureCoverage;
 import org.thema.msca.GridGroupLayer;
 import org.thema.msca.operation.MeanOperation;
+import org.thema.msca.operation.SimpleCoverageOperation;
 import org.thema.mupcity.MainFrame;
 import org.thema.mupcity.operation.YagerAgregOperation;
 
@@ -294,11 +296,11 @@ public class EvaluationDialog extends javax.swing.JDialog {
                     MSGridBuilder<SquareGridExtent> msGrid = project.getMSGrid();
                     File residFile = buildResidselectFilePanel.getSelectedFile();
                     // chargement du shapefile
-                    Geometry resid = GlobalDataStore.createDataStore(residFile.getParentFile()).getGeometry(residFile.getName());
+                    DefaultFeatureCoverage<DefaultFeature> residCov = new DefaultFeatureCoverage<>(DefaultFeature.loadFeatures(residFile));
                     // crée la couche raster 
                     msGrid.addLayer(Evaluator.BATI_RESID, DataBuffer.TYPE_BYTE, 0);
                     // rasterisation du bati résidentiel
-                    msGrid.visit(new SimpleGeomOperation(SimpleGeomOperation.ISEMPTY, Evaluator.BATI_RESID), resid);
+                    msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.ISEMPTY, Evaluator.BATI_RESID, residCov), true);
                     // on supprime les cellules qui ne sont pas bati
                     msGrid.execute(new AbstractLayerOperation(4) {
                         public void perform(Cell cell) {
@@ -306,7 +308,7 @@ public class EvaluationDialog extends javax.swing.JDialog {
                                 cell.setLayerValue(Evaluator.BATI_RESID, 0);
                             }
                         }
-                    });
+                    }, true);
 
                     // récupère la grille à la résolution la plus fine
                     SquareGrid grid = msGrid.getGrid(msGrid.getResolutions().last());

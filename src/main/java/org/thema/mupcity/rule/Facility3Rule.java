@@ -16,7 +16,7 @@ import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
 import org.thema.common.collection.HashMapList;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
@@ -32,7 +32,7 @@ import org.thema.msca.operation.AbstractLayerOperation;
  */
 public class Facility3Rule extends AbstractRule {
     
-    @XMLParams.Name("Distance function")
+    @ReflectObject.Name("Distance function")
     DiscreteFunction distance = new DiscreteFunction(new double[]{15.0, 30.0}, new double []{1.0, 0.0});
     
     public Facility3Rule() {

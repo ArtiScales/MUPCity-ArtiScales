@@ -1,38 +1,38 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
-import java.awt.Frame;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.thema.common.param.XMLObject;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.AHPDialog;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.param.XMLParams;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class RuleSelectionPanel extends javax.swing.JPanel {
 
-    AHP ahp;
+    private AHP ahp;
     
     public RuleSelectionPanel() {
         initComponents();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         // pour la phase de développement dans NetBeans
-        if(Project.getProject() == null)
-            for(Rule rule : Project.RULES)
+        if(Project.getProject() == null) {
+            for(Rule rule : Project.RULES) {
                 model.addRow(new Object[]{rule, true, 1.0});
-        else
-            for(Rule rule : Project.getProject().getRules())
-                if(rule.isUsable())
+            }
+        } else {
+            for(Rule rule : Project.getProject().getRules()) {
+                if(rule.isUsable()) {
                     model.addRow(new Object[]{rule, true, 1.0});
+                }
+            }
+        }
     }
     
     public RuleSelectionPanel(Map<String, Double> coefRules) {
@@ -43,20 +43,25 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
     public void setCoefRules(Map<String, Double> coefRules) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setNumRows(0);
-        for(Rule rule : Project.getProject().getRules())
-            if(rule.isUsable())
-                if(coefRules.containsKey(rule.getName())) 
+        for(Rule rule : Project.getProject().getRules()) {
+            if(rule.isUsable()) {
+                if(coefRules.containsKey(rule.getName())) {
                     model.addRow(new Object[]{rule, true, coefRules.get(rule.getName())});
-                else
-                    model.addRow(new Object[]{rule, false, Double.NaN});
+                } else {
+                    model.addRow(new Object[]{rule, false, Double.NaN});       
+                }
+            }
+        }
     }
     
     public Map<String, Double> getCoefRules() {
-       Map<String, Double> coefRules = new LinkedHashMap<String, Double>();
+       Map<String, Double> coefRules = new LinkedHashMap<>();
        DefaultTableModel model = (DefaultTableModel) table.getModel();
-       for(int i = 0; i < model.getRowCount(); i++)
-           if((Boolean)model.getValueAt(i, 1))
+       for(int i = 0; i < model.getRowCount(); i++) {
+           if((Boolean)model.getValueAt(i, 1)) {
                coefRules.put(((Rule)model.getValueAt(i, 0)).getName(), (Double)model.getValueAt(i, 2));
+           }
+       }
        return coefRules;
     }
 
@@ -152,32 +157,24 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
 
     private void updateAHP() {
         Set<String> rules = getCoefRules().keySet();
-        if(ahp == null || !ahp.getMatrix().getKeys1().containsAll(rules))
-            ahp = new AHP(new ArrayList<String>(rules));
-        else {
-//            if(!ahp.getMatrix().getKeys1().containsAll(rules))
-//                for(String rule : rules) {
-//                    ahp.getMatrix().addKey1(rule);
-//                    ahp.getMatrix().addKey2(rule);
-//                }
-            
-            if(!rules.containsAll(ahp.getMatrix().getKeys1())) {
-                HashSet<String> set = new HashSet<String>(ahp.getMatrix().getKeys1());
-                set.removeAll(rules);
-                for(String rule : set)  {
-                    ahp.getMatrix().removeKey1(rule);
-                    ahp.getMatrix().removeKey2(rule);
-                }
-            }   
-            
+        if(ahp == null || !ahp.getMatrix().getKeys1().containsAll(rules)) {
+            ahp = new AHP(new ArrayList<>(rules));
+        } else if(!rules.containsAll(ahp.getMatrix().getKeys1())) {
+            HashSet<String> set = new HashSet<>(ahp.getMatrix().getKeys1());
+            set.removeAll(rules);
+            for(String rule : set)  {
+                ahp.getMatrix().removeKey1(rule);
+                ahp.getMatrix().removeKey2(rule);
+            } 
         }
     }
     private void ahpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ahpButtonActionPerformed
         updateAHP();
         AHPDialog dlg = new AHPDialog(null, ahp);
         dlg.setVisible(true);
-        if(!dlg.isOk)
+        if(!dlg.isOk) {
             return;
+        }
         ahp = dlg.ahp;
         setCoefRules(ahp.getCoefs());
     }//GEN-LAST:event_ahpButtonActionPerformed
@@ -191,10 +188,10 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
         }
         Scenario sel = (Scenario) JOptionPane.showInputDialog(this, "Select scenario :", "Import parameters", 
                 JOptionPane.PLAIN_MESSAGE, null, scenarios.toArray(), null);
-        if(sel == null)
+        if(sel == null) {
             return;
-        
-        ahp = XMLParams.dupplicate(sel.getAHP());
+        }
+        ahp = XMLObject.dupplicate(sel.getAHP());
         setCoefRules(ahp.getCoefs());
         
     }//GEN-LAST:event_importButtonActionPerformed

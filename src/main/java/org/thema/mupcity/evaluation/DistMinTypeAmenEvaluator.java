@@ -12,11 +12,11 @@ import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
 import org.thema.common.collection.HashMapList;
 import org.thema.common.fuzzy.DiscreteFunction;
+import org.thema.common.param.ReflectObject;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.graph.SpatialGraph;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.param.XMLParams;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
 import org.thema.graph.GraphLocation;
@@ -32,21 +32,21 @@ import org.thema.mupcity.rule.OriginDistance;
  */
 public class DistMinTypeAmenEvaluator extends Evaluator {
 
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private Project project;
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private Project.Layers layer;
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private int level;
     
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient HashSet types;
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient HashMapList<Node, Object> nodeTypes ;
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient DefaultFeatureCoverage<DefaultFeature> facCov;
         
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient SpatialGraph graph;
     
      

@@ -7,13 +7,19 @@ package org.thema.mupcity.evaluation;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.awt.image.DataBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import org.thema.common.fuzzy.DiscreteFunction;
+import org.thema.common.swing.TaskMonitor;
+import org.thema.data.feature.DefaultFeature;
+import org.thema.data.feature.DefaultFeatureCoverage;
+import org.thema.data.feature.Feature;
+import org.thema.data.feature.FeatureCoverage;
 import org.thema.msca.Cell;
 import org.thema.msca.SquareGrid;
-import org.thema.msca.operation.SimpleGeomOperation;
-import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.swing.TaskMonitor;
+import org.thema.msca.operation.SimpleCoverageOperation;
 import org.thema.mupcity.Project;
+import org.thema.mupcity.scenario.Scenario;
 
 /**
  *
@@ -21,7 +27,7 @@ import org.thema.mupcity.Project;
  */
 public class NbCellOnEnvelopeEvaluator extends Evaluator {
     
-    transient Geometry urbanBorder;
+    transient FeatureCoverage urbanBorder;
     
     public NbCellOnEnvelopeEvaluator() {
         super(new DiscreteFunction(new double[] {0.0, 1.0}, new double[] {0.001, 1}));
@@ -29,15 +35,18 @@ public class NbCellOnEnvelopeEvaluator extends Evaluator {
 
     @Override
     public void execute(Scenario scenario, SquareGrid grid, TaskMonitor monitor) {
-        
         // créé une nouvelle couche pour stocker l'évaluation
         Project.getProject().getMSGrid().addLayer(getEvalLayerName(scenario), DataBuffer.TYPE_FLOAT, Float.NaN);
-
-        Project.getProject().getMSGrid().visit(new SimpleGeomOperation(SimpleGeomOperation.ISEMPTY, getEvalLayerName(scenario)), urbanBorder);
+        Project.getProject().getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.ISEMPTY, 
+                getEvalLayerName(scenario), urbanBorder), true);
     }
 
-    public void setUrbanBorder(Geometry urbanBorder) {
-        this.urbanBorder = urbanBorder;
+    public void setUrbanBorder(Geometry urbanBorderGeom) {
+        List<Feature> features = new ArrayList<>();
+        for(int i = 0; i < urbanBorderGeom.getNumGeometries(); i++) {
+            features.add(new DefaultFeature(i, urbanBorderGeom.getGeometryN(i)));
+        }
+        this.urbanBorder = new DefaultFeatureCoverage(features);
     }
     
     @Override
@@ -49,40 +58,5 @@ public class NbCellOnEnvelopeEvaluator extends Evaluator {
     public String getShortName() {
         return "NbCellEnv";
     }
-
-
-//    @Override
-//    public Double[] eval(final Scenario anal, final double mean) {
-//        final String analLayer = anal.getResultLayerName();
-//        FeatureCoverage<GridFeature> newBuild = cov.getCoverage(new FeatureFilter() {
-//            public boolean accept(Feature f) {
-//                return ((Number)f.getAttribute(analLayer)).intValue() == 2;
-//            }
-//        });
-//
-//        ArrayList<Geometry> geoms = new ArrayList<Geometry>();
-//        for(Feature f : newBuild.getFeatures())
-//            geoms.add(f.getGeometry().getCentroid());
-//
-//        Geometry buildBuf = BufferTask.threadedBuffer(new GeometryFactory().buildGeometry(geoms), radius + 5);
-//        if(buildBuf == null)
-//            buildBuf = totBuild;
-//        else
-//            buildBuf = buildBuf.union(totBuild);
-//        Geometry envelope = BufferTask.threadedBuffer(buildBuf, -radius);
-//        Geometry envLine = envelope.getBoundary();
-//
-//        msGrid.visit(new SimpleGeomOperation(SimpleGeomOperation.ISEMPTY, "env"), envLine);
-//       
-//        double nb = grid.agregate(new AbstractAgregateOperation<Double>(4, 0.0) {
-//            public void perform(Cell cell) {
-//                if(isEvaluated(cell, anal) && cell.getLayerValue("env") == 1)
-//                    result++;
-//            }
-//        });
-//        
-//        return new Double[] {nb, nb, nb};
-//    }
-
 
 }

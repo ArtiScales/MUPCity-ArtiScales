@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.evaluation;
 
@@ -13,11 +9,11 @@ import org.thema.common.param.ParamEditor;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class EvalParamDialog extends javax.swing.JDialog {
 
-    ParamEditor<Evaluator> currentEditor;
+    private ParamEditor<Evaluator> currentEditor;
     
     public EvalParamDialog(java.awt.Frame parent, Collection<Evaluator> evaluators) {
         super(parent, true);
@@ -100,13 +96,13 @@ public class EvalParamDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void evalListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_evalListValueChanged
-        if(currentEditor != null)
-            currentEditor.validateParam();
-        
+        if(currentEditor != null) {
+            currentEditor.validateValue();
+        }
         paramPanel.removeAll();
-        if(evalList.getSelectedIndex() < 0)     
+        if(evalList.getSelectedIndex() < 0) {
             return;
-        
+        }
         Evaluator evaluator = (Evaluator) evalList.getSelectedValue();
 
         currentEditor = new DefaultParamEditor<>(evaluator);
@@ -114,7 +110,6 @@ public class EvalParamDialog extends javax.swing.JDialog {
         
         // permet de redimensionner et de ne pas perdre l'evenement sur click difference avec pack
         validate();
-        //pack();
     }//GEN-LAST:event_evalListValueChanged
 
    

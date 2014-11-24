@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity;
 
 import java.util.*;
@@ -11,7 +8,7 @@ import org.thema.common.param.ParamEditor;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class AHPEditor extends ParamEditor<AHP> {
 
@@ -27,19 +24,22 @@ public class AHPEditor extends ParamEditor<AHP> {
                     values[i][j] = param.getValue(list1.get(i), list2.get(j));
         }
         
+        @Override
         public int getRowCount() {
             return list1.size();
         }
 
+        @Override
         public int getColumnCount() {
             return list2.size()+1;
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if(columnIndex == 0)
+            if(columnIndex == 0) {
                 return list1.get(rowIndex);
-            else 
+            } else {
                 return values[rowIndex][columnIndex-1];
+            }
         }
 
         @Override
@@ -49,18 +49,18 @@ public class AHPEditor extends ParamEditor<AHP> {
 
         @Override
         public String getColumnName(int column) {
-            if(column == 0)
+            if(column == 0) {
                 return "";
-            else
+            } else {
                 return list2.get(column-1).toString();
+            }
         }
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            
-            if(columnIndex == 0)
+            if(columnIndex == 0) {
                 return false;
-            
+            }
             return rowIndex != columnIndex-1;
         }
 
@@ -68,9 +68,9 @@ public class AHPEditor extends ParamEditor<AHP> {
         public void setValueAt(Object value, int rowIndex, int columnIndex) {
             values[rowIndex][columnIndex-1] = value;
             String inv = "1/" + value;
-            if(value.toString().startsWith("1/"))
+            if(value.toString().startsWith("1/")) {
                 inv = value.toString().substring(2);
-            
+            }
             if(!values[columnIndex-1][rowIndex].equals(inv)) {
                 values[columnIndex-1][rowIndex] = inv;
                 fireTableCellUpdated(columnIndex-1, rowIndex+1);
@@ -79,15 +79,17 @@ public class AHPEditor extends ParamEditor<AHP> {
         
         public HashMap2D getMap2D() {
             HashMap2D map = new HashMap2D(list1, list2);
-            for(int i = 0; i < list1.size(); i++)
-                for(int j = 0; j < list2.size(); j++)
+            for(int i = 0; i < list1.size(); i++) {
+                for(int j = 0; j < list2.size(); j++) {
                     map.setValue(list1.get(i), list2.get(j), values[i][j]);
+                }
+            }
             return map;
         }
         
     }
     
-    SimpleTableModel model;
+    private SimpleTableModel model;
 
     
     /**
@@ -106,17 +108,18 @@ public class AHPEditor extends ParamEditor<AHP> {
     }
     
     @Override
-    public void setParam(AHP param) {
-        super.setParam(param);
+    public void setValue(AHP param) {
+        super.setValue(param);
         model = new SimpleTableModel(param.getMatrix());
         table.setModel(model);
     }
 
     @Override
-    public void validateParam() {
-        if(table.isEditing())
+    public void validateValue() {
+        if(table.isEditing()) {
             table.getCellEditor().stopCellEditing();
-        param.setMatrix(model.getMap2D());
+        }
+        getValue().setMatrix(model.getMap2D());
     }
     
 

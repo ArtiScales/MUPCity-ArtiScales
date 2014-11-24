@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.rule;
 
@@ -10,7 +6,6 @@ import java.awt.Frame;
 import java.util.Arrays;
 import java.util.Collection;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import org.thema.mupcity.Project;
 import org.thema.common.param.DefaultParamEditor;
@@ -18,11 +13,11 @@ import org.thema.common.param.ParamEditor;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class RuleParamDialog extends javax.swing.JDialog {
 
-    ParamEditor<Rule> currentEditor;
+    private ParamEditor<Rule> currentEditor;
     
     public RuleParamDialog(java.awt.Frame parent, Collection<Rule> rules) {
         super(parent, true);
@@ -114,16 +109,16 @@ public class RuleParamDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void ruleListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_ruleListValueChanged
-        if(currentEditor != null)
-            currentEditor.validateParam();
-        
+        if(currentEditor != null) {
+            currentEditor.validateValue();
+        }
         paramPanel.removeAll();
-        if(ruleList.getSelectedIndex() < 0)     
+        if(ruleList.getSelectedIndex() < 0) {
             return;
-        
+        }
         Rule rule = (Rule) ruleList.getSelectedValue();
         if(rule.isUsable()) {
-            currentEditor = new DefaultParamEditor<Rule>(rule);
+            currentEditor = new DefaultParamEditor<>(rule);
             paramPanel.add(currentEditor, BorderLayout.CENTER);
         } else {
             paramPanel.add(new JTextArea("This rule is not enabled.\nIt needs layers : \n" + Arrays.deepToString(rule.getUsedLayers().toArray())), BorderLayout.CENTER);

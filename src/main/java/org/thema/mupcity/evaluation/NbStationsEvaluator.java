@@ -11,7 +11,7 @@ import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.graph.SpatialGraph;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.msca.Cell;
 import org.thema.mupcity.Project;
@@ -22,16 +22,16 @@ import org.thema.mupcity.Project;
  */
 public class NbStationsEvaluator extends Evaluator {
 
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private Project project;
     
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient DistAmenities distAmen;
         
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient SpatialGraph graph;
     
-    double distMax;
+    private double distMax;
     
     public NbStationsEvaluator(Project project, double distMax) {
         super(new DiscreteFunction(new double[] {0, 5}, new double[] {0, 1}));

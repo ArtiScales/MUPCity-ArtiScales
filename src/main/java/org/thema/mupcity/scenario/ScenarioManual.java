@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.scenario;
 
@@ -16,7 +12,7 @@ import org.thema.msca.*;
 
 /**
  *
- * @author gvuidel
+ * @author Gilles Vuidel
  */
 public class ScenarioManual extends Scenario {
     
@@ -80,21 +76,24 @@ public class ScenarioManual extends Scenario {
     }
 
     
+    @Override
     public String getResultLayerName() {
         return name + "-" + Project.SCENARIO;
     }
 
+    @Override
     public String getEvalLayerName() {
         return name + "-" + Project.SCENARIO + "-" + Project.EVAL;
     }
 
+    @Override
     public String getBuildFreeLayerName() {
         return name + "-" + Project.SCENARIO + "-" + Project.MORPHO_RULE;
     }
 
-
+    @Override
     protected void createLayers(MSGridBuilder<? extends SquareGrid> msGrid) {
-        layers = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("mupcity/scenario/Bundle").getString("Cell_interest"));
+        layers = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/scenario/Bundle").getString("Cell_interest"));
         final String resLayer = getResultLayerName();
         MSGridFeatureCoverage coverages = new MSGridFeatureCoverage(msGrid);
         FeatureLayer l = null;
@@ -102,12 +101,14 @@ public class ScenarioManual extends Scenario {
             GridFeatureCoverage features = coverages.getGridCoverage(res);
             l = new FeatureLayer(String.format("%g", res),
                     features.getFeatures(new FeatureFilter() {
+                        @Override
                         public boolean accept(Feature f) {
                             return ((Number)f.getAttribute(Project.ZONE)).intValue() == 1;
                         }
                     }),
                     new ScenarioStyle(resLayer, getEvalLayerName(), 
                     features.getFeatures(new FeatureFilter() {
+                        @Override
                         public boolean accept(Feature f) {
                             return ((Number)f.getAttribute(resLayer)).intValue() != 1;
                         }

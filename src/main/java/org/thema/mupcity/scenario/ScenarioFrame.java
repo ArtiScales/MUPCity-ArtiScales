@@ -108,9 +108,12 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         }
 
         double res = 0;
-        for(Layer l : scenario.getLayers().getLayers())
-            if(l.isVisible())
+        for(Layer l : scenario.getLayers().getLayers()) {
+            if(l.isVisible()) {
                 res = Double.parseDouble(l.getName());
+            }
+        }
+        
         Raster r = msGrid.getGrid(res).getRaster(scenario.getResultLayerName());
 
         try {
@@ -136,8 +139,8 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
     private int getNbClusterGap(Raster r) {
         WritableRaster clust = r.createCompatibleWritableRaster(r.getWidth()+2, r.getHeight()+1);
         int k = 0;
-        TreeSet<Integer> set = new TreeSet<Integer>();
-        ArrayList<Integer> idClust = new ArrayList<Integer>();
+        TreeSet<Integer> set = new TreeSet<>();
+        ArrayList<Integer> idClust = new ArrayList<>();
 
         for(int j = 1; j <= r.getHeight(); j++) {
             for(int i = 1; i <= r.getWidth(); i++)
@@ -157,9 +160,11 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                         clust.setSample(i, j, 0, id);
                     } else {
                         int minId = Integer.MAX_VALUE;
-                        for(Integer id : set)
-                            if(idClust.get(id-1) < minId)
+                        for(Integer id : set) {
+                            if(idClust.get(id-1) < minId) {
                                 minId = idClust.get(id-1);
+                            }
+                        }
 
                         for(Integer id : set) {
                             while(idClust.get(id-1) != minId) {
@@ -178,16 +183,17 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
         for(int i = 0; i < idClust.size(); i++) {
             int m = i+1;
-            while(idClust.get(m-1) != m)
+            while(idClust.get(m-1) != m) {
                 m = idClust.get(m-1);
+            }
             idClust.set(i, m);
         }
 
 
         set.clear();
-        for(Integer id : idClust)
+        for(Integer id : idClust) {
             set.add(id);
-
+        }
         return set.size();
 
     }
@@ -223,10 +229,10 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         setResizable(true);
         getContentPane().add(mapViewer, java.awt.BorderLayout.CENTER);
 
-        toolBar.setOrientation(1);
+        toolBar.setOrientation(javax.swing.SwingConstants.VERTICAL);
         toolBar.setRollover(true);
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("mupcity/scenario/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/thema/mupcity/scenario/Bundle"); // NOI18N
         editToggleButton.setText(bundle.getString("ScenarioFrame.editToggleButton.text")); // NOI18N
         editToggleButton.setToolTipText(bundle.getString("ScenarioFrame.editToggleButton.toolTipText")); // NOI18N
         editToggleButton.setFocusable(false);
@@ -239,7 +245,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         });
         toolBar.add(editToggleButton);
 
-        downButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mupcity/image/down.png"))); // NOI18N
+        downButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/thema/mupcity/image/down.png"))); // NOI18N
         downButton.setToolTipText(bundle.getString("ScenarioFrame.downButton.toolTipText")); // NOI18N
         downButton.setFocusable(false);
         downButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -251,7 +257,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         });
         jPanel1.add(downButton);
 
-        upButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/mupcity/image/up.png"))); // NOI18N
+        upButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/thema/mupcity/image/up.png"))); // NOI18N
         upButton.setToolTipText(bundle.getString("ScenarioFrame.upButton.toolTipText")); // NOI18N
         upButton.setFocusable(false);
         upButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -307,18 +313,16 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         if(!editToggleButton.isSelected()) {
             int res = JOptionPane.showConfirmDialog(this, "Voulez-vous enregistrer les modifications ?",
                     "Suppression...", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            if(res == JOptionPane.YES_OPTION)
+            if(res == JOptionPane.YES_OPTION) {
                 save();
-            else
+            } else {
                 try {
                     undo();
                 } catch(Exception ex) {
                     Logger.getLogger(ScenarioFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-        } else {
-
+            }    
         }
-
 
     }//GEN-LAST:event_editToggleButtonActionPerformed
 
@@ -344,9 +348,9 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
         mapViewer.getMap().clearSelection();
         List<Layer> sceLayers = scenario.getLayers().getLayers();
-        List<Layer> gridLayers = ((GroupLayer)layers.getLayer(java.util.ResourceBundle.getBundle("mupcity/Bundle").getString("Grid"))).getLayers();
+        List<Layer> gridLayers = ((GroupLayer)layers.getLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Grid"))).getLayers();
         int n = gridLayers.size();
-        for(int i = 1; i < sceLayers.size(); i++)
+        for(int i = 1; i < sceLayers.size(); i++) {
              if(sceLayers.get(i).isVisible()) {
                  sceLayers.get(i).setVisible(false);
                  sceLayers.get(i-1).setVisible(true);
@@ -357,14 +361,15 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                  updateNbNewBuild();
                  return ;
              }
+        }
     }//GEN-LAST:event_upButtonActionPerformed
 
     private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButtonActionPerformed
         mapViewer.getMap().clearSelection();
         List<Layer> sceLayers = scenario.getLayers().getLayers();
-        List<Layer> gridLayers = ((GroupLayer)layers.getLayer(java.util.ResourceBundle.getBundle("mupcity/Bundle").getString("Grid"))).getLayers();
+        List<Layer> gridLayers = ((GroupLayer)layers.getLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Grid"))).getLayers();
         int n = gridLayers.size();
-        for(int i = 0; i < sceLayers.size()-1; i++)
+        for(int i = 0; i < sceLayers.size()-1; i++) {
              if(sceLayers.get(i).isVisible()) {
                  sceLayers.get(i).setVisible(false);
                  sceLayers.get(i+1).setVisible(true);
@@ -375,6 +380,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                  updateNbNewBuild();
                  return ;
              }
+        }
     }//GEN-LAST:event_downButtonActionPerformed
 
     private void buildButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buildButtonActionPerformed
@@ -382,12 +388,14 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
             JOptionPane.showMessageDialog(this, "Not in edit mode");
             return;
         }
-        for(MSFeature f : selFeatures)
+        for(MSFeature f : selFeatures) {
             if(canBeBuild(f)) {
                 if(scenario.isWhite(f))
                     scenario.setBlack(f);
-            } else
+            } else {
                 break;
+            }
+        }
         refresh();
     }//GEN-LAST:event_buildButtonActionPerformed
 
@@ -396,12 +404,14 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
             JOptionPane.showMessageDialog(this, "Not in edit mode");
             return;
         }
-        for(MSFeature f : selFeatures)
+        for(MSFeature f : selFeatures) {
             if(canBeUnBuild(f)) {
                 if(scenario.isBlack(f))
                     scenario.setWhite(f);
-            } else
+            } else {
                 break;
+            }
+        }
 
         refresh();
     }//GEN-LAST:event_unBuildButtonActionPerformed
@@ -409,13 +419,17 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
     private void updateNbNewBuild() {
         double res = 0;
-        for(Layer l : scenario.getLayers().getLayers())
-            if(l.isVisible())
+        for(Layer l : scenario.getLayers().getLayers()) {
+            if(l.isVisible()) {
                 res = Double.parseDouble(l.getName().replace(",", "."));
+            }
+        }
         int nb = msGrid.getGrid(res).agregate(new AbstractAgregateOperation<Integer>(0, 0) {
+            @Override
             public void perform(Cell cell) {
-                if(cell.getLayerValue(scenario.getResultLayerName()) == ScenarioAuto.NEW_BUILD)
+                if(cell.getLayerValue(scenario.getResultLayerName()) == ScenarioAuto.NEW_BUILD) {
                     result++;
+                }
             }
         });
         nbNewBuildLabel.setText("Nb build : "+nb);

@@ -8,11 +8,11 @@ package org.thema.mupcity.evaluation;
 
 import java.io.IOException;
 import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.param.XMLParams;
+import org.thema.common.param.ReflectObject;
 import org.thema.graph.SpatialGraph;
 import org.thema.msca.Cell;
 import org.thema.mupcity.Project;
+import org.thema.mupcity.scenario.Scenario;
 
 /**
  *
@@ -20,17 +20,17 @@ import org.thema.mupcity.Project;
  */
 public class NbAmenEvaluator extends Evaluator {
 
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private Project project;
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private Project.Layers layer;
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private int level;
     
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient DistAmenities distAmen;
     
-    @XMLParams.NoParam
+    @ReflectObject.NoParam
     private transient SpatialGraph graph;
     
     double distMax;

@@ -4,15 +4,11 @@
 
   <groupId>org.thema</groupId>
   <artifactId>mupcity</artifactId>
-  <version>1.1</version>
+  <version>1.1.1</version>
   <packaging>jar</packaging>
 
   <name>MUP-City</name>
   <url>http://dev.umrthema.univ-fcomte.fr/projects/${project.artifactId}/</url>
-    <ciManagement>
-        <system>hudson</system>
-        <url>http://dev.umrthema.univ-fcomte.fr:8080/job/${project.artifactId}/</url>
-    </ciManagement>
     <build>
         <plugins>
             <plugin>
@@ -85,56 +81,36 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>drawshape</artifactId>
-      <version>1.1.5</version>
-    </dependency>
-    <dependency>
       <groupId>gov.nist.math</groupId>
       <artifactId>jama</artifactId>
       <version>1.0.3</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>graph</artifactId>
-      <version>1.1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>msca</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>common</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>common</artifactId>
-      <version>1.3</version>
+      <version>1.3.2</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>drawshape</artifactId>
-      <version>1.2</version>
+      <version>1.2.4</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>graph</artifactId>
-      <version>1.2</version>
+      <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>msca</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
     </dependency>
   </dependencies>
   <repositories>
         <repository>
-            <id>thema</id>
-            <name>Local ThéMA Repository</name>
-            <url>http://dev.umrthema.univ-fcomte.fr/repository/</url>
+            <id>thema-sf</id>
+            <name>ThéMA libs Repository</name>
+            <url>http://themalibs.sourceforge.net/repository/</url>
         </repository>
     </repositories>
     <distributionManagement>
@@ -162,7 +138,22 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10</version>
             </plugin>
         </plugins>
     </reporting>
+    <organization>
+        <name>Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté</name>
+        <url>http://thema.univ-fcomte.fr</url>
+    </organization>
+    <developers>
+        <developer>
+            <id>gvuidel</id>
+            <name>Gilles Vuidel</name>
+        </developer>
+        <developer>
+            <id>flitot</id>
+            <name>Florian Litot</name>
+        </developer>
+    </developers>
 </project>
