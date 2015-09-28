@@ -78,17 +78,17 @@ public class ScenarioManual extends Scenario {
     
     @Override
     public String getResultLayerName() {
-        return name + "-" + Project.SCENARIO;
+        return getName() + "-" + Project.SCENARIO;
     }
 
     @Override
     public String getEvalLayerName() {
-        return name + "-" + Project.SCENARIO + "-" + Project.EVAL;
+        return getName() + "-" + Project.SCENARIO + "-" + Project.EVAL;
     }
 
     @Override
     public String getBuildFreeLayerName() {
-        return name + "-" + Project.SCENARIO + "-" + Project.MORPHO_RULE;
+        return getName() + "-" + Project.SCENARIO + "-" + Project.MORPHO_RULE;
     }
 
     @Override

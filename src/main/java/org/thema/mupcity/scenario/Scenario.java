@@ -30,11 +30,11 @@ public abstract class Scenario {
     public static final int NEW_BUILD = 2;
     public static final int REM_BUILD = -1;
     
-    String name;
+    private String name;
 
-    AHP ahp;
-    int nMax;
-    boolean mean;
+    private AHP ahp;
+    private int nMax;
+    private boolean mean;
 
     protected transient DefaultGroupLayer layers;
 
@@ -69,8 +69,9 @@ public abstract class Scenario {
     public abstract String getBuildFreeLayerName();
 
     public DefaultGroupLayer getLayers() {
-        if(layers == null)
+        if(layers == null) {
             createLayers(Project.getProject().getMSGrid());
+        }
         return layers;
     }
     
@@ -78,13 +79,15 @@ public abstract class Scenario {
     
     protected void initLayers(MSGridBuilder msGrid) {
         boolean useBuildRule = false;
-        Map<String, Double> coefLayers = new HashMap<String, Double>();
-        for(String rule : ahp.getCoefs().keySet()) 
+        Map<String, Double> coefLayers = new HashMap<>();
+        for(String rule : ahp.getCoefs().keySet()) { 
             if(rule.equals(Project.MORPHO_RULE)) {
                 coefLayers.put(getBuildFreeLayerName(), ahp.getCoefs().get(rule));
                 useBuildRule = true;
-            } else
+            } else {
                 coefLayers.put(rule, ahp.getCoefs().get(rule));
+            }
+        }
 
         // initialise la couche SIMUL avec le bati existant
         final String simLayer = getResultLayerName();
@@ -96,16 +99,21 @@ public abstract class Scenario {
                 cell.setLayerValue(simLayer, cell.getLayerValue(Project.BUILD));
             }
         });
-        if(useBuildRule)
+        if(useBuildRule) {
             msGrid.addDynamicLayer(getBuildFreeLayerName(),
                     new PBuildFreeOperation(simLayer));
+        }
 
-        if(!coefLayers.isEmpty())
+        if(!coefLayers.isEmpty()) {
             msGrid.addDynamicLayer(getEvalLayerName(), mean ? new MeanOperation(coefLayers, 4, false) : new YagerAgregOperation(coefLayers));
-        else
+        } else {
             msGrid.addDynamicLayer(getEvalLayerName(), new AbstractOperation(true, 4) {
-                    public final double getValue(Cell cell) { return 0; }
-                });
+                @Override
+                public final double getValue(Cell cell) { 
+                    return 0; 
+                }
+            });
+        }
 
     }
 }

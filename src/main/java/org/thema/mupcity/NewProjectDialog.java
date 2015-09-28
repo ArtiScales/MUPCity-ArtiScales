@@ -11,10 +11,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.thema.common.Config;
-import org.thema.common.JFileFilter;
+import org.geotools.feature.SchemaException;
 import org.thema.common.swing.TaskMonitor;
 
 /**
@@ -147,23 +145,21 @@ public class NewProjectDialog extends javax.swing.JDialog {
         Project zonePrj = null;
         if(zonePrjSelectFilePanel.getSelectedFile() != null) {
             XStream xml = new XStream();
-            try {
-                FileReader fr = new FileReader(zonePrjSelectFilePanel.getSelectedFile());
+            try (FileReader fr = new FileReader(zonePrjSelectFilePanel.getSelectedFile())) {
                 zonePrj = (Project)xml.fromXML(fr);
-                fr.close();
-
             } catch (IOException e) {
                 Logger.getLogger(NewProjectDialog.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "Impossible de lire le projet pour la zone!\nDétails : " + e, "Erreur", JOptionPane.ERROR_MESSAGE);      
+                return;
             }
         }
 
-
         try {
             project = Project.createProject(nameTextField.getText(), dirSelectFilePanel.getSelectedFile(), buildSelectFilePane.getSelectedFile(), new TaskMonitor.EmptyMonitor());
-            if(zonePrj != null)
+            if(zonePrj != null) {
                 project.defineZone(zonePrj);
-        } catch(Throwable ex) {
+            }
+        } catch(IOException | SchemaException ex) {
             Logger.getLogger(NewProjectDialog.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "An error occured while creating project :\n" + ex.getLocalizedMessage());
             return;
@@ -173,19 +169,6 @@ public class NewProjectDialog extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_createButtonActionPerformed
     
-    private String getShapeFile() {
-        JFileChooser dlg = new JFileChooser(Config.getDir());
-        JFileFilter filter = new JFileFilter(".shp");
-        filter.setDescription("Shape file (*.shp)");
-        dlg.addChoosableFileFilter(filter);
-
-        if(dlg.showOpenDialog(this) == JFileChooser.CANCEL_OPTION)
-            return null;
-
-        Config.setDir(dlg.getCurrentDirectory().getAbsolutePath());
-
-        return dlg.getSelectedFile().getAbsolutePath();
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.thema.common.swing.SelectFilePanel buildSelectFilePane;

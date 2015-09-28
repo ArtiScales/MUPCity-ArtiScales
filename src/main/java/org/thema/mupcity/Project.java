@@ -43,6 +43,7 @@ import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
 import org.thema.mupcity.scenario.ScenarioAuto;
 import org.thema.mupcity.scenario.ScenarioManual;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.feature.SchemaException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -110,7 +111,7 @@ public class Project extends AbstractTreeNode {
     public static final String NODE_SCENARIO = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Scenarios");
     public static final String NODE_ANALYSE = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Analyses");
 
-    public static final TreeMap<Object, Color> colorMap = new TreeMap<Object, Color>();
+    public static final TreeMap<Object, Color> colorMap = new TreeMap<>();
 
     static {
         colorMap.put(-1.0, new Color(220, 220, 220)); colorMap.put(0.0, Color.WHITE);
@@ -151,18 +152,19 @@ public class Project extends AbstractTreeNode {
     private transient SpatialGraph spatialGraph;
     
     /** Creates a new instance of Project */
-    private Project(String name, File dir) throws Exception {
+    private Project(String name, File dir)  {
         
         file = new File(dir, name + ".xml");
         Envelope env = getCoverage(Layers.BUILD).getEnvelope();
         bounds = new GridModShape(new Rectangle2D.Double(-0.5, -0.5, 1, 1), new AffineTransform(env.getWidth(), 0, 0, env.getHeight(), env.centre().x, env.centre().y), 1);
 
-        rules = new LinkedHashMap<String, Rule>();
-        for(Rule rule : RULES)
+        rules = new LinkedHashMap<>();
+        for(Rule rule : RULES) {
             rules.put(rule.getName(), rule);
+        }
         
-        scenarioAutos = new ArrayList<ScenarioAuto>();
-        scenarios = new ArrayList<ScenarioManual>();
+        scenarioAutos = new ArrayList<>();
+        scenarios = new ArrayList<>();
         distType = OriginDistance.EuclidianDistance.class;
         
         try {
@@ -170,10 +172,10 @@ public class Project extends AbstractTreeNode {
             crs = dataStore.getSchema().getCoordinateReferenceSystem();
             dataStore.dispose();
         } catch (IOException ex) {
-            Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Project.class.getName()).log(Level.WARNING, null, ex);
         }
         
-        infoLayers = new ArrayList<ShapeFileLayer>();
+        infoLayers = new ArrayList<>();
     }
 
     public void defineZone(Project zonePrj) {
@@ -183,9 +185,11 @@ public class Project extends AbstractTreeNode {
     public void decomp(int exp, double maxSize, double minSize, 
             final double seuilDensBuild) throws IOException {
         int nbRule = 0;
-        for(Rule rule : rules.values())
-            if(rule.isUsable())
+        for(Rule rule : rules.values()) {
+            if(rule.isUsable()) {
                 nbRule++;
+            }
+        }
         
         TaskMonitor monitor = new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3);
         monitor.setMillisToPopup(0);
@@ -212,17 +216,20 @@ public class Project extends AbstractTreeNode {
         msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
         msGrid.addLayer(BUILD, DataBuffer.TYPE_SHORT, 0.0);
         msGrid.execute(new AbstractLayerOperation() {
+            @Override
             public void perform(Cell cell) {
                 double dens = cell.getLayerValue(BUILD_DENS);
-                if(dens > 0 && dens <= seuilDensBuild)
+                if(dens > 0 && dens <= seuilDensBuild) {
                     cell.setLayerValue(BUILD, -1);
+                }
 
                 if(dens > seuilDensBuild) {
                     Cell parent = ((MSCell)cell).getParent();
-                    if(parent == null || parent.getLayerValue(BUILD) == 1)
+                    if(parent == null || parent.getLayerValue(BUILD) == 1) {
                         cell.setLayerValue(BUILD, 1);
-                    else
+                    } else {
                         cell.setLayerValue(BUILD, -1);
+                    }
                 }
             }
         }, true);
@@ -235,7 +242,7 @@ public class Project extends AbstractTreeNode {
         }
 
         long t = System.currentTimeMillis();
-        for(Rule rule : rules.values())
+        for(Rule rule : rules.values()) {
             if(rule.isUsable()) {
                 monitor.incProgress(1);
                 monitor.setNote("Create grid... rule " + rule.getFullName());
@@ -243,16 +250,18 @@ public class Project extends AbstractTreeNode {
                 System.out.println(rule.getFullName() + " : " + (System.currentTimeMillis() - t) / 60000.0 + " minutes");
                 t = System.currentTimeMillis();
             }
+        }
         
         createGridLayer();
         monitor.close();
     }
     
     public OriginDistance getDistance(Polygon origin, double maxCost) {
-        if(distType.equals(EuclidianDistance.class))
+        if(distType.equals(EuclidianDistance.class)) {
             return new EuclidianDistance(origin);
-        else
+        } else {
             return new NetworkDistance(getSpatialGraph(), origin, maxCost);
+        }
     }
     
     public synchronized SpatialGraph getSpatialGraph() {
@@ -284,10 +293,12 @@ public class Project extends AbstractTreeNode {
     }
 
     public void removeDecomp() {
-        for(ScenarioManual sce : new ArrayList<ScenarioManual>(scenarios))
+        for(ScenarioManual sce : new ArrayList<>(scenarios)) {
             removeScenario(sce);
-        for(ScenarioAuto anal : new ArrayList<ScenarioAuto>(scenarioAutos))
+        }
+        for(ScenarioAuto anal : new ArrayList<>(scenarioAutos)) {
             removeAnalysis(anal);
+        }
         coefDecomp = 0;
         msGrid = null;
     }
@@ -307,16 +318,20 @@ public class Project extends AbstractTreeNode {
     }
 
     public ScenarioAuto getScenarioAuto(String name) {
-        for(ScenarioAuto anal : getScenarioAutos())
-            if(anal.toString().equals(name))
+        for(ScenarioAuto anal : getScenarioAutos()) {
+            if(anal.toString().equals(name)) {
                 return anal;
+            }
+        }
         return null;
     }
 
     public ScenarioManual getScenario(String name) {
-        for(ScenarioManual sce : scenarios)
-            if(sce.toString().equals(name))
+        for(ScenarioManual sce : scenarios) {
+            if(sce.toString().equals(name)) {
                 return sce;
+            }
+        }
         return null;
     }
     
@@ -335,10 +350,11 @@ public class Project extends AbstractTreeNode {
     }
     
     public NavigableSet<Double> getResolutions() {
-        if(isDecomp())
+        if(isDecomp()) {
             return msGrid.getResolutions();
-        else
+        } else {
             return null;
+        }
     }
     
     public GroupLayer getDecompLayer() {
@@ -358,8 +374,9 @@ public class Project extends AbstractTreeNode {
             l.setVisible(false);
             gridLayers.addLayerLast(l);
             i--;
-            for(int j = 0; j < 3; j++)
+            for(int j = 0; j < 3; j++) {
                 col[j] = (int) (col[j] + dcol[j]);
+            }
         }
 
         return gridLayers;
@@ -394,24 +411,28 @@ public class Project extends AbstractTreeNode {
     }
     
     public synchronized DefaultFeatureCoverage<DefaultFeature> getCoverage(Layers name) {
-        if(coverages == null)
-            coverages = new HashMap<String, DefaultFeatureCoverage<DefaultFeature>>();
-        if(!coverages.containsKey(name.toString()))
+        if(coverages == null) {
+            coverages = new HashMap<>();
+        }
+        if(!coverages.containsKey(name.toString())) {
             try {
-                coverages.put(name.toString(), new DefaultFeatureCoverage<DefaultFeature>(DefaultFeature.loadFeatures(new File(getDirectory(), name.toString()+".shp"), false)));
+                coverages.put(name.toString(), new DefaultFeatureCoverage<>(DefaultFeature.loadFeatures(new File(getDirectory(), name.toString()+".shp"), false)));
             } catch (IOException ex) {
                 Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
         
         return coverages.get(name.toString());
     }
     
     public synchronized DefaultFeatureCoverage<DefaultFeature> getCoverageLevel(Layers layer, final int level) {
-        if(coverages == null)
-            coverages = new HashMap<String, DefaultFeatureCoverage<DefaultFeature>>();
+        if(coverages == null) {
+            coverages = new HashMap<>();
+        }
         String levelName = layer.toString() + level;
         if(!coverages.containsKey(levelName)) {
-            coverages.put(levelName, new DefaultFeatureCoverage<DefaultFeature>(getCoverage(layer).getFeatures(new FeatureFilter() {
+            coverages.put(levelName, new DefaultFeatureCoverage<>(getCoverage(layer).getFeatures(new FeatureFilter() {
+                            @Override
                             public boolean accept(Feature f) {
                                 return ((Number)f.getAttribute(Project.LEVEL_FIELD)).intValue() == level;
                             }
@@ -423,6 +444,7 @@ public class Project extends AbstractTreeNode {
     
     public FeatureGetter<DefaultFeature> getLayerFeatures(final Layers name) {
         return new FeatureGetter<DefaultFeature>() {
+            @Override
             public Collection<DefaultFeature> getFeatures() {
                     return getCoverage(name).getFeatures();
             }
@@ -432,19 +454,24 @@ public class Project extends AbstractTreeNode {
     public void setLayer(LayerDef layer, File file, List<String> attrs) throws Exception {
         TaskMonitor mon = new TaskMonitor(null, "Create layer", "", 0, 2);
         mon.setMillisToDecideToPopup(0);
-        if(coverages != null) // remove from cache if exists
+        if(coverages != null) { // remove from cache if exists
             coverages.remove(layer.getName());
+        }
 
         mon.setProgress(0);
         mon.setNote("Loading...");
         List<DefaultFeature> features = DefaultFeature.loadFeatures(file, false);
         if(!layer.attrNames.isEmpty()) {
-            for(String attr : layer.attrNames)
-                if(!features.get(0).getAttributeNames().contains(attr))
+            for(String attr : layer.attrNames) {
+                if(!features.get(0).getAttributeNames().contains(attr)) {
                     DefaultFeature.addAttribute(attr, features, null);
-            for(DefaultFeature f : features)
-                for(int i = 0; i < layer.attrNames.size(); i++)
+                }
+            }
+            for(DefaultFeature f : features) {
+                for(int i = 0; i < layer.attrNames.size(); i++) {
                     f.setAttribute(layer.attrNames.get(i), f.getAttribute(attrs.get(i)));
+                }
+            }
         }
         mon.incProgress(1);
         
@@ -455,25 +482,27 @@ public class Project extends AbstractTreeNode {
     }
 
     public void removeAnalysis(ScenarioAuto anal) {
-        for(Layer l : anal.getLayers().getLayers())
+        for(Layer l : anal.getLayers().getLayers()) {
             msGrid.removeLayer(l.getName());
+        }
 
         scenarioAutos.remove(anal);
     }
 
     public void removeScenario(ScenarioManual sce) {
-        for(Layer l : sce.getLayers().getLayers())
+        for(Layer l : sce.getLayers().getLayers()) {
             msGrid.removeLayer(l.getName());
+        }
 
         scenarios.remove(sce);
     }
     
     public List<Evaluator> getEvaluators() {
-        if(evaluators == null)
+        if(evaluators == null) {
             evaluators = Arrays.asList((Evaluator)new MeanWhiteEvaluator(), new NbNearWhiteEvaluator(), 
                     new NbCellOnEnvelopeEvaluator(), new DistEnvelopeEvaluator(),
                     
-                    new DistMinAmenEvaluator(this, Layers.FACILITY, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}), 
+                    new DistMinAmenEvaluator(this, Layers.FACILITY, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}),
                     new DistMinAmenEvaluator(this, Layers.FACILITY, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001}), 
                     
                     new DistMinAmenEvaluator(this, Layers.LEISURE, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}), 
@@ -495,15 +524,17 @@ public class Project extends AbstractTreeNode {
                     
                     new DistMinTypeAmenEvaluator(this, Layers.LEISURE, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}),
                     new DistMinTypeAmenEvaluator(this, Layers.LEISURE, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001})
-                    );
+            );
+        }
         return evaluators;
     }
 
     public synchronized DefaultGroupLayer getInfoLayer() {
         if(infoLayer == null) {
             infoLayer = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Infos"));
-            for(ShapeFileLayer l : infoLayers)
+            for(ShapeFileLayer l : infoLayers) {
                 infoLayer.addLayerFirst(l);
+            }
         }
         return infoLayer;
     }
@@ -514,43 +545,25 @@ public class Project extends AbstractTreeNode {
         
         decompLayer.addLayerFirst(createLayer(BUILD, new UniqueColorTable(colorMap), java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Built-up")));
 
-        for(Rule rule : rules.values())
-            if(rule.isUsable())
+        for(Rule rule : rules.values()) {
+            if(rule.isUsable()) {
                 decompLayer.addLayerLast(createLayer(rule.getName(), null, rule.getFullName()));
-        
-//        decompLayer.addLayerLast(createLayer(NB_BUILD_FREE, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Accessibility_open_space")));
-//        if(hasNetworkLayer()) {
-//            decompLayer.addLayerLast(createLayer(NET_RULE, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Proximity_road")));
-//            if(hasServiceLayer()) {
-//                decompLayer.addLayerLast(createLayer(N1_ATTR, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Accessibility_N1")));
-//                decompLayer.addLayerLast(createLayer(N2_ATTR, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Accessibility_N2")));
-//            }
-//        }
-//        if(hasStationLayer())
-//            decompLayer.addLayerLast(createLayer(STATION_RULE, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Proximity_station")));
-//           
-//        if(hasNetworkLayer() && hasServiceLayer() && msGrid.getLayers().contains(DISTMIN_N1)) {
-//            decompLayer.addLayerLast(createLayer(DISTMIN_N1, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Min_dist_N1")));
-//            decompLayer.addLayerLast(createLayer(DISTMIN_N2, null, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Min_dist_N2")));
-//        }
+            }
+        }
 
     }
     
     public GroupLayer createLayer(String layerName, ColorBuilder colors, String viewLayerName) {
         DefaultGroupLayer gl = new DefaultGroupLayer(viewLayerName);
 
-        //style.setAlpha(0.33f);
-//        style.setDrawGrid(false);
-//        style.getGridStyle().setContourColor(Color.ORANGE);
         int i = msGrid.getResolutions().size();
         int [] col = {Color.ORANGE.getRed(), Color.ORANGE.getGreen(), Color.ORANGE.getBlue()};
         double dcol [] = {(200.0-col[0])/i, (10.0-col[1])/i, (10.0-col[2])/i};
         
         for(Double res : msGrid.getResolutions()) {
-            if(msGrid.getGrid(res).getLayer(layerName) == null)
+            if(msGrid.getGrid(res).getLayer(layerName) == null) {
                 continue;
-//            style.getGridStyle().setStroke(new BasicStroke(0.5f+i/4f));
-//            style.getGridStyle().setContourColor(new Color(col[0], col[1], col[2]));
+            }
             RasterStyle style = colors == null ? new RasterStyle(ColorRamp.RAMP_INVGRAY)
                 : new RasterStyle(colors, false);
             RasterLayer l = new RasterLayer(String.format("%g", res),
@@ -562,8 +575,9 @@ public class Project extends AbstractTreeNode {
             l.setDrawLegend(false);
             gl.addLayerFirst(l);
             i--;
-            for(int j = 0; j < 3; j++)
+            for(int j = 0; j < 3; j++) {
                 col[j] = (int) (col[j] + dcol[j]);
+            }
         }
         return gl;
     }
@@ -584,23 +598,23 @@ public class Project extends AbstractTreeNode {
             msGrid.save(getSubDir());
         }
         file = file.getAbsoluteFile();
-        for(ShapeFileLayer l : infoLayers) 
-            if(file.getParentFile().equals(l.getShapeFile().getParentFile()))
+        for(ShapeFileLayer l : infoLayers) { 
+            if(file.getParentFile().equals(l.getShapeFile().getParentFile())) {
                 l.setShapeFile(new File(l.getShapeFile().getName()));
+            }
+        }
 
-        FileWriter fw = new FileWriter(file);
-        xml.toXML(this, fw);
-        fw.close();
+        try (FileWriter fw = new FileWriter(file)) {
+            xml.toXML(this, fw);
+        }
     }
 
 
     public static Project load(File file) throws IOException {
         XStream xml = new XStream(new DomDriver());
-        FileReader fr = new FileReader(file);
-        Project prj = (Project)xml.fromXML(fr);
-        fr.close();
-
-        project = prj;
+        try (FileReader fr = new FileReader(file)) {
+            project = (Project)xml.fromXML(fr);
+        }
 
         project.file = file;
         if(project.coefDecomp > 0) {
@@ -609,9 +623,11 @@ public class Project extends AbstractTreeNode {
         }
         
         // add new rules if not already exist in this project
-        for(Rule rule : RULES)
-            if(!project.rules.containsKey(rule.getName()))
+        for(Rule rule : RULES) {
+            if(!project.rules.containsKey(rule.getName())) {
                 project.rules.put(rule.getName(), rule);
+            }
+        }
 
         return project; 
     }
@@ -628,9 +644,11 @@ public class Project extends AbstractTreeNode {
     public String getStatDecomp() {
         msGrid.addLayer("bati", DataBuffer.TYPE_BYTE, 0);
         msGrid.execute(new AbstractLayerOperation(4) {
+            @Override
             public void perform(Cell cell) {
-                if(cell.getLayerValue(Layers.BUILD.toString()) == 1)
+                if(cell.getLayerValue(Layers.BUILD.toString()) == 1) {
                     cell.setLayerValue("bati", 1);
+                }
             }
         });
         TreeMap<Double, Double> nbCell = msGrid.agregate(new SimpleAgregateOperation.COUNT(4));
@@ -638,8 +656,9 @@ public class Project extends AbstractTreeNode {
         msGrid.removeLayer("bati");
 
         StringBuilder res = new StringBuilder("Scale\tnb cell\tnb cell bati\n");
-        for(Double scale : nbCell.keySet())
+        for(Double scale : nbCell.keySet()) {
             res.append(String.format("%g\t%d\t%d\n", scale, nbCell.get(scale).intValue(), nbBati.get(scale).intValue()));
+        }
 
         return res.toString();
     }
@@ -651,7 +670,7 @@ public class Project extends AbstractTreeNode {
 
     @Override
     protected List<TreeNode> getChildren() {
-        List<TreeNode> vChildren = new ArrayList<TreeNode>();
+        List<TreeNode> vChildren = new ArrayList<>();
         vChildren.add(new DefaultMutableTreeNode(NODE_ZONE));
         if(isDecomp()) {
             vChildren.add(new DefaultMutableTreeNode(NODE_DECOMP));
@@ -670,7 +689,7 @@ public class Project extends AbstractTreeNode {
         return project;
     }
     
-    public static Project createProject(String name, File dir, File buildFile, TaskMonitor mon) throws Throwable {
+    public static Project createProject(String name, File dir, File buildFile, TaskMonitor mon) throws IOException, SchemaException {
         File directory = new File(dir, name);
         directory.mkdir();
         mon.setProgress(1);
@@ -689,13 +708,14 @@ public class Project extends AbstractTreeNode {
     }
     
     private static class DistBorderOperation extends  AbstractOperation{
-        int distBorder;
+        private int distBorder;
 
         public DistBorderOperation(int distBorder) {
             super(true, 0);
             this.distBorder = distBorder;
         }
 
+        @Override
         public double getValue(Cell cell) {
             return cell.getDistBorder() < distBorder ? 0 : 1;
         }

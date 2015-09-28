@@ -16,6 +16,7 @@ import org.thema.graph.SpatialGraph;
 import org.thema.graph.Util;
 import org.thema.graph.pathfinder.DijkstraPathFinder;
 import org.thema.graph.pathfinder.DijkstraPathFinder.CalculateListener;
+import org.thema.graph.pathfinder.EdgeWeighter;
 
 /**
  *
@@ -125,7 +126,7 @@ public interface OriginDistance {
             return timePathfinder;
         }
         
-        private DijkstraPathFinder calcPathFinder(DijkstraPathFinder.EdgeWeighter weighter) {
+        private DijkstraPathFinder calcPathFinder(EdgeWeighter weighter) {
             DijkstraPathFinder pathfinder;
             if(origin instanceof Point) {
                 pathfinder = new DijkstraPathFinder(graph.getGraph(), graph.getLocation((Point)origin), weighter);
@@ -161,7 +162,7 @@ public interface OriginDistance {
         }
     }
     
-    static class TimeEdgeWeighter implements DijkstraPathFinder.EdgeWeighter {
+    static class TimeEdgeWeighter implements EdgeWeighter {
 
         @Override
         public double getWeight(Edge e) {

@@ -36,17 +36,17 @@ import org.thema.mupcity.Project;
  */
 public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSelectionListener {
     
-    DefaultGroupLayer layers;
-    ScenarioManual scenario;
+    private DefaultGroupLayer layers;
+    private ScenarioManual scenario;
 
-    MSGridBuilder<? extends SquareGrid> msGrid;
+    private MSGridBuilder<? extends SquareGrid> msGrid;
     
-    List<MSFeature> selFeatures;
+    private List<MSFeature> selFeatures;
 
     /** Creates new form MapInternalFrame */
     public ScenarioFrame(ScenarioManual scenario, DefaultGroupLayer layers, MSGridBuilder<? extends SquareGrid> msGrid) {
         initComponents();
-        setTitle(Project.NODE_SCENARIO + " : " + scenario.name);
+        setTitle(Project.NODE_SCENARIO + " : " + scenario.getName());
         this.msGrid = msGrid;
         this.layers = layers;
         this.scenario = scenario;
@@ -62,13 +62,16 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         return mapViewer;
     }
 
+    @Override
     public void selectionChanged(ShapeSelectionEvent event) {
         List<? extends SelectableShape> shapes = mapViewer.getMap().getSelection();
-        List<MSFeature> features = new ArrayList<MSFeature>();
-        for(SelectableShape s : shapes)
+        List<MSFeature> features = new ArrayList<>();
+        for(SelectableShape s : shapes) {
             if(s instanceof FeatureShape &&
-                ((FeatureShape)s).getFeature() instanceof MSFeature)
+                    ((FeatureShape)s).getFeature() instanceof MSFeature) {
                 features.add((MSFeature)((FeatureShape)s).getFeature());
+            }
+        }
 
         selFeatures = features;
 
@@ -85,8 +88,9 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         int build = ((Number)f.getAttribute(scenario.getResultLayerName())).intValue();
 
         if(build == ScenarioAuto.BUILD || build == ScenarioAuto.REM_BUILD
-                || build == ScenarioAuto.NEW_BUILD)
+                || build == ScenarioAuto.NEW_BUILD) {
             return true;
+        }
 
         // finalement build == 0
         MSFeature parent = f.getParent();
@@ -97,9 +101,11 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                 return false;
             }
 
-            for(MSFeature c : parent.getChildren())
-                if(scenario.isBlack(c))
+            for(MSFeature c : parent.getChildren()) {
+                if(scenario.isBlack(c)) {
                     nb++;
+                }
+            }
         }
 
         if(nb >= scenario.getNMax()) {
@@ -110,7 +116,11 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         double res = 0;
         for(Layer l : scenario.getLayers().getLayers()) {
             if(l.isVisible()) {
-                res = Double.parseDouble(l.getName());
+                String name = l.getName();
+                if(name.contains(",")) {
+                    name = name.replace(',', '.');
+                }
+                res = Double.parseDouble(name);
             }
         }
         
@@ -143,7 +153,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         ArrayList<Integer> idClust = new ArrayList<>();
 
         for(int j = 1; j <= r.getHeight(); j++) {
-            for(int i = 1; i <= r.getWidth(); i++)
+            for(int i = 1; i <= r.getWidth(); i++) {
                 if(r.getSample(i-1, j-1, 0) == 0) {
                     set.add(clust.getSample(i-1, j, 0));
                     set.add(clust.getSample(i, j-1, 0));
@@ -179,6 +189,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                     }
                     set.clear();
                 }
+            }
         }
 
         for(int i = 0; i < idClust.size(); i++) {
@@ -390,8 +401,9 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         }
         for(MSFeature f : selFeatures) {
             if(canBeBuild(f)) {
-                if(scenario.isWhite(f))
+                if(scenario.isWhite(f)) {
                     scenario.setBlack(f);
+                }
             } else {
                 break;
             }
@@ -406,8 +418,9 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         }
         for(MSFeature f : selFeatures) {
             if(canBeUnBuild(f)) {
-                if(scenario.isBlack(f))
+                if(scenario.isBlack(f)) {
                     scenario.setWhite(f);
+                }
             } else {
                 break;
             }

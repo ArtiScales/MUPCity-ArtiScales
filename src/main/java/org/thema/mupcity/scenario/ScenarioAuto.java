@@ -39,25 +39,24 @@ import org.thema.msca.operation.*;
  */
 public class ScenarioAuto extends Scenario {
 
+    private boolean monoScale;
 
-    boolean monoScale;
-
-    double startScale;
-    double endScale;
-    boolean useNoBuild;
+    private double startScale;
+    private double endScale;
+    private boolean useNoBuild;
 
     // multiscale atributes
-    boolean strict;
+    private boolean strict;
 
     // monoscale attributes
-    int nbCell;
+    private int nbCell;
 
     protected ScenarioAuto(String name, AHP ahp, int nMax, boolean mean) {
         super(name, ahp, nMax, mean);
     }
 
     public boolean isRandom() {
-        return ahp.getCoefs().isEmpty();
+        return getAHP().getCoefs().isEmpty();
     }
 
     public int getNbNewBuild() {
@@ -104,51 +103,57 @@ public class ScenarioAuto extends Scenario {
     public final boolean canBeBuild(Cell c) {
         return !isBlack(c) &&
                 (!useNoBuild || c.getLayerValue(Project.NOBUILD_DENS)
-                    <= (1 - (monoScale ?  0.5 : nMax / Math.pow(Project.getProject().getCoefDecomp(), 2))));
+                    <= (1 - (monoScale ?  0.5 : getNMax() / Math.pow(Project.getProject().getCoefDecomp(), 2))));
     }
 
     public void perform(MSGridBuilder msGrid) {
         initLayers(msGrid);
         
-        if(monoScale)
-            if(isRandom())
+        if(monoScale) {
+            if(isRandom()) {
                 performMonoRandom(msGrid);
-            else
+            } else {
                 performMonoSimOptim(msGrid);
-        else
+            }
+        } else {
             performSim(msGrid);
+        }
     }
 
     protected void performSim(MSGridBuilder msGrid) {
          AbstractLayerOperation op = new AbstractLayerOperation(4) {
-            final int NBCELL = nMax;
+            final int NBCELL = getNMax();
 
             @Override
             public void perform(Cell cell) {
                 String simLayer = getResultLayerName();
                 List<MSCell> lstCell = ((MSCell)cell).getChildren();
-                if(!isBlack(cell) || lstCell.isEmpty())
+                if(!isBlack(cell) || lstCell.isEmpty()) {
                     return;
+                }
                 byte nb = 0;
-                for(MSCell c : lstCell)
-                    if(isBlack(c))
+                for(MSCell c : lstCell) {
+                    if(isBlack(c)) {
                         nb++;
+                    }
+                }
 
                 Collections.shuffle(lstCell);
-                TreeMap<Double, List<Cell>> map = new TreeMap<Double, List<Cell>>();
+                TreeMap<Double, List<Cell>> map = new TreeMap<>();
                 // on enlève du bati
                 if(strict && nb > NBCELL) {
-                    for(Cell c : lstCell)
+                    for(Cell c : lstCell) {
                         if(isBlack(c)) {
                             double v = c.getLayerValue(getEvalLayerName());
-                            if(map.containsKey(v))
+                            if(map.containsKey(v)) {
                                 map.get(v).add(c);
-                            else {
-                                List<Cell> lst = new ArrayList<Cell>();
+                            } else {
+                                List<Cell> lst = new ArrayList<>();
                                 lst.add(c);
                                 map.put(v, lst);
                             }
                         }
+                    }
 
                     while(nb > NBCELL) {
                         List<Cell> cells = map.pollFirstEntry().getValue();
@@ -158,18 +163,21 @@ public class ScenarioAuto extends Scenario {
                             nb--;
                         }
                     }
-                } else // on ajoute du bati
-                    for(Cell c : lstCell)
+                } else {
+                    // on ajoute du bati
+                    for(Cell c : lstCell) {
                         if(canBeBuild(c)) {
                             double v = c.getLayerValue(getEvalLayerName());
-                            if(map.containsKey(v))
+                            if(map.containsKey(v)) {
                                 map.get(v).add(c);
-                            else {
-                                List<Cell> lst = new ArrayList<Cell>();
+                            } else {
+                                List<Cell> lst = new ArrayList<>();
                                 lst.add(c);
                                 map.put(v, lst);
                             }
                         }
+                    }
+                }
 
                     while(nb < NBCELL && map.size() > 0) {
                         List<Cell> cells = map.pollLastEntry().getValue();
@@ -195,17 +203,20 @@ public class ScenarioAuto extends Scenario {
 }
 
     public String getInfo() {
-        String info = name;
-        if(monoScale)
+        String info = getName();
+        if(monoScale) {
             info += "\nMono échelle : " + startScale;
-        else
-            info += "\nMulti échelle\nNmax : " + nMax + "\n" + (strict ? "Strict\n" : "");
+        } else {
+            info += "\nMulti échelle\nNmax : " + getNMax() + "\n" + (strict ? "Strict\n" : "");
+        }
         info += "Nb new build cell : " + nbCell;
         info += "\nRègles :\n";
-        for(String rule : ahp.getCoefs().keySet())
-            info += "- " + rule + " - " + ahp.getCoefs().get(rule) + "\n";
-        if(useNoBuild)
+        for(String rule : getAHP().getCoefs().keySet()) {
+            info += "- " + rule + " - " + getAHP().getCoefs().get(rule) + "\n";
+        }
+        if(useNoBuild) {
             info += "Prends en compte les zones non-constructibles.\n";
+        }
         return info;
     }
 
@@ -244,6 +255,7 @@ public class ScenarioAuto extends Scenario {
                 this.eval = eval;
             }
 
+            @Override
             public int compareTo(CellEval c) {
                 return eval == c.eval ? 0 : (eval < c.eval ? 1 : -1);
             }
@@ -267,17 +279,19 @@ public class ScenarioAuto extends Scenario {
             @Override
             public final void perform(Cell cell) {
                 // cellule déjà batie ?
-                if(!canBeBuild(cell))
+                if(!canBeBuild(cell)) {
                     return;
+                }
                 double eval = cell.getLayerValue(evalLayer);
-                if(eval >= min)
+                if(eval >= min) {
                     result.add(new CellEval(cell.getId(), eval));
+                }
             }
         }
             
         ProgressMonitor monitor = new ProgressMonitor(null, "MonoScale Analysis", "", 0, nbCell);
 
-        PriorityQueue<CellEval> queue = new PriorityQueue<CellEval>();
+        PriorityQueue<CellEval> queue = new PriorityQueue<>();
         double min = Double.NaN;
         for(int i = 0; i < nbCell; i++) {
             monitor.setNote(i + "/" + nbCell);
@@ -299,8 +313,9 @@ public class ScenarioAuto extends Scenario {
                 int [] bins = histo.getBins(0);
                 int nb = 0;
                 int j = 100;
-                while(j >= 0 && nb < nbCell)
+                while(j >= 0 && nb < nbCell) {
                     nb += bins[j--];
+                }
                 // solution à la con pour le nobuild
                 min = ((j+1) / 100.0 >= min) ? min-0.1 : ((j+1) / 100.0);
                 
@@ -317,21 +332,24 @@ public class ScenarioAuto extends Scenario {
                 //System.out.println(i + " - " + cell.getId() + " : " + cEval.eval);
                 // on réinsère les cellules modifiées
                 List<Cell> cells = cell.getNeighbors(2);
-                for(Cell c : cells)
+                for(Cell c : cells) {
                     if(canBeBuild(c) && c.getDistBorder() >= 4) {
                         double eval = c.getLayerValue(evalLayer);
-                        if(eval >= min)
+                        if(eval >= min) {
                             queue.add(new CellEval(c.getId(), eval));
+                        }
                     }
-            } else
+                }
+            } else {
                 i--;
+            }
         }
         monitor.close();
     }
 
     @Override
     protected void createLayers(MSGridBuilder<? extends SquareGrid> msGrid) {
-        layers = new DefaultGroupLayer(name);
+        layers = new DefaultGroupLayer(getName());
 
         if(monoScale) {
             MSGrid grid = msGrid.getGrid(startScale);
@@ -358,22 +376,25 @@ public class ScenarioAuto extends Scenario {
             }
         } else {
             layers.addLayerFirst(Project.getProject().createLayer(getResultLayerName(), new UniqueColorTable(Project.colorMap),
-                    name + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario")));
-            layers.addLayerLast(Project.getProject().createLayer(getEvalLayerName(), null,  name + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest")));
+                    getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario")));
+            layers.addLayerLast(Project.getProject().createLayer(getEvalLayerName(), null,  getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest")));
         }
 
     }
 
+    @Override
     public final String getResultLayerName() {
-        return name + "-" + Project.SIMUL;
+        return getName() + "-" + Project.SIMUL;
     }
 
+    @Override
     public final String getEvalLayerName() {
-        return name + "-" + Project.EVAL;
+        return getName() + "-" + Project.EVAL;
     }
 
+    @Override
     public final String getBuildFreeLayerName() {
-        return name + "-" + Project.MORPHO_RULE;
+        return getName() + "-" + Project.MORPHO_RULE;
     }
 
 
