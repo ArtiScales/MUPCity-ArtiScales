@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.evaluation;
 
 import java.util.*;
@@ -11,53 +8,77 @@ import org.thema.mupcity.AHPDialog;
 import org.thema.mupcity.Project;
 
 /**
- *
- * @author gvuidel
+ * Panel for selecting evaluator and weights
+ * 
+ * @author Gilles Vuidel
  */
 public class EvaluatorSelectionPanel extends javax.swing.JPanel {
 
-    AHP ahp;
+    private AHP ahp;
     
+    /**
+     * Creates a new EvaluatorSelectionPanel with evaluators from the current project if it exists
+     */
     public EvaluatorSelectionPanel() {
         initComponents();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         // pour la phase de développement dans NetBeans
-        if(Project.getProject() != null)
-            for(Evaluator eval : Project.getProject().getEvaluators())
-                if(eval.isUsable())
+        if(Project.getProject() != null) {
+            for(Evaluator eval : Project.getProject().getEvaluators()) {
+                if(eval.isUsable()) {
                     model.addRow(new Object[]{eval, true, 1.0});
-        String  toto= "java" ; 
+                }
+            }
+        }
     }
     
+    /**
+     * Creates a new EvaluatorSelectionPanel with evaluators from the current project 
+     * @param coefEvaluators the weight of each evaluator used
+     */
     public EvaluatorSelectionPanel(Map<String, Double> coefEvaluators) {
         initComponents();
         setCoefEvaluators(coefEvaluators);
     }
 
-    public void setCoefEvaluators(Map<String, Double> coefEvaluators) {
+    private void setCoefEvaluators(Map<String, Double> coefEvaluators) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setNumRows(0);
-        for(Evaluator eval : Project.getProject().getEvaluators())
-            if(coefEvaluators.containsKey(eval.getShortName())) 
+        for(Evaluator eval : Project.getProject().getEvaluators()) {
+            if(coefEvaluators.containsKey(eval.getShortName())) { 
                 model.addRow(new Object[]{eval, true, coefEvaluators.get(eval.getShortName())});
-            else
+            } else {
                 model.addRow(new Object[]{eval, false, Double.NaN});
+            }
+        }
     }
     
+    /**
+     * Returns a map with the name of the evaluators used and their weight.
+     * @return the weight for each evaluator used
+     */
     public Map<String, Double> getCoefEvaluators() {
-       Map<String, Double> coefEvaluators = new LinkedHashMap<String, Double>();
+       Map<String, Double> coefEvaluators = new LinkedHashMap<>();
        DefaultTableModel model = (DefaultTableModel) table.getModel();
-       for(int i = 0; i < model.getRowCount(); i++)
-           if((Boolean)model.getValueAt(i, 1))
+       for(int i = 0; i < model.getRowCount(); i++) {
+           if((Boolean)model.getValueAt(i, 1)) {
                coefEvaluators.put(((Evaluator)model.getValueAt(i, 0)).getShortName(), (Double)model.getValueAt(i, 2));
+           }
+       }
        return coefEvaluators;
     }
 
+    /**
+     * @return the ahp matrix used to define the weights
+     */
     public AHP getAHP() {
         updateAHP();
         return ahp;
     }
     
+    /**
+     * @return true if average agregation is used, false for yager agregation
+     */
     public boolean isAgregMean() {
         return meanRadioButton.isSelected();      
     }
@@ -113,11 +134,6 @@ public class EvaluatorSelectionPanel extends javax.swing.JPanel {
         buttonGroup1.add(YagerRadioButton);
         YagerRadioButton.setSelected(true);
         YagerRadioButton.setText("Yager");
-        YagerRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                YagerRadioButtonActionPerformed(evt);
-            }
-        });
 
         buttonGroup1.add(meanRadioButton);
         meanRadioButton.setText("Mean");
@@ -149,39 +165,29 @@ public class EvaluatorSelectionPanel extends javax.swing.JPanel {
 
     private void updateAHP() {
         Set<String> evaluators = getCoefEvaluators().keySet();
-        if(ahp == null || !ahp.getMatrix().getKeys1().containsAll(evaluators))
-            ahp = new AHP(new ArrayList<String>(evaluators));
-        else {
-//            if(!ahp.getMatrix().getKeys1().containsAll(rules))
-//                for(String rule : rules) {
-//                    ahp.getMatrix().addKey1(rule);
-//                    ahp.getMatrix().addKey2(rule);
-//                }
-            
+        if(ahp == null || !ahp.getMatrix().getKeys1().containsAll(evaluators)) {
+            ahp = new AHP(new ArrayList<>(evaluators));
+        } else {            
             if(!evaluators.containsAll(ahp.getMatrix().getKeys1())) {
-                HashSet<String> set = new HashSet<String>(ahp.getMatrix().getKeys1());
+                HashSet<String> set = new HashSet<>(ahp.getMatrix().getKeys1());
                 set.removeAll(evaluators);
                 for(String rule : set)  {
                     ahp.getMatrix().removeKey1(rule);
                     ahp.getMatrix().removeKey2(rule);
                 }
             }   
-            
         }
     }
     private void ahpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ahpButtonActionPerformed
         updateAHP();
         AHPDialog dlg = new AHPDialog(null, ahp);
         dlg.setVisible(true);
-        if(!dlg.isOk)
+        if(!dlg.isOk) {
             return;
+        }
         ahp = dlg.ahp;
         setCoefEvaluators(ahp.getCoefs());
     }//GEN-LAST:event_ahpButtonActionPerformed
-
-    private void YagerRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_YagerRadioButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_YagerRadioButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton YagerRadioButton;

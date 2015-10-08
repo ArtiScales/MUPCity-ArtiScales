@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.evaluation;
 
@@ -22,13 +18,18 @@ import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
 
 /**
- *
- * @author gvuidel
+ * Evaluates the number of cell touching the urban border.
+ * 
+ * @author Gilles Vuidel
  */
 public class NbCellOnEnvelopeEvaluator extends Evaluator {
     
-    transient FeatureCoverage urbanBorder;
+    private transient FeatureCoverage urbanBorder;
     
+    /**
+     * Creates a new NbCellOnEnvelopeEvaluator with default parameters.
+     * Before calculating evaluation, the urban border must be set.
+     */
     public NbCellOnEnvelopeEvaluator() {
         super(new DiscreteFunction(new double[] {0.0, 1.0}, new double[] {0.001, 1}));
     }
@@ -41,6 +42,11 @@ public class NbCellOnEnvelopeEvaluator extends Evaluator {
                 getEvalLayerName(scenario), urbanBorder), true);
     }
 
+    /**
+     * Sets the urban border.
+     * Must be set before evaluation calculation
+     * @param urbanBorder a MultiLinestring representing the urban border
+     */
     public void setUrbanBorder(Geometry urbanBorderGeom) {
         List<Feature> features = new ArrayList<>();
         for(int i = 0; i < urbanBorderGeom.getNumGeometries(); i++) {
@@ -49,9 +55,15 @@ public class NbCellOnEnvelopeEvaluator extends Evaluator {
         this.urbanBorder = new DefaultFeatureCoverage(features);
     }
     
+    /**
+     * @throws UnsupportedOperationException
+     * @param scenario
+     * @param cell
+     * @return nothing
+     */
     @Override
     protected double eval(Scenario scenario, Cell cell) { // does nothing
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override

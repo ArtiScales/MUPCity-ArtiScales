@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
 import com.vividsolutions.jts.geom.*;
@@ -11,7 +8,7 @@ import org.thema.mupcity.Project;
 import org.thema.mupcity.Project.Layers;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.fuzzy.MembershipFunction;
-import org.thema.common.parallel.BufferTask;
+import org.thema.common.parallel.BufferForkJoinTask;
 import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.AbstractFeature;
 import org.thema.data.feature.DefaultFeature;
@@ -21,27 +18,33 @@ import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
 
 /**
- *
- * @author gvuidel
+ * Facility rule for level 1 and 2.
+ * 
+ * @author Gilles Vuidel
  */
 public class Facility12Rule extends AbstractRule {
 
     @ReflectObject.NoParam
-    int level;
+    private int level;
     
-    double maxDistClust;
+    private double maxDistClust;
     
     @ReflectObject.Name("Distance max between facility")
-    double distClust = 200;
+    private double distClust = 200;
     
     @ReflectObject.Name("Diversity function")
-    MembershipFunction diversity;
+    private MembershipFunction diversity;
     @ReflectObject.Name("Count function")
-    MembershipFunction count;
+    private MembershipFunction count;
     @ReflectObject.Name("Distance function")
     @ReflectObject.Comment("Last entry must be 0")
-    DiscreteFunction distance;
+    private DiscreteFunction distance;
     
+    /**
+     * Creates a new facility rule for level 1 or 2.
+     * Initializes parameters with default values depending on the level.
+     * @param level level 1 or 2
+     */
     public Facility12Rule(int level) {
         super(Arrays.asList(Layers.FACILITY));
         this.level = level;
@@ -69,12 +72,11 @@ public class Facility12Rule extends AbstractRule {
         // charge coverage service du niveau level
         DefaultFeatureCoverage<DefaultFeature> facCov = project.getCoverageLevel(Layers.FACILITY, level);
         
-        if (level == 2)
-        {
+        if (level == 2) {
             // charge coverage service du niveau level 1
             final DefaultFeatureCoverage<DefaultFeature> facCovLevel1 = project.getCoverageLevel(Layers.FACILITY, 1);// extrait l'ensemble des points
             //récupère la liste des features de level 1
-            List<DefaultFeature> featuresLevel1 = new ArrayList<DefaultFeature>(facCovLevel1.getFeatures());
+            List<DefaultFeature> featuresLevel1 = new ArrayList<>(facCovLevel1.getFeatures());
 
             //récupère la liste des features de level 2
             List<DefaultFeature> featuresLevel2 = facCov.getFeatures();
@@ -87,35 +89,35 @@ public class Facility12Rule extends AbstractRule {
         }
                
         // extrait l'ensemble des points
-        List<Geometry> geoms = new ArrayList<Geometry>(facCov.getFeatures().size());
-        for(Feature f : facCov.getFeatures())
+        List<Geometry> geoms = new ArrayList<>(facCov.getFeatures().size());
+        for(Feature f : facCov.getFeatures()) {
             geoms.add(f.getGeometry());
+        }
         
         // création du buffer pour créer les clusters de services
-        Geometry bufFac = BufferTask.buffer(new GeometryFactory().buildGeometry(geoms), distClust/2, 8);
+        Geometry bufFac = BufferForkJoinTask.buffer(new GeometryFactory().buildGeometry(geoms), distClust/2, 8);
         // Créer les clusters à partir du buffer
-        List<ClusterFeature> clusters = new ArrayList<ClusterFeature>();
+        List<ClusterFeature> clusters = new ArrayList<>();
         for(int i = 0; i < bufFac.getNumGeometries(); i++) {
-            List<DefaultFeature> facIn = new ArrayList<DefaultFeature>();
+            List<DefaultFeature> facIn = new ArrayList<>();
             
             // variable qui test l'existence dans une cluster de niveau 2
             boolean featureLevel2 = false;
-            for(DefaultFeature fac : facCov.getFeaturesIn(bufFac.getGeometryN(i)))
-            {
+            for(DefaultFeature fac : facCov.getFeaturesIn(bufFac.getGeometryN(i))) {
                 // récupère le level du default feature 
-                if(((Number)fac.getAttribute(Project.LEVEL_FIELD)).intValue() == 2)
+                if(((Number)fac.getAttribute(Project.LEVEL_FIELD)).intValue() == 2) {
                     featureLevel2 = true;
+                }
                 facIn.add(fac);
             }
             //ajout du cluster: si le niveau est 1 ou si le niveau est 2 on ajotuer si exitence un services de niveau 2
-            if (level ==1 || featureLevel2)
-            {
+            if (level ==1 || featureLevel2) {
                 clusters.add(new ClusterFeature(i, facIn));
             }
         }
         
         // créer un coverage pour les clusters
-        final DefaultFeatureCoverage<ClusterFeature> clusterCov = new DefaultFeatureCoverage<ClusterFeature>(clusters);
+        final DefaultFeatureCoverage<ClusterFeature> clusterCov = new DefaultFeatureCoverage<>(clusters);
         
         // calcule pour chaque cellule la règle d'accessibilité
         project.getMSGrid().addLayer(getName(), DataBuffer.TYPE_FLOAT, Float.NaN);
@@ -138,20 +140,23 @@ public class Facility12Rule extends AbstractRule {
                 OriginDistance origDistance = project.getDistance(cellGeom, maxDistClust);
                 
                 /// recréé les clusters en ne prenant que les services qui ont une distance inférieure à maxDistClust
-                List<ClusterFacility> clusters = new ArrayList<ClusterFacility>();
+                List<ClusterFacility> clusters = new ArrayList<>();
                 for(ClusterFeature clust : cellClusters) {
-                    List<DefaultFeature> facIn = new ArrayList<DefaultFeature>();
+                    List<DefaultFeature> facIn = new ArrayList<>();
                     double distMin = Double.MAX_VALUE;
                     for(DefaultFeature fac : clust.getFacilities()) {
                         double d = origDistance.getDistance((Point)fac.getGeometry());
-                        if(d < maxDistClust)
+                        if(d < maxDistClust) {
                             facIn.add(fac);
-                        if(d < distMin)
+                        }
+                        if(d < distMin) {
                             distMin = d;
+                        }
                     }
                     // créé un nouveau cluster avec les services facIn et la distance minimale distMin
-                    if(!facIn.isEmpty() && distMin <= maxDistNearestFac)
+                    if(!facIn.isEmpty() && distMin <= maxDistNearestFac) {
                         clusters.add(new ClusterFacility(facIn, distMin));
+                    }
                 }
 
                 double phi = 1;
@@ -168,9 +173,9 @@ public class Facility12Rule extends AbstractRule {
         
     }
     
-    public static class ClusterFacility {
-        List<DefaultFeature> facilities;
-        double distMin;
+    private static class ClusterFacility {
+        private List<DefaultFeature> facilities;
+        private double distMin;
 
         public ClusterFacility(List<DefaultFeature> facilities, double distMin) {
             this.facilities = facilities;
@@ -183,43 +188,32 @@ public class Facility12Rule extends AbstractRule {
 
         public double getNbTypeFacilities() {
             HashSet types = new HashSet();
-            for(Feature f : facilities)
+            for(Feature f : facilities) {
                 types.add(f.getAttribute(Project.TYPE_FIELD));
+            }
             return types.size();
         }
-        
-//        public double getMinDistance(OriginDistance distance) {
-//            double minDist = Double.MAX_VALUE;
-//            for(Feature f : facilities) {
-//                double d = distance.getDistance((Point)f.getGeometry());
-//                if(d < minDist)
-//                    minDist = d;
-//            }
-//            return minDist;
-//                
-//        }
 
         public double getDistMin() {
             return distMin;
         }
         
-        
     }
     
-    public static class ClusterFeature extends AbstractFeature{
+    private static class ClusterFeature extends AbstractFeature {
 
         private Integer id;
         private List<DefaultFeature> facilities;
         private MultiPoint geom;
 
-
-        /** Creates a new instance of ClusterService */
+        /** Creates a new instance of ClusterFeature */
         public ClusterFeature(int id, List<DefaultFeature> facilities) {
             this.facilities = facilities;
             this.id = id;
             Point[] points = new Point[facilities.size()];
-            for(int i = 0; i < points.length; i++)
+            for(int i = 0; i < points.length; i++) {
                 points[i] = (Point)facilities.get(i).getGeometry();
+            }
             geom = new GeometryFactory().createMultiPoint(points);
         }
 
@@ -231,34 +225,42 @@ public class Facility12Rule extends AbstractRule {
             return facilities;
         }
 
+        @Override
         public Object getId() {
             return id;
         }
 
+        @Override
         public MultiPoint getGeometry() {
             return geom;
         }
 
+        @Override
         public Object getAttribute(int ind) {
-            return null;
+            throw new IllegalArgumentException("No attributes in ClusterFeature");
         }
 
+        @Override
         public Object getAttribute(String name) {
-            return null;
+            throw new IllegalArgumentException("No attributes in ClusterFeature");
         }
 
+        @Override
         public Class getAttributeType(int ind) {
-            return Void.TYPE;
+            throw new IllegalArgumentException("No attributes in ClusterFeature");
         }
 
+        @Override
         public List<String> getAttributeNames() {
             return Collections.EMPTY_LIST;
         }
 
+        @Override
         public List<Object> getAttributes() {
             return Collections.EMPTY_LIST;
         }
 
+        @Override
         public Class getIdType() {
             return Integer.class;
         }

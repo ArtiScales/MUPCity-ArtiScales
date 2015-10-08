@@ -10,15 +10,22 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 /**
- *
+ * Dialog form for editing AHP matrix.
+ * 
  * @author Gilles Vuidel
  */
 public class AHPDialog extends javax.swing.JDialog {
 
+    /** user has validated the form ? */
     public boolean isOk = false;
+    /** the AHP matrix */
     public AHP ahp;
 
-    /** Creates new form AHPDialog */
+    /** 
+     * Creates new form AHPDialog 
+     * @param parent the parent frame
+     * @param ahp the ahp matrix
+     */
     public AHPDialog(java.awt.Frame parent, AHP ahp) {
         super(parent, true);
         initComponents();
@@ -32,7 +39,7 @@ public class AHPDialog extends javax.swing.JDialog {
         actionMap.put(cancelName, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                doClose();
+                cancelButtonActionPerformed(e);
             }
         });
         
@@ -52,12 +59,6 @@ public class AHPDialog extends javax.swing.JDialog {
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         ahpEditor = new org.thema.mupcity.AHPEditor();
-
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                closeDialog(evt);
-            }
-        });
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -105,22 +106,15 @@ public class AHPDialog extends javax.swing.JDialog {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         ahp = ahpEditor.getValue();
         isOk = true;
-        doClose();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        doClose();
-    }//GEN-LAST:event_cancelButtonActionPerformed
-
-    /** Closes the dialog */
-    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        doClose();
-    }//GEN-LAST:event_closeDialog
-
-    private void doClose() {
         setVisible(false);
         dispose();
-    }
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
 
    
     // Variables declaration - do not modify//GEN-BEGIN:variables

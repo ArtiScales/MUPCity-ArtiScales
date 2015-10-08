@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity;
 
 import Jama.EigenvalueDecomposition;
@@ -12,42 +9,60 @@ import java.util.logging.Logger;
 import org.thema.common.collection.HashMap2D;
 
 /**
- *
- * @author gvuidel
+ * AHP matrix.
+ * Matrix comparison of items for determining weights by calculating first eigenvector of the matrix.
+ * @author Gilles Vuidel
  */
 public class AHP {
-    HashMap2D<String, String, String> matrix;
+    
+    private HashMap2D<String, String, String> matrix;
 
+    /**
+     * Creates a new AHP matrix for the list of items
+     * @param items the list of items to compare
+     */
     public AHP(List<String> items) {
-        matrix = new HashMap2D<String, String, String>(items, items, "1");
+        matrix = new HashMap2D<>(items, items, "1");
     }
 
+    /**
+     * @return the matrix comparison
+     */
     public HashMap2D<String, String, String> getMatrix() {
         return matrix;
     }
 
+    /**
+     * Sets the matrix comparison
+     * @param matrix the matrix
+     */
     public void setMatrix(HashMap2D<String, String, String> matrix) {
         this.matrix = matrix;
     }
 
+    /**
+     * Calculates the first eigenvector of the comparison matrix
+     * @return the coefficient of each item
+     */
     public Map<String, Double> getCoefs() {
-        
         int size = matrix.getKeys1().size();
-        if(size == 0)
+        if(size == 0) {
             return Collections.EMPTY_MAP;
+        }
         
         double[][] mat = new double[size][size];
-        List<String> items = new ArrayList<String>(matrix.getKeys1());
+        List<String> items = new ArrayList<>(matrix.getKeys1());
         int i = 0;
         for(String s1 : items) {
             int j = 0;
             for(String s2 : items) {
                 String s = matrix.getValue(s1, s2);
                 double val;
-                if(s.startsWith("1/"))
+                if(s.startsWith("1/")) {
                     val = 1.0 / Integer.parseInt(s.substring(2));
-                else
+                } else {
                     val = Integer.parseInt(s);
+                }
                 mat[i][j++] = val;
             }
             i++;
@@ -58,16 +73,18 @@ public class AHP {
         double[] eigValues = eig.getRealEigenvalues();
         int bestInd = -1;
         double maxEigValue = -Double.MAX_VALUE;
-        for(i = 0; i < eigValues.length; i++)
+        for(i = 0; i < eigValues.length; i++) {
             if(eigValues[i] > maxEigValue) {
                 bestInd = i;
                 maxEigValue = eigValues[i];
             }
+        }
                 
         double [] vector = eig.getV().getMatrix(0, size-1, bestInd, bestInd).getColumnPackedCopy();
         double sum = 0;
-        for(i = 0; i < vector.length; i++)
+        for(i = 0; i < vector.length; i++) {
             sum += vector[i];
+        }
         double [] finalVector = new double[size];
         for(i = 0; i < size; i++) {
             finalVector[i] = size * vector[i] / sum;
@@ -78,9 +95,10 @@ public class AHP {
                         + "\nValues" + Arrays.toString(new Matrix(mat).eig().getRealEigenvalues()));
             }
         }
-        HashMap<String, Double> coefs = new HashMap<String, Double>();
-        for(i = 0; i < size; i++)
+        HashMap<String, Double> coefs = new HashMap<>();
+        for(i = 0; i < size; i++) {
             coefs.put(items.get(i), finalVector[i]);
+        }
         return coefs;        
     }
     

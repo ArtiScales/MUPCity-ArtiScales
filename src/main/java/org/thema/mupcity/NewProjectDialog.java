@@ -1,8 +1,3 @@
-/*
- * newProjectDialog.java
- *
- * Created on 7 mai 2007, 16:24
- */
 
 package org.thema.mupcity;
 
@@ -16,13 +11,13 @@ import org.geotools.feature.SchemaException;
 import org.thema.common.swing.TaskMonitor;
 
 /**
- *
+ * Dialog form for project creation.
+ * 
  * @author  Gilles Vuidel
  */
 public class NewProjectDialog extends javax.swing.JDialog {
     
-    Project project;
-    boolean isConnected = false;
+    private Project project;
     
     /** Creates new form newProjectDialog */
     public NewProjectDialog(java.awt.Frame parent) {
@@ -30,6 +25,14 @@ public class NewProjectDialog extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(parent);
     }
+
+    /**
+     * @return the created project or null
+     */
+    public Project getProject() {
+        return project;
+    }
+    
     
     /** This method is called from within the constructor to
      * initialize the form.

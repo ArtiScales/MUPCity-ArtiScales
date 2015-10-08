@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.evaluation;
 
@@ -18,19 +14,21 @@ import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.msca.Cell;
 
 /**
- *
- * @author gvuidel
+ * Evaluates the network distance to the urban border.
+ * 
+ * @author Gilles Vuidel
  */
 public class DistEnvelopeEvaluator extends Evaluator {
 
-    transient Geometry urbanBorder;
-    
-    transient SpatialGraph graph;
-    
-    transient Geometry netGeom;
+    private transient Geometry urbanBorder;
+    private transient SpatialGraph graph;
+    private transient Geometry netGeom;
+    private transient DistAmenities distAmenities;
 
-    transient DistAmenities distAmenities;
-
+    /**
+     * Creates a new DistEnvelopeEvaluator with default parameters.
+     * Before calculating evaluation, the network graph and geometry and the urban border must be set.
+     */
     public DistEnvelopeEvaluator() {
         super(new DiscreteFunction(new double[] {0.0, 200}, new double[] {1.0, 0.001}));
     }
@@ -38,9 +36,10 @@ public class DistEnvelopeEvaluator extends Evaluator {
     @Override
     public void execute(Scenario scenario, SquareGrid grid, TaskMonitor monitor) {
         Geometry points = netGeom.intersection(urbanBorder);
-        ArrayList<Feature> dest = new ArrayList<Feature>();
-        for(int i = 0; i < points.getNumGeometries(); i++)
+        ArrayList<Feature> dest = new ArrayList<>();
+        for(int i = 0; i < points.getNumGeometries(); i++) {
             dest.add(new DefaultFeature("Env_"+i, points.getGeometryN(i), null, null));
+        }
         DefaultFeatureCoverage destCov = new DefaultFeatureCoverage(dest);
         distAmenities = new DistAmenities(destCov, graph);
         
@@ -57,95 +56,31 @@ public class DistEnvelopeEvaluator extends Evaluator {
         return "DistEnv";
     }
 
+    /**
+     * Sets the urban border.
+     * Must be set before evaluation calculation
+     * @param urbanBorder a MultiLinestring representing the urban border
+     */
     public void setUrbanBorder(Geometry urbanBorder) {
         this.urbanBorder = urbanBorder;
     }
     
+    /**
+     * Sets the network graph.
+     * Must be set before evaluation calculation
+     * @param graph 
+     */
     public void setGraph(SpatialGraph graph) {
         this.graph = graph;
     }
 
+    /**
+     * Sets the network geometry.
+     * Must be set before evaluation calculation
+     * @param netGeom 
+     */
     public void setNetGeom(Geometry netGeom) {
         this.netGeom = netGeom;
     }    
-//    @Override
-//    public Double[] eval(final Scenario anal, final double mean) {
-//        final String analLayer = anal.getResultLayerName();
-//        FeatureCoverage<GridFeature> newBuild = cov.getCoverage(new FeatureFilter() {
-//            public boolean accept(Feature f) {
-//                return ((Number)f.getAttribute(analLayer)).intValue() == 2;
-//            }
-//        });
-//
-//        ArrayList<Geometry> geoms = new ArrayList<Geometry>();
-//        for(Feature f : newBuild.getFeatures())
-//            geoms.add(f.getGeometry().getCentroid());
-//
-//        Geometry buildBuf = BufferTask.threadedBuffer(new GeometryFactory().buildGeometry(geoms), radius + 5);
-//        if(buildBuf == null)
-//            buildBuf = totBuild;
-//        else
-//            buildBuf = buildBuf.union(totBuild);
-//        Geometry envelope = BufferTask.threadedBuffer(buildBuf, -radius);
-//        saveGeom(envelope, anal + "-envelope", "MultiPolygon");
-//        Geometry envLine = envelope.getBoundary();
-//        //saveGeom(envLine, "envLine", "MultiLineString");
-//        
-//        Geometry points = netGeom.intersection(envLine);
-//        saveGeom(points, anal + "-points", "MultiPoint");
-//        ArrayList<Feature> dest = new ArrayList<Feature>();
-//        for(int i = 0; i < points.getNumGeometries(); i++)
-//            dest.add(new DefaultFeature("Env_"+i, points.getGeometryN(i), null, null));
-//
-//        List<GridFeature> residBuild = cov.getFeatures(new FeatureFilter() {
-//            public boolean accept(Feature f) {
-//                return isEvaluated(((GridFeature)f).getCell(), anal);
-//            }
-//        });
-//
-//        double [] dist = new double[residBuild.size()];
-//        Arrays.fill(dist, Double.MAX_VALUE);
-//        for(Feature f : dest) {
-//            double [] dc = graph.getCostVector(f, residBuild, DijkstraPathFinder.DIST_WEIGHTER);
-//            for(int i = 0; i < dist.length; i++)
-//                if(dc[i] < dist[i])
-//                    dist[i] = dc[i];
-//        }
-//
-//        double sum = 0;
-//        int nb = 0, nbInf = 0;
-//        for(int i = 0; i < dist.length; i++)
-//            if(dist[i] != Double.MAX_VALUE) {
-//                sum += dist[i];
-//                nb++;
-//                if(dist[i] < mean && isNewBuild(residBuild.get(i).getCell(), anal))
-//                    nbInf++;
-//            }
-//
-//        return new Double[] {sum / nb, (double)nb, (double)nbInf};
-//    }
-
-
-
-//    private void saveGeom(Geometry geom, String name, String geomType) {
-//        try {
-//            ShapefileDataStore store = new ShapefileDataStore(new File(
-//                    Project.getProject().getDirectory().getAbsolutePath() + File.separator + name + ".shp").toURI().toURL());
-//            SimpleFeatureType fType = DataUtilities.createType("result", "geom:" + geomType);
-//            store.createSchema(fType);
-//            FeatureStore fStore = (FeatureStore) store.getFeatureSource();
-//            FeatureCollection fCol = FeatureCollections.newCollection();
-//            for (int i = 0; i < geom.getNumGeometries(); i++) {
-//                SimpleFeature sf = DataUtilities.template(fType);
-//                sf.setAttributes(new Object[]{geom.getGeometryN(i)});
-//                fCol.add(sf);
-//            }
-//            fStore.addFeatures(fCol);
-//            store.dispose();
-//        } catch (Exception ex) {
-//            Logger.getLogger(DistEnvelopeEvaluator.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-
 
 }

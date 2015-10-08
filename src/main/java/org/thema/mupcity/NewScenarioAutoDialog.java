@@ -1,8 +1,3 @@
-/*
- * SimulationDialog.java
- *
- * Created on 8 juin 2007, 12:15
- */
 
 package org.thema.mupcity;
 
@@ -11,26 +6,34 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Dialog form for creating new automatic multiscale scenario.
+ * 
  * @author  Gilles Vuidel
  */
-public class SimulationDialog extends javax.swing.JDialog {
+public class NewScenarioAutoDialog extends javax.swing.JDialog {
 
+    /** user has validated the form ? */
     public boolean returnOk = false;
-    public ScenarioAuto analyse;
+    
+    /** the new scenario */
+    public ScenarioAuto scenario;
     
     /**
-     * Creates new form SimulationDialog
+     * Creates new form ScenarioAutoDialog
+     * @param parent the parent frame
+     * @param project the current project
      */
-    public SimulationDialog(java.awt.Frame parent, Project project) {
+    public NewScenarioAutoDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
         initComponents();
         setLocationRelativeTo(parent);
 
         if(!project.isDecomp()) {
-            JOptionPane.showMessageDialog(this, "No decomposition !");
+            JOptionPane.showMessageDialog(parent, "No decomposition !");
             setVisible(false);
         }
+        ruleSelectionPanel.setProject(project);
+        
         DefaultComboBoxModel lstStart = new DefaultComboBoxModel();
         DefaultComboBoxModel lstEnd = new DefaultComboBoxModel();
         
@@ -68,43 +71,43 @@ public class SimulationDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle"); // NOI18N
-        setTitle(bundle.getString("SimulationDialog.title")); // NOI18N
+        setTitle(bundle.getString("NewScenarioAutoDialog.title")); // NOI18N
 
         startComboBox.setEnabled(false);
 
-        jLabel1.setText(bundle.getString("SimulationDialog.jLabel1.text")); // NOI18N
+        jLabel1.setText(bundle.getString("NewScenarioAutoDialog.jLabel1.text")); // NOI18N
         jLabel1.setEnabled(false);
 
         endComboBox.setEnabled(false);
 
-        jLabel2.setText(bundle.getString("SimulationDialog.jLabel2.text")); // NOI18N
+        jLabel2.setText(bundle.getString("NewScenarioAutoDialog.jLabel2.text")); // NOI18N
         jLabel2.setEnabled(false);
 
-        okButton.setText(bundle.getString("SimulationDialog.okButton.text")); // NOI18N
+        okButton.setText(bundle.getString("NewScenarioAutoDialog.okButton.text")); // NOI18N
         okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okButtonActionPerformed(evt);
             }
         });
 
-        cancelButton.setText(bundle.getString("SimulationDialog.cancelButton.text")); // NOI18N
+        cancelButton.setText(bundle.getString("NewScenarioAutoDialog.cancelButton.text")); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
             }
         });
 
-        nMaxTextField.setText(bundle.getString("SimulationDialog.nMaxTextField.text")); // NOI18N
+        nMaxTextField.setText(bundle.getString("NewScenarioAutoDialog.nMaxTextField.text")); // NOI18N
 
-        jLabel3.setText(bundle.getString("SimulationDialog.jLabel3.text")); // NOI18N
+        jLabel3.setText(bundle.getString("NewScenarioAutoDialog.jLabel3.text")); // NOI18N
 
-        strictCheckBox.setText(bundle.getString("SimulationDialog.strictCheckBox.text")); // NOI18N
+        strictCheckBox.setText(bundle.getString("NewScenarioAutoDialog.strictCheckBox.text")); // NOI18N
 
-        jLabel4.setText(bundle.getString("SimulationDialog.jLabel4.text")); // NOI18N
+        jLabel4.setText(bundle.getString("NewScenarioAutoDialog.jLabel4.text")); // NOI18N
 
-        nameTextField.setText(bundle.getString("SimulationDialog.nameTextField.text")); // NOI18N
+        nameTextField.setText(bundle.getString("NewScenarioAutoDialog.nameTextField.text")); // NOI18N
 
-        noBuildCheckBox.setText(bundle.getString("SimulationDialog.noBuildCheckBox.text")); // NOI18N
+        noBuildCheckBox.setText(bundle.getString("NewScenarioAutoDialog.noBuildCheckBox.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -187,7 +190,7 @@ public class SimulationDialog extends javax.swing.JDialog {
         boolean strict = strictCheckBox.isSelected();
         String simName = nameTextField.getText();
 
-        analyse = ScenarioAuto.createMultiScaleAnalysis(simName, start, end, 
+        scenario = ScenarioAuto.createMultiScaleScenario(simName, start, end, 
                 nMax, strict, ruleSelectionPanel.getAHP(), noBuildCheckBox.isSelected(), ruleSelectionPanel.isAgregMean());
         returnOk = true;
         setVisible(false);

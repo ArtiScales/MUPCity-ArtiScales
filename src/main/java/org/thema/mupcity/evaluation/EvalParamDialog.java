@@ -8,13 +8,19 @@ import org.thema.common.param.DefaultParamEditor;
 import org.thema.common.param.ParamEditor;
 
 /**
- *
+ * Dialog form for editing evaluator parameters by reflection.
+ * 
  * @author Gilles Vuidel
  */
 public class EvalParamDialog extends javax.swing.JDialog {
 
     private ParamEditor<Evaluator> currentEditor;
     
+    /**
+     * Creates a new EvalParamDialog
+     * @param parent the parent frame
+     * @param evaluators all project evaluators
+     */
     public EvalParamDialog(java.awt.Frame parent, Collection<Evaluator> evaluators) {
         super(parent, true);
         initComponents();

@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -23,18 +20,23 @@ import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
 
 /**
- *
- * @author gvuidel
+ * Leisure rule for level 1, 2 and 3.
+ * @author Gilles Vuidel
  */
 public class LeisureRule extends AbstractRule {
 
     @ReflectObject.NoParam
-    int level;
+    private int level;
     
     @ReflectObject.Name("Distance function")
     @ReflectObject.Comment("Last Y value must be 0 and function must be monotone decreasing")
-    DiscreteFunction distance;
+    private DiscreteFunction distance;
     
+    /**
+     * Creates a new Leisure rule for level 1, 2 or 3.
+     * Initializes parameters with default values depending on the level.
+     * @param level the level 1, 2 or 3
+     */
     public LeisureRule(int level) {
         super(Arrays.asList(Project.Layers.LEISURE));
         this.level = level;
@@ -46,6 +48,7 @@ public class LeisureRule extends AbstractRule {
             distance = new DiscreteFunction(new double[]{0.0, 5000.0}, new double []{1.0, 0.0});
         }
     }
+    
     @Override
     public String getName() {
         return "lei" + level;
@@ -55,8 +58,9 @@ public class LeisureRule extends AbstractRule {
     public void createRule(final Project project) {
         final DefaultFeatureCoverage<DefaultFeature> leiCov = project.getCoverageLevel(Layers.LEISURE, level);
         final HashSet types = new HashSet();
-        for(Feature f : leiCov.getFeatures())
+        for(Feature f : leiCov.getFeatures()) {
             types.add(f.getAttribute(Project.TYPE_FIELD));
+        }
         
         project.getMSGrid().addLayer(getName(), DataBuffer.TYPE_FLOAT, Float.NaN);
         project.getMSGrid().execute(new AbstractLayerOperation(4) {
@@ -67,28 +71,32 @@ public class LeisureRule extends AbstractRule {
                 Envelope envMax = new Envelope(cellGeom.getEnvelopeInternal());
                 envMax.expandBy(distMax);
                 OriginDistance origDistance = project.getDistance(cellGeom, distMax);
-                HashMap<Object, Double> minDist = new HashMap<Object, Double>();
+                HashMap<Object, Double> minDist = new HashMap<>();
                 for(Feature lei : leiCov.getFeatures(envMax)) {
                     double dist = origDistance.getDistance((Point)lei.getGeometry());
-                    if(dist > distMax)
+                    if(dist > distMax) {
                         continue;
+                    }
                     Object type = lei.getAttribute(Project.TYPE_FIELD);
                     if(minDist.containsKey(type)) {
                         double min = minDist.get(type);
-                        if(dist < min)
+                        if(dist < min) {
                             minDist.put(type, dist);
-                    } else
-                        minDist.put(type, dist);                    
+                        }
+                    } else {
+                        minDist.put(type, dist);
+                    }                    
                 }
                 if(minDist.isEmpty()) {
                     cell.setLayerValue(getName(), 0);
                     return;
                 }
                 double o;
-                if(types.size() == 1) // pour éviter la division par 0
+                if(types.size() == 1) { // pour éviter la division par 0
                     o = 0;
-                else
+                } else {
                     o = 1 - (minDist.size()-1) / (types.size() - 1);
+                }
                 // on maximise l'évaluation et donc on minimise la distance car la fonction d'évaluation est monotone décroissante
                 double min = Collections.min(minDist.values());
                 cell.setLayerValue(getName(), Math.pow(distance.getValue(min), o));

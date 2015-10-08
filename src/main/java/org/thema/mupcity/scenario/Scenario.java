@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.scenario;
 
 import java.awt.image.DataBuffer;
@@ -20,14 +17,19 @@ import org.thema.msca.operation.AbstractOperation;
 import org.thema.msca.operation.MeanOperation;
 
 /**
- *
- * @author gvuidel
+ * Base class for scenario.
+ * 
+ * @author Gilles Vuidel
  */
 public abstract class Scenario {
     
+    /** the cell is empty (ie. non built)  */
     public static final int EMPTY = 0;
+    /** the cell is initially built */
     public static final int BUILD = 1;
+    /** the cell is build in the scenario */
     public static final int NEW_BUILD = 2;
+    /** the cell is initially built and has been unbuilt */
     public static final int REM_BUILD = -1;
     
     private String name;
@@ -38,6 +40,13 @@ public abstract class Scenario {
 
     protected transient DefaultGroupLayer layers;
 
+    /**
+     * Creates a new scenario
+     * @param name name of the new scenario
+     * @param ahp the AHP matrix for weights
+     * @param nMax the maximum number of cells which can be built between 1 and 9
+     * @param mean true for average aggregation, false for yager
+     */
     public Scenario(String name, AHP ahp, int nMax, boolean mean) {
         this.name = name;
         this.ahp = ahp;
@@ -45,38 +54,74 @@ public abstract class Scenario {
         this.mean = mean;
     }
     
+    /**
+     * @return the AHP matrix
+     */
     public AHP getAHP() {
         return ahp;
     }
 
+    /**
+     * @return the maximum number of cells which can be built between 1 and 9
+     */
     public int getNMax() {
         return nMax;
     }
 
+    /**
+     * @return  the name of the scenario
+     */
     public String getName() {
         return name;
     }
     
+    /**
+     * @return the name of the scenario
+     */
     @Override
     public String toString() {
         return name;
     }
     
+    /**
+     * @return the name of the layer in the grid containing the result of the scenario
+     */
     public abstract String getResultLayerName();
 
+    /**
+     * @return the name of the layer in the grid containing the evaluation of the scenario
+     */
     public abstract String getEvalLayerName();
 
+    /**
+     * Warning, the layer in the grid does not necessarily exist
+     * @return the name of the layer in the grid containing the morpho rule of the scenario
+     */
     public abstract String getBuildFreeLayerName();
 
-    public DefaultGroupLayer getLayers() {
+    /**
+     * Creates the group layers if it has not been created yet
+     * @return the group of layers for viewing the scenario layers
+     */
+    public synchronized DefaultGroupLayer getLayers() {
         if(layers == null) {
             createLayers(Project.getProject().getMSGrid());
         }
         return layers;
     }
     
+    /**
+     * Creates the group layers of the scenario.
+     * This method is called by {@link #getLayers() }
+     * @param msGrid the multiscale grid
+     */
     protected abstract void createLayers(MSGridBuilder<? extends SquareGrid> msGrid);
     
+    /**
+     * Creates the layers for the scenario in the MSGrid.
+     * The result layer, the evaluation layer and the morpho rule if needed.
+     * @param msGrid the multi scale grid
+     */
     protected void initLayers(MSGridBuilder msGrid) {
         boolean useBuildRule = false;
         Map<String, Double> coefLayers = new HashMap<>();

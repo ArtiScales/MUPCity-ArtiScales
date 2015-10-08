@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity;
 
 import java.util.Arrays;
@@ -11,16 +8,23 @@ import org.thema.mupcity.Project.Layers;
 import org.thema.drawshape.style.FeatureStyle;
 
 /**
- *
- * @author gvuidel
+ * Layer definition for predefined layers.
+ * 
+ * @author Gilles Vuidel
  */
 public class LayerDef {
-    Layers layer;
-    String desc;
-    FeatureStyle style;
-    List<String> attrNames;
-    List<Class> attrClasses;
+    private Layers layer;
+    private String desc;
+    private FeatureStyle style;
+    private List<String> attrNames;
+    private List<Class> attrClasses;
 
+    /**
+     * Creates a new LayerDef.
+     * @param layer the predefined layer
+     * @param desc the localized name
+     * @param style the layer style
+     */
     public LayerDef(Layers layer, String desc, FeatureStyle style) {
         this.layer = layer;
         this.desc = desc;
@@ -28,26 +32,84 @@ public class LayerDef {
         this.attrNames = Collections.EMPTY_LIST;
     }
     
+    /**
+     * Creates a new LayerDef.
+     * @param layer the predefined layer
+     * @param desc the localized name
+     * @param style the layer style
+     * @param attr the required attribute
+     * @param type the type of the required attribute
+     */
     public LayerDef(Layers layer, String desc, FeatureStyle style, String attr, Class type) {
         this(layer, desc, style);
         this.attrNames = Arrays.asList(attr);
         this.attrClasses = Arrays.asList(type);
     }
     
+    /**
+     * Creates a new LayerDef.
+     * @param layer the predefined layer
+     * @param desc the localized name
+     * @param style the layer style
+     * @param attr1 the first required attribute
+     * @param type1 the type of the first required attribute
+     * @param attr2 the second required attribute
+     * @param type2 the type of the second required attribute
+     */
     public LayerDef(Layers layer, String desc, FeatureStyle style, String attr1, Class type1, String attr2, Class type2) {
         this(layer, desc, style);
         this.attrNames = Arrays.asList(attr1, attr2);
         this.attrClasses = Arrays.asList(type1, type2);
     }
 
+    /**
+     * @return the localized name
+     */
     @Override
     public String toString() {
         return desc;
     }
     
+    /**
+     * @return the internal name of the predefined layer
+     */
     public String getName() {
         return layer.toString();
     }
-    
+
+    /**
+     * @return the predefined layer
+     */
+    public Layers getLayer() {
+        return layer;
+    }
+
+    /**
+     * @return the required attributes name
+     */
+    public List<String> getAttrNames() {
+        return attrNames;
+    }
+
+    /**
+     * @return the types of all required attributes name
+     */
+    public List<Class> getAttrClasses() {
+        return attrClasses;
+    }
+
+    /**
+     * @return the localized name of this layer
+     */
+    public String getDesc() {
+        return desc;
+    }
+
+    /**
+     * @return the layer style
+     */
+    public FeatureStyle getStyle() {
+        return style;
+    }
     
 }

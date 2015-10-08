@@ -16,7 +16,8 @@ import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
 
 /**
- *
+ * Public transport rule.
+ * 
  * @author Gilles Vuidel
  */
 public class PTRule extends AbstractRule {
@@ -30,6 +31,9 @@ public class PTRule extends AbstractRule {
     @ReflectObject.Name("Distance train station function")
     private DiscreteFunction distanceStation = new DiscreteFunction(new double[]{0.0, 3000.0}, new double []{1.0, 0.0});
     
+    /**
+     * Creates a new public transport rule with default parameters.
+     */
     public PTRule() {
         super(Arrays.asList(Layers.BUS_STATION, Layers.TRAIN_STATION));
     }

@@ -1,8 +1,3 @@
-/*
- * MapInternalFrame.java
- *
- * Created on 13 juin 2008, 11:14
- */
 
 package org.thema.mupcity.scenario;
 
@@ -31,23 +26,31 @@ import org.thema.msca.operation.AbstractAgregateOperation;
 import org.thema.mupcity.Project;
 
 /**
- *
- * @author  gvuidel
+ * Frame for manual scenario editing.
+ * 
+ * @author  Gilles Vuidel
  */
 public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSelectionListener {
     
     private DefaultGroupLayer layers;
     private ScenarioManual scenario;
 
+    private Project project;
     private MSGridBuilder<? extends SquareGrid> msGrid;
     
     private List<MSFeature> selFeatures;
 
-    /** Creates new form MapInternalFrame */
-    public ScenarioFrame(ScenarioManual scenario, DefaultGroupLayer layers, MSGridBuilder<? extends SquareGrid> msGrid) {
+    /**
+     * Creates new form ScenarioFrame 
+     * @param scenario the scenario to view/edit
+     * @param layers the layers to add in the mapframe
+     * @param project the current project
+     */
+    public ScenarioFrame(ScenarioManual scenario, DefaultGroupLayer layers, Project project) {
         initComponents();
         setTitle(Project.NODE_SCENARIO + " : " + scenario.getName());
-        this.msGrid = msGrid;
+        this.project = project;
+        this.msGrid = project.getMSGrid();
         this.layers = layers;
         this.scenario = scenario;
         mapViewer.setRootLayer(layers);
@@ -58,6 +61,9 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         pack();
     }
     
+    /**
+     * @return the map viewer of this frame
+     */
     public MapViewer getMapViewer() {
         return mapViewer;
     }
@@ -339,7 +345,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
     private void undo() {
         try {
-            Project.getProject().reloadLayer(scenario.getResultLayerName());
+            project.reloadLayer(scenario.getResultLayerName());
             refresh();
         } catch (IOException ex) {
             Logger.getLogger(ScenarioFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -349,7 +355,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
     
     private void save() {
         try {
-            Project.getProject().saveLayer(scenario.getResultLayerName());
+            project.saveLayer(scenario.getResultLayerName());
         } catch (IOException ex) {
             Logger.getLogger(ScenarioFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Une erreur est survenue pendant l'enregistrement :\n" + ex.getLocalizedMessage());
@@ -366,9 +372,6 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                  sceLayers.get(i).setVisible(false);
                  sceLayers.get(i-1).setVisible(true);
                  gridLayers.get(n-i-1).setVisible(false);
-//                     Envelope env = f.getGeometry().getEnvelopeInternal();
-//                     env.expandBy(env.getWidth()*Math.pow(project.params.coefDecomp, 2), env.getHeight()*Math.pow(project.params.coefDecomp, 2));
-//                     frm.getMapViewer().getMap().setZoom(JTS.envToRect(env));
                  updateNbNewBuild();
                  return ;
              }
@@ -385,9 +388,6 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                  sceLayers.get(i).setVisible(false);
                  sceLayers.get(i+1).setVisible(true);
                  gridLayers.get(n-i-1).setVisible(true);
-    //                     Envelope env = f.getGeometry().getEnvelopeInternal();
-    //                     env.expandBy(env.getWidth()*project.params.coefDecomp, env.getHeight()*project.params.coefDecomp);
-    //                     frm.getMapViewer().getMap().setZoom(JTS.envToRect(env));
                  updateNbNewBuild();
                  return ;
              }

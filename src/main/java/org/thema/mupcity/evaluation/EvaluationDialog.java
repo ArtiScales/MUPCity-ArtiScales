@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * EvaluationDialog.java
- *
- * Created on 15 mars 2010, 09:36:28
- */
 
 package org.thema.mupcity.evaluation;
 
@@ -19,6 +9,7 @@ import java.awt.Frame;
 import java.awt.image.DataBuffer;
 import java.beans.PropertyVetoException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,14 +44,19 @@ import org.thema.mupcity.MainFrame;
 import org.thema.mupcity.operation.YagerAgregOperation;
 
 /**
- *
- * @author gvuidel
+ * Dialog form for launching ex post evaluations.
+ * 
+ * @author Gilles Vuidel, Florian Litot
  */
 public class EvaluationDialog extends javax.swing.JDialog {
 
-    Project project;
+    private Project project;
 
-    /** Creates new form EvaluationDialog */
+    /**
+     * Creates new form EvaluationDialog.
+     * @param parent the parent frame
+     * @param project the current project
+     */
     public EvaluationDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
         initComponents();
@@ -174,51 +170,38 @@ public class EvaluationDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(19, 19, 19)
-                        .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(4, 4, 4)
-                        .add(nameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel5)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(nameTextField))
+                            .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(evalParamButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
+                            .add(layout.createSequentialGroup()
+                                .add(scenarioRadioButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 97, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(scenarioComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(externScenarioRadioButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(31, 31, 31)
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
-                        .add(63, 63, 63)
-                        .add(seuilSpinner, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(evalParamButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(scenarioRadioButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(2, 2, 2)
-                        .add(scenarioComboBox, 0, 477, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(19, 19, 19)
-                        .add(externScenarioRadioButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(418, 418, 418)
-                        .add(okButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
-                        .add(6, 6, 6)
-                        .add(cancelButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
-                .add(70, 70, 70))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel1)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(seuilSpinner))
+                            .add(layout.createSequentialGroup()
+                                .add(okButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 82, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(cancelButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 97, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -228,42 +211,40 @@ public class EvaluationDialog extends javax.swing.JDialog {
                     .add(layout.createSequentialGroup()
                         .add(3, 3, 3)
                         .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(nameTextField))
+                    .add(nameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(6, 6, 6)
-                .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(buildResidselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(6, 6, 6)
-                .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, Short.MAX_VALUE)
                 .add(6, 6, 6)
-                .add(netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(netN1SelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(18, 18, 18)
-                .add(jLabel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(1, 1, 1)
-                .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(buildTotselectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(11, 11, 11)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(3, 3, 3)
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(seuilSpinner))
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(seuilSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(11, 11, 11)
-                .add(evalParamButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(evalParamButton)
                 .add(18, 18, 18)
-                .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                .add(evalSelectionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(scenarioRadioButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
-                        .add(1, 1, 1)
-                        .add(scenarioComboBox)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 1, Short.MAX_VALUE)
+                        .add(scenarioComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(externScenarioRadioButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(extScenarioSelectFilePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(6, 6, 6)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(okButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(cancelButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(cancelButton)
+                    .add(okButton))
+                .add(24, 24, 24))
         );
 
         externScenarioRadioButton.getAccessibleContext().setAccessibleName(bundle.getString("EvaluationDialog.externScenarioRadioButton.AccessibleContext.accessibleName")); // NOI18N
@@ -275,328 +256,19 @@ public class EvaluationDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        
         new Thread(new Runnable() {
+            @Override
             public void run() {
-                 try {
-                    final TaskMonitor monitor = new TaskMonitor(getParent(), "Evaluation...", "", 0, 10);
-                    monitor.popupNow();
-                    Scenario scenario;
-            //        final ScenarioAuto defaultAnal = ScenarioAuto.createMonoScaleAnalysis("Empty", project.getMSGrid().getResolutions().last(), 0, new AHP(Collections.EMPTY_LIST), false, false);
-
-            //            defaultAnal.perform(project.getMSGrid());
-            //            analysis.add(defaultAnal);
-                    if(scenarioRadioButton.isSelected())
-                        scenario = (Scenario) scenarioComboBox.getSelectedItem();
-                    else
-                        scenario = new ExternalScenario(extScenarioSelectFilePanel.getSelectedFile());
-                    
-        
-                    monitor.setNote("Initialisation...");
-                    MSGridBuilder<SquareGridExtent> msGrid = project.getMSGrid();
-                    File residFile = buildResidselectFilePanel.getSelectedFile();
-                    // chargement du shapefile
-                    DefaultFeatureCoverage<DefaultFeature> residCov = new DefaultFeatureCoverage<>(DefaultFeature.loadFeatures(residFile));
-                    // crée la couche raster 
-                    msGrid.addLayer(Evaluator.BATI_RESID, DataBuffer.TYPE_BYTE, 0);
-                    // rasterisation du bati résidentiel
-                    msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.ISEMPTY, Evaluator.BATI_RESID, residCov), true);
-                    // on supprime les cellules qui ne sont pas bati
-                    msGrid.execute(new AbstractLayerOperation(4) {
-                        public void perform(Cell cell) {
-                            if (cell.getLayerValue(Project.BUILD) == 0 && cell.getLayerValue(Evaluator.BATI_RESID) == 1) {
-                                cell.setLayerValue(Evaluator.BATI_RESID, 0);
-                            }
-                        }
-                    }, true);
-
-                    // récupère la grille à la résolution la plus fine
-                    SquareGrid grid = msGrid.getGrid(msGrid.getResolutions().last());
-
-                    Geometry totBuildBuf = null;
-                    if(buildTotselectFilePanel.getSelectedFile() != null) {
-                        // chargement du bati total
-                        Geometry totBuild = GlobalDataStore.createDataStore(buildTotselectFilePanel.getSelectedFile().getParentFile())
-                                .getGeometry(buildTotselectFilePanel.getSelectedFile().getName());
-                        double radius = ((Number)seuilSpinner.getValue()).doubleValue() / 2;
-                        totBuildBuf = BufferForkJoinTask.threadedBuffer(totBuild, radius);
-                        
-                        // Création de la bordure urbaine en tenant compte des nouvelles cellules baties du scénario
-                        GridFeatureCoverage cov = new GridFeatureCoverage(grid);
-                        final String analLayer = scenario.getResultLayerName();
-                        FeatureCoverage<GridFeatureCoverage.GridFeature> newBuild = cov.getCoverage(new FeatureFilter() {
-                            public boolean accept(Feature f) {
-                                return ((Number)f.getAttribute(analLayer)).intValue() == 2;
-                            }
-                        });
-
-                        ArrayList<Geometry> geoms = new ArrayList<Geometry>();
-                        for(Feature f : newBuild.getFeatures())
-                            geoms.add(f.getGeometry().getCentroid());
-
-                        Geometry buildBuf = BufferForkJoinTask.threadedBuffer(new GeometryFactory().buildGeometry(geoms), radius + 5);
-                        if(buildBuf == null)
-                            buildBuf = totBuildBuf;
-                        else
-                            buildBuf = buildBuf.union(totBuildBuf);
-                        Geometry envelope = BufferForkJoinTask.threadedBuffer(buildBuf, -radius);
-                        // bordure urbaine
-                        Geometry envLine = envelope.getBoundary();
-                        
-                        for(Evaluator evaluator : project.getEvaluators()) {
-                            if(evaluator instanceof NbCellOnEnvelopeEvaluator)
-                                ((NbCellOnEnvelopeEvaluator)evaluator).setUrbanBorder(envLine);
-                            else if(evaluator instanceof DistEnvelopeEvaluator)
-                                ((DistEnvelopeEvaluator)evaluator).setUrbanBorder(envLine);
-                        }
-                    }
-                    
-                    if(netN1SelectFilePanel.getSelectedFile() != null) {
-                        Geometry netGeom = GlobalDataStore.createDataStore(netN1SelectFilePanel.getSelectedFile().getParentFile())
-                                .getGeometry(netN1SelectFilePanel.getSelectedFile().getName());
-                        SpatialGraph graph= new SpatialGraph(GlobalDataStore.getFeatures(netN1SelectFilePanel.getSelectedFile(), null, null),
-                                new GeometryPrecisionReducer(new PrecisionModel(10)));
-                        for(Evaluator evaluator : project.getEvaluators()) {
-                            if(evaluator instanceof DistMinAmenEvaluator)
-                                ((DistMinAmenEvaluator)evaluator).setGraph(graph);
-                            else if(evaluator instanceof NbAmenEvaluator)
-                                ((NbAmenEvaluator)evaluator).setGraph(graph);
-                            else if(evaluator instanceof DistEnvelopeEvaluator) {
-                                ((DistEnvelopeEvaluator)evaluator).setGraph(graph);
-                                ((DistEnvelopeEvaluator)evaluator).setNetGeom(netGeom);
-                            }
-                            else if(evaluator instanceof NbStationsEvaluator)
-                                ((NbStationsEvaluator)evaluator).setGraph(graph);
-                            
-                        }
-                    }
-                    
-                    
-                    Map<String, Double> coefEvaluators = evalSelectionPanel.getCoefEvaluators();
-                    monitor.setMaximum(coefEvaluators.size());
-                    Map<String, Double> coefLayers = new HashMap<>();
-                    for(Evaluator evaluator : project.getEvaluators()) {
-                        if(!coefEvaluators.containsKey(evaluator.getShortName()))
-                            continue;
-                        
-                        evaluator.execute(scenario, grid, monitor.getSubMonitor(0, 100, 1));
-                        // change le shortname en nom du layer pour l'opération d'agrégation
-                        coefLayers.put(evaluator.getEvalLayerName(scenario), coefEvaluators.get(evaluator.getShortName()));
-                    }
-
-                    if(evalSelectionPanel.isAgregMean()) {
-                        grid.addDynamicLayer(scenario.getName() + "_eval_agreg", new MeanOperation(coefLayers, 4, false));
-                    } else {
-                        grid.addDynamicLayer(scenario.getName() + "_eval_agreg", new YagerAgregOperation(coefLayers));
-                    }
-                    
-                    try {
-                        MapInternalFrame frm = new MapInternalFrame();
-                        GridGroupLayer gridGroupLayer = new GridGroupLayer("grid", grid, null);
-                        
-                        //new File(nameTextField + "/" + scenario.getName() + "_eval_agreg")
-                        // création des sous répertoires 
-                        File rep = new File (project.getDirectory().getAbsolutePath(), nameTextField.getText());
-                        rep.mkdir();
-                        File fichier = new File(rep.getAbsolutePath(), scenario.getName() + "_eval_agreg.tif");
-                        ((RasterLayer)gridGroupLayer.getLayer(scenario.getName() + "_eval_agreg")).saveRaster(fichier);
-                        
-                     
-                        List <Evaluator> listSelectEvaluator = new ArrayList<Evaluator>();
-                        // boucler sur chaque evaluator et enregistrer le tif correspondant
-                        for(Evaluator evaluator : project.getEvaluators()) {
-                            // sélectionne uniquement les evaluators
-                            if(!coefEvaluators.containsKey(evaluator.getShortName()))
-                            continue;
-                            listSelectEvaluator.add(evaluator);
-                            fichier = new File(rep.getAbsolutePath(),  evaluator.getShortName() + ".tif");
-                            ((RasterLayer)gridGroupLayer.getLayer(evaluator.getEvalLayerName(scenario))).saveRaster(fichier);
-                        }
-                        
-                        // enregistrement en fichier xml des evaluators et ahp
-                        EvaluatorSerialisation eval = new EvaluatorSerialisation(listSelectEvaluator, evalSelectionPanel.getAHP(), coefEvaluators);
-                        eval.save(rep);
-                        
-                        
-                        gridGroupLayer.setExpanded(true);
-                        frm.getMapViewer().setRootLayer(gridGroupLayer);
-                        frm.setName("Evaluation - " + scenario.getName());
-                        frm.setTitle("Evaluation - " + scenario.getName());
-                        ((MainFrame)getParent()).getDesktopPane().add(frm);
-                        frm.setMaximum(true);
-                        frm.setVisible(true);
-                        frm.setSelected(true);
-                        frm.getMapViewer().setTreeLayerVisible(true);
-                        frm.getMapViewer().getMap().setZoom(project.getBounds());
-                    } catch (PropertyVetoException ex) {
-                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                        
-//                    NbCellOnEnvelopeEvaluator nbCellEnvEval = null;
-//                    if(totBuildBuf != null) {
-//                        monitor.setNote("Envelope");
-//                        nbCellEnvEval = new NbCellOnEnvelopeEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, project.getMSGrid(), grid,
-//                                totBuildBuf, ((Number)seuilSpinner.getValue()).doubleValue());
-//                    }
-//
-//                    DistEnvelopeEvaluator envEval = null;
-//                    if(totBuildBuf != null && netN1SelectFilePanel.getSelectedFile() != null) {
-//                        monitor.setNote("Envelope");
-//                        envEval = new DistEnvelopeEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid,
-//                            totBuildBuf, netN1SelectFilePanel.getSelectedFile(), ((Number)seuilSpinner.getValue()).doubleValue());
-//                    }
-//
-//                    NbAmenEvaluator n1NbEval = null;
-//                    DistMinAmenEvaluator n1MinEval = null;
-////                    if(netN1SelectFilePanel.getSelectedFile() != null) {
-//                    if(project.isLayerExist(Project.Layers.FACILITY)) {
-//                        monitor.setNote("Facilities L1");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.FACILITY, 1);
-//                        n1NbEval = new NbAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist, (Integer)distFacN1Spinner.getValue());
-//                        n1MinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                    }
-//
-//                    NbAmenEvaluator n2NbEval = null;
-//                    DistMinAmenEvaluator n2MinEval = null;
-////                    if(netN2SelectFilePanel.getSelectedFile() != null) {
-//                    if(project.isLayerExist(Project.Layers.FACILITY)) {
-//                        monitor.setNote("Facilities L2");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.FACILITY, 2);
-//                        n2NbEval = new NbAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist, (Integer)distFacN2Spinner.getValue());
-//                        n2MinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                    }
-//                    
-//                    DistMinAmenEvaluator n3MinEval = null;
-////                    if(netN2SelectFilePanel.getSelectedFile() != null) {
-//                    if(project.isLayerExist(Project.Layers.FACILITY)) {
-//                        monitor.setNote("Facilities L3");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.FACILITY, 3);
-//                        n3MinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                    }
-//                    
-//                    NbAmenEvaluator n1LeiNbEval = null;
-//                    DistMinAmenEvaluator n1LeiMinEval = null;
-//                    if(project.isLayerExist(Project.Layers.LEISURE)) {
-//                        monitor.setNote("Leisures L1");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.LEISURE, 1);
-//                        n1LeiMinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                        n1LeiNbEval = new NbAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist, (Integer)distLeiN1Spinner.getValue());
-//                    }
-//                    
-//                    NbAmenEvaluator n2LeiNbEval = null;
-//                    DistMinAmenEvaluator n2LeiMinEval = null;
-//                    if(project.isLayerExist(Project.Layers.LEISURE)) {
-//                        monitor.setNote("Leisures L2");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.LEISURE, 2);
-//                        n2LeiMinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                        n2LeiNbEval = new NbAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist, (Integer)distLeiN2Spinner.getValue());
-//                    }
-//                    
-//                    NbAmenEvaluator n3LeiNbEval = null;
-//                    DistMinAmenEvaluator n3LeiMinEval = null;
-//                    if(project.isLayerExist(Project.Layers.LEISURE)) {
-//                        monitor.setNote("Leisures L3");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.LEISURE, 3);
-//                        n3LeiMinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                        n3LeiNbEval = new NbAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist, (Integer)distLeiN3Spinner.getValue());
-//                    }
-//                    
-//                    NbAmenEvaluator busNbEval = null;
-//                    if(project.isLayerExist(Project.Layers.BUS_STATION)) {
-//                        monitor.setNote("Bus station");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.BUS_STATION);
-//                        busNbEval = new NbAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist, (Integer)distBusSpinner.getValue());
-//                    }
-//                    
-//                    DistMinAmenEvaluator trainMinEval = null;
-//                    if(project.isLayerExist(Project.Layers.TRAIN_STATION)) {
-//                        monitor.setNote("Train station");
-//                        DistAmenities dist = new DistAmenities(project, Project.Layers.TRAIN_STATION);
-//                        trainMinEval = new DistMinAmenEvaluator(monitor.getSubMonitor(0, analysis.size(), 1), analysis, grid, dist);
-//                    }
-//
-//                    monitor.setNote("Noir/Blanc");
-//                    NbNearWhiteEvaluator nearWhiteEval = new NbNearWhiteEvaluator(monitor, analysis, grid);
-//                    MeanWhiteEvaluator meanEval = new MeanWhiteEvaluator(monitor, analysis, grid);
-//                    NbCellEvaluator nbCell = new NbCellEvaluator(monitor, analysis, grid);
-//                    
-//                    StringBuilder res = new StringBuilder("Analyse\tNb Env\tDistmin Env\tDistmin facN1\tNb facL1\tDistmin facL2\tNb facN2\tDistmin facL3\t"
-//                            + "Distmin leiL1\tNb leiL1\tDistmin leiL2\tNb leiL2\tDistmin leiL3\tNb leiL3\tNb bus\tDistmin train\tMeanWhiteCell\tNbNearWhite\tNbCell\n");
-//                    for(Scenario anal : analysis) {
-//                        res.append(anal + "\t");
-//                        res.append(String.format("%g\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)"
-//                                + "\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g (%g)\t%g\t%g\t%g\n",
-//                                nbCellEnvEval == null ? Double.NaN : nbCellEnvEval.getResult().get(anal)[0],
-//                                envEval == null ? Double.NaN : envEval.getResult().get(anal)[0],
-//                                envEval == null ? Double.NaN : envEval.getResult().get(anal)[1],
-//                                n1MinEval == null ? Double.NaN : n1MinEval.getResult().get(anal)[0],
-//                                n1MinEval == null ? Double.NaN : n1MinEval.getResult().get(anal)[1],
-//                                n1NbEval == null ? Double.NaN : n1NbEval.getResult().get(anal)[0],
-//                                n1NbEval == null ? Double.NaN : n1NbEval.getResult().get(anal)[1],
-//                                n2MinEval == null ? Double.NaN : n2MinEval.getResult().get(anal)[0],
-//                                n2MinEval == null ? Double.NaN : n2MinEval.getResult().get(anal)[1],
-//                                n2NbEval == null ? Double.NaN : n2NbEval.getResult().get(anal)[0],
-//                                n2NbEval == null ? Double.NaN : n2NbEval.getResult().get(anal)[1],
-//                                n3MinEval == null ? Double.NaN : n3MinEval.getResult().get(anal)[0],
-//                                n3MinEval == null ? Double.NaN : n3MinEval.getResult().get(anal)[1],
-//                                n1LeiMinEval == null ? Double.NaN : n1LeiMinEval.getResult().get(anal)[0],
-//                                n1LeiMinEval == null ? Double.NaN : n1LeiMinEval.getResult().get(anal)[1],
-//                                n1LeiNbEval == null ? Double.NaN : n1LeiNbEval.getResult().get(anal)[0],
-//                                n1LeiNbEval == null ? Double.NaN : n1LeiNbEval.getResult().get(anal)[1],
-//                                n2LeiMinEval == null ? Double.NaN : n2LeiMinEval.getResult().get(anal)[0],
-//                                n2LeiMinEval == null ? Double.NaN : n2LeiMinEval.getResult().get(anal)[1],
-//                                n2LeiNbEval == null ? Double.NaN : n2LeiNbEval.getResult().get(anal)[0],
-//                                n2LeiNbEval == null ? Double.NaN : n2LeiNbEval.getResult().get(anal)[1],
-//                                n3LeiMinEval == null ? Double.NaN : n3LeiMinEval.getResult().get(anal)[0],
-//                                n3LeiMinEval == null ? Double.NaN : n3LeiMinEval.getResult().get(anal)[1],
-//                                n3LeiNbEval == null ? Double.NaN : n3LeiNbEval.getResult().get(anal)[0],
-//                                n3LeiNbEval == null ? Double.NaN : n3LeiNbEval.getResult().get(anal)[1],
-//                                busNbEval == null ? Double.NaN : busNbEval.getResult().get(anal)[0],
-//                                busNbEval == null ? Double.NaN : busNbEval.getResult().get(anal)[1],
-//                                trainMinEval == null ? Double.NaN : trainMinEval.getResult().get(anal)[0],
-//                                trainMinEval == null ? Double.NaN : trainMinEval.getResult().get(anal)[1],
-//                                meanEval.getResult().get(anal)[0],
-//                                nearWhiteEval.getResult().get(anal)[0],
-//                                nbCell.getResult().get(anal)[0]));
-//
-//                    }
-//
-//                    res.append("\n\nNb new cell better\nAnalyse\tDistmin Env\tDistmin facL1\tNb facL1\tDistmin facL2\tNb facL2\tDistmin facL3"
-//                            + "\tDistmin leiL1\tNb leiL1\tDistmin leiL2\tNb leiL2\tDistmin leiL3\tNb leiL3\tNb bus\tDistmin train\tMeanWhiteCell\tNbNewCell\n");
-//                    for(Scenario anal : analysis) {
-//                        res.append(anal + "\t");
-//                        res.append(String.format("%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",
-//                                envEval == null ? Double.NaN : envEval.getResult().get(anal)[2],
-//                                n1MinEval == null ? Double.NaN : n1MinEval.getResult().get(anal)[2],
-//                                n1NbEval == null ? Double.NaN : n1NbEval.getResult().get(anal)[2],
-//                                n2MinEval == null ? Double.NaN : n2MinEval.getResult().get(anal)[2],
-//                                n2NbEval == null ? Double.NaN : n2NbEval.getResult().get(anal)[2],
-//                                n3MinEval == null ? Double.NaN : n3MinEval.getResult().get(anal)[2],
-//                                n1LeiMinEval == null ? Double.NaN : n1LeiMinEval.getResult().get(anal)[2],
-//                                n1LeiNbEval == null ? Double.NaN : n1LeiNbEval.getResult().get(anal)[2],
-//                                n2LeiMinEval == null ? Double.NaN : n2LeiMinEval.getResult().get(anal)[2],
-//                                n2LeiNbEval == null ? Double.NaN : n2LeiNbEval.getResult().get(anal)[2],
-//                                n3LeiMinEval == null ? Double.NaN : n3LeiMinEval.getResult().get(anal)[2],
-//                                n3LeiNbEval == null ? Double.NaN : n3LeiNbEval.getResult().get(anal)[2],
-//                                busNbEval == null ? Double.NaN : busNbEval.getResult().get(anal)[2],
-//                                trainMinEval == null ? Double.NaN : trainMinEval.getResult().get(anal)[2],
-//                                meanEval.getResult().get(anal)[2],
-//                                nbCell.getResult().get(anal)[0] - nbCell.getResult().get(defaultAnal)[0]));
-//
-//                    }
-//
-//                    monitor.close();
-//                    JOptionPane.showMessageDialog(null, new JScrollPane(new JTextArea(res.toString(), 20, 50)));
-                    monitor.close();
+                try {
+                    calcEvaluation();
                     setVisible(false);
                     dispose();
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     Logger.getLogger(EvaluationDialog.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(null, "Error : \n" + ex.getLocalizedMessage());
+                    JOptionPane.showMessageDialog(EvaluationDialog.this, "Error : " + ex);
                 }
             }
         }).start();
-       
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
@@ -610,6 +282,162 @@ public class EvaluationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_evalParamButtonActionPerformed
 
 
+    private void calcEvaluation() throws IOException {
+        final TaskMonitor monitor = new TaskMonitor(getParent(), "Evaluation...", "", 0, 10);
+        monitor.popupNow();
+        Scenario scenario;
+
+        if(scenarioRadioButton.isSelected()) {
+            scenario = (Scenario) scenarioComboBox.getSelectedItem();
+        } else {
+            scenario = new ExternalScenario(extScenarioSelectFilePanel.getSelectedFile(), project.getMSGrid());
+        }
+
+        monitor.setNote("Initialisation...");
+        MSGridBuilder<SquareGridExtent> msGrid = project.getMSGrid();
+        File residFile = buildResidselectFilePanel.getSelectedFile();
+        // chargement du shapefile
+        DefaultFeatureCoverage<DefaultFeature> residCov = new DefaultFeatureCoverage<>(DefaultFeature.loadFeatures(residFile));
+        // crée la couche raster 
+        msGrid.addLayer(Evaluator.BATI_RESID, DataBuffer.TYPE_BYTE, 0);
+        // rasterisation du bati résidentiel
+        msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.ISEMPTY, Evaluator.BATI_RESID, residCov), true);
+        // on supprime les cellules qui ne sont pas bati
+        msGrid.execute(new AbstractLayerOperation(4) {
+            @Override
+            public void perform(Cell cell) {
+                if (cell.getLayerValue(Project.BUILD) == 0 && cell.getLayerValue(Evaluator.BATI_RESID) == 1) {
+                    cell.setLayerValue(Evaluator.BATI_RESID, 0);
+                }
+            }
+        }, true);
+
+        // récupère la grille à la résolution la plus fine
+        SquareGrid grid = msGrid.getGrid(msGrid.getResolutions().last());
+
+        if(buildTotselectFilePanel.getSelectedFile() != null) {
+            // chargement du bati total
+            Geometry totBuild = GlobalDataStore.createDataStore(buildTotselectFilePanel.getSelectedFile().getParentFile())
+                    .getGeometry(buildTotselectFilePanel.getSelectedFile().getName());
+            double radius = ((Number)seuilSpinner.getValue()).doubleValue() / 2;
+            Geometry totBuildBuf = BufferForkJoinTask.threadedBuffer(totBuild, radius);
+
+            // Création de la bordure urbaine en tenant compte des nouvelles cellules baties du scénario
+            GridFeatureCoverage cov = new GridFeatureCoverage(grid);
+            final String analLayer = scenario.getResultLayerName();
+            FeatureCoverage<GridFeatureCoverage.GridFeature> newBuild = cov.getCoverage(new FeatureFilter() {
+                @Override
+                public boolean accept(Feature f) {
+                    return ((Number)f.getAttribute(analLayer)).intValue() == 2;
+                }
+            });
+
+            ArrayList<Geometry> geoms = new ArrayList<>();
+            for(Feature f : newBuild.getFeatures()) {
+                geoms.add(f.getGeometry().getCentroid());
+            }
+
+            Geometry buildBuf = BufferForkJoinTask.threadedBuffer(new GeometryFactory().buildGeometry(geoms), radius + 5);
+            if(buildBuf == null) {
+                buildBuf = totBuildBuf;
+            } else {
+                buildBuf = buildBuf.union(totBuildBuf);
+            }
+            Geometry envelope = BufferForkJoinTask.threadedBuffer(buildBuf, -radius);
+            // bordure urbaine
+            Geometry envLine = envelope.getBoundary();
+
+            for(Evaluator evaluator : project.getEvaluators()) {
+                if(evaluator instanceof NbCellOnEnvelopeEvaluator) {
+                    ((NbCellOnEnvelopeEvaluator)evaluator).setUrbanBorder(envLine);
+                } else if(evaluator instanceof DistEnvelopeEvaluator) {
+                    ((DistEnvelopeEvaluator)evaluator).setUrbanBorder(envLine);
+                }
+            }
+        }
+
+        if(netN1SelectFilePanel.getSelectedFile() != null) {
+            Geometry netGeom = GlobalDataStore.createDataStore(netN1SelectFilePanel.getSelectedFile().getParentFile())
+                    .getGeometry(netN1SelectFilePanel.getSelectedFile().getName());
+            SpatialGraph graph= new SpatialGraph(GlobalDataStore.getFeatures(netN1SelectFilePanel.getSelectedFile(), null, null),
+                    new GeometryPrecisionReducer(new PrecisionModel(10)));
+            for(Evaluator evaluator : project.getEvaluators()) {
+                if(evaluator instanceof DistMinAmenEvaluator) {
+                    ((DistMinAmenEvaluator)evaluator).setGraph(graph);
+                } else if(evaluator instanceof NbAmenEvaluator) {
+                    ((NbAmenEvaluator)evaluator).setGraph(graph);
+                } else if(evaluator instanceof DistEnvelopeEvaluator) {
+                    ((DistEnvelopeEvaluator)evaluator).setGraph(graph);
+                    ((DistEnvelopeEvaluator)evaluator).setNetGeom(netGeom);
+                } else if(evaluator instanceof NbStationsEvaluator) {
+                    ((NbStationsEvaluator)evaluator).setGraph(graph);
+                }
+            }
+        }
+
+        Map<String, Double> coefEvaluators = evalSelectionPanel.getCoefEvaluators();
+        monitor.setMaximum(coefEvaluators.size());
+        Map<String, Double> coefLayers = new HashMap<>();
+        for(Evaluator evaluator : project.getEvaluators()) {
+            if(!coefEvaluators.containsKey(evaluator.getShortName())) {
+                continue;
+            }
+
+            evaluator.execute(scenario, grid, monitor.getSubMonitor(0, 100, 1));
+            // change le shortname en nom du layer pour l'opération d'agrégation
+            coefLayers.put(evaluator.getEvalLayerName(scenario), coefEvaluators.get(evaluator.getShortName()));
+        }
+
+        if(evalSelectionPanel.isAgregMean()) {
+            grid.addDynamicLayer(scenario.getName() + "_eval_agreg", new MeanOperation(coefLayers, 4, false));
+        } else {
+            grid.addDynamicLayer(scenario.getName() + "_eval_agreg", new YagerAgregOperation(coefLayers));
+        }
+
+
+        MapInternalFrame frm = new MapInternalFrame();
+        GridGroupLayer gridGroupLayer = new GridGroupLayer("grid", grid, null);
+
+        // création des sous répertoires 
+        File rep = new File (project.getDirectory(), nameTextField.getText());
+        rep.mkdir();
+        File fichier = new File(rep.getAbsolutePath(), scenario.getName() + "_eval_agreg.tif");
+        ((RasterLayer)gridGroupLayer.getLayer(scenario.getName() + "_eval_agreg")).saveRaster(fichier);
+
+
+        List <Evaluator> listSelectEvaluator = new ArrayList<>();
+        // boucler sur chaque evaluator et enregistrer le tif correspondant
+        for(Evaluator evaluator : project.getEvaluators()) {
+            // sélectionne uniquement les evaluators
+            if(!coefEvaluators.containsKey(evaluator.getShortName())) {
+                continue;
+            }
+            listSelectEvaluator.add(evaluator);
+            fichier = new File(rep.getAbsolutePath(),  evaluator.getShortName() + ".tif");
+            ((RasterLayer)gridGroupLayer.getLayer(evaluator.getEvalLayerName(scenario))).saveRaster(fichier);
+        }
+
+        // enregistrement en fichier xml des evaluators et ahp
+        EvaluatorSerialization eval = new EvaluatorSerialization(listSelectEvaluator, evalSelectionPanel.getAHP(), coefEvaluators);
+        eval.save(rep);
+
+        try {    
+            gridGroupLayer.setExpanded(true);
+            frm.getMapViewer().setRootLayer(gridGroupLayer);
+            frm.setName("Evaluation - " + scenario.getName());
+            frm.setTitle("Evaluation - " + scenario.getName());
+            ((MainFrame)getParent()).getDesktopPane().add(frm);
+            frm.setMaximum(true);
+            frm.setVisible(true);
+            frm.setSelected(true);
+            frm.getMapViewer().setTreeLayerVisible(true);
+            frm.getMapViewer().getMap().setZoom(project.getBounds());
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        monitor.close();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.thema.common.swing.SelectFilePanel buildResidselectFilePanel;

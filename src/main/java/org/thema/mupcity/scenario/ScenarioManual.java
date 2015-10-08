@@ -11,18 +11,30 @@ import org.thema.drawshape.layer.FeatureLayer;
 import org.thema.msca.*;
 
 /**
- *
+ * Implementation for handmade scenario.
+ * 
  * @author Gilles Vuidel
  */
 public class ScenarioManual extends Scenario {
     
 
+    /**
+     * Creates a new user made scenario
+     * @param name name of the scenario
+     * @param ahp the ahp matrix for rule weight
+     * @param nMax the max number of cell which can be built between 1 and 9
+     * @param msGrid the multiscale grid
+     * @param mean true for average aggregation, yager agregation otherwise
+     */
     public ScenarioManual(String name, int nMax, AHP ahp, MSGridBuilder msGrid, boolean mean) {
         super(name, ahp, nMax, mean);
         initLayers(msGrid);
     }
 
-
+    /**
+     * Build the cell f
+     * @param f the feature representing a cell of the grid
+     */
     public void setBlack(MSFeature f) {
         if(!isBlack(f)) {
             int build = ((Number)f.getAttribute(getResultLayerName())).intValue();
@@ -31,6 +43,10 @@ public class ScenarioManual extends Scenario {
 
     }
 
+    /**
+     * Unbuild the cell f
+     * @param f the feature representing a cell of the grid
+     */
     public void setWhite(MSFeature f) {
         if(isBlack(f)) {
             int build = ((Number)f.getAttribute(getResultLayerName())).intValue();
@@ -43,8 +59,8 @@ public class ScenarioManual extends Scenario {
      * Retourne vrai si la cellule est construite réellement
      * c à d si il y a du bati à l'intérieur
      * Code 1
-     * @param f
-     * @return
+     * @param f the feature representing a cell of the grid
+     * @return true if the cell is initially built
      */
     public final boolean isBuild(MSFeature f) {
         return ((Number)f.getAttribute(getResultLayerName())).intValue() == 1;
@@ -54,13 +70,18 @@ public class ScenarioManual extends Scenario {
      * Retourne vrai si la cellule est noire (ou grise)
      * c à d si il y a du bati à l'intérieur ou bien va être construite
      * Code 1 ou 2
-     * @param f
-     * @return
+     * @param f the feature representing a cell of the grid
+     * @return true if the cell is built (initially or in the scenario)
      */
     public final boolean isBlack(MSFeature f) {
         return ((Number)f.getAttribute(getResultLayerName())).intValue() > 0;
     }
 
+    /**
+     * Code -1 or 1
+     * @param f the feature representing a cell of the grid
+     * @return true if the cell is empty or unbuild
+     */
     public final boolean isWhite(MSFeature f) {
         return !isBlack(f);
     }
@@ -68,8 +89,8 @@ public class ScenarioManual extends Scenario {
     /**
      * Retourne vrai si la cellule n'est pas construite
      * Code 0
-     * @param f
-     * @return
+     * @param f the feature representing a cell of the grid
+     * @return true if the cell is empty
      */
     public final boolean canBeBuild(MSFeature f) {
         return ((Number)f.getAttribute(getResultLayerName())).intValue() == 0;

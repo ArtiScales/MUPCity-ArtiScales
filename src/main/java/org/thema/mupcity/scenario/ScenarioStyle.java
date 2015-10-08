@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.scenario;
 
@@ -21,14 +17,21 @@ import org.thema.drawshape.ui.StylePanel;
 import org.thema.msca.MSFeature;
 
 /**
- *
- * @author gvuidel
+ * Layer style for manual scenario.
+ * 
+ * @author Gilles Vuidel
  */
 public class ScenarioStyle<T extends FeatureShape> extends FeatureStyle<T> {
 
-    String scenarioAttr;
-    String evalAttr;
+    private String scenarioAttr;
+    private String evalAttr;
 
+    /**
+     * Creates a new ScenarioStyle
+     * @param scenarioAttr the scenario attribute (ie. grid layer)
+     * @param evalAttr the evaluation attribute (ie. grid layer)
+     * @param features the multi scale grid features (cells)
+     */
     public ScenarioStyle(String scenarioAttr, String evalAttr, List<MSFeature> features) {
         super(evalAttr, new ColorRamp(ColorRamp.reverse(ColorRamp.RAMP_SYM_GREEN_RED),
                 new FeatureAttributeIterator<Number>(features, evalAttr)));
@@ -39,7 +42,7 @@ public class ScenarioStyle<T extends FeatureShape> extends FeatureStyle<T> {
 
     @Override
     public void setStyle(Style style) {
-        System.err.println("Setstyle in scenariostyle not implemented !!");
+        throw new UnsupportedOperationException("Setstyle in scenariostyle is not implemented !!");
     }
 
     @Override
@@ -49,18 +52,19 @@ public class ScenarioStyle<T extends FeatureShape> extends FeatureStyle<T> {
         double eval = ((Number)f.getAttribute(evalAttr)).doubleValue();
         int build = ((Number)f.getAttribute(scenarioAttr)).intValue();
         Color c = getRampFill().getColor(eval);
-        if(build == -1)
+        if(build == -1) {
             g.setColor(Color.GRAY.brighter());
-        else if(build == 1)
+        } else if(build == 1) {
             g.setColor(Color.GRAY);
-        else if(build == 2)
+        } else if(build == 2) {
             g.setColor(Color.BLACK);
-        else if(f.getParent() != null && ((Number)f.getParent().
-                getAttribute(scenarioAttr)).intValue() <= 0)
+        } else if(f.getParent() != null && ((Number)f.getParent().
+                getAttribute(scenarioAttr)).intValue() <= 0) {
             g.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
-        else
+        } else {
             g.setColor(c);
-        //g.setColor(Color.getHSBColor(eval*0.333f, 1, build == 1 ? 0 : 0.75f - build*0.125f));
+        }
+
         g.fill(s);
         g.setColor(new Color(128, 128, 128, 50));
         g.setStroke(new BasicStroke(1));
@@ -80,7 +84,7 @@ public class ScenarioStyle<T extends FeatureShape> extends FeatureStyle<T> {
 
     @Override
     public StylePanel getPanel(StyledLayer layer) {
-        return null;
+        throw new UnsupportedOperationException("This style cannot be edited");
     }
 
     

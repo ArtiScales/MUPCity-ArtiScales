@@ -7,21 +7,25 @@ import org.thema.common.collection.HashMap2D;
 import org.thema.common.param.ParamEditor;
 
 /**
- *
+ * Panel for editing AHP matrix comparison.
+ * 
  * @author Gilles Vuidel
  */
 public class AHPEditor extends ParamEditor<AHP> {
 
     private class SimpleTableModel extends AbstractTableModel {
-        List list1, list2;
-        Object[][] values;
+        private List list1, list2;
+        private Object[][] values;
+
         public SimpleTableModel(HashMap2D param) {
             list1 = new ArrayList(param.getKeys1());
             list2 = new ArrayList(param.getKeys2());
             values = new Object[list1.size()][list2.size()];
-            for(int i = 0; i < list1.size(); i++)
-                for(int j = 0; j < list2.size(); j++)
+            for(int i = 0; i < list1.size(); i++) {
+                for(int j = 0; j < list2.size(); j++) {
                     values[i][j] = param.getValue(list1.get(i), list2.get(j));
+                }
+            }
         }
         
         @Override
@@ -34,6 +38,7 @@ public class AHPEditor extends ParamEditor<AHP> {
             return list2.size()+1;
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             if(columnIndex == 0) {
                 return list1.get(rowIndex);
@@ -93,12 +98,17 @@ public class AHPEditor extends ParamEditor<AHP> {
 
     
     /**
-     * Creates new form CollectionEditor
+     * Creates new empty panel AHPEditor
      */
     public AHPEditor() {
         super(null);
         initComponents();
     }
+    
+    /**
+     * Creates new panel AHPEditor
+     * @param ahp the AHP matrix
+     */
     public AHPEditor(AHP ahp) {
         super(ahp);
         initComponents();

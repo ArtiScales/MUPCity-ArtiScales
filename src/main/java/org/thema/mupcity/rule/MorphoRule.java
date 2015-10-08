@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
 import java.util.Collections;
@@ -9,10 +6,13 @@ import org.thema.mupcity.Project;
 import org.thema.mupcity.operation.PBuildFreeOperation;
 
 /**
- *
- * @author gvuidel
+ * The default morphological rule.
+ * This rule is used only for initial view.
+ * It is dupplicated for each scenario, cause values change for each built cell.
+ * 
+ * @author Gilles Vuidel
  */
-public class MorphoRule extends AbstractRule{
+public class MorphoRule extends AbstractRule {
 
     public MorphoRule() {
         super(Collections.EMPTY_LIST);

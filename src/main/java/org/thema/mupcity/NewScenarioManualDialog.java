@@ -1,38 +1,36 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * NewScenarioDialog.java
- *
- * Created on 21 sept. 2009, 12:51:10
- */
 
 package org.thema.mupcity;
 
-import java.util.Map;
-
 
 /**
- *
- * @author gvuidel
+ * Dialog form for manual scenario creation.
+ * 
+ * @author Gilles Vuidel
  */
-public class NewScenarioDialog extends javax.swing.JDialog {
+public class NewScenarioManualDialog extends javax.swing.JDialog {
 
-    boolean isOk = false;
-    String name;
-    int nMax;
-    AHP ahp;
-    boolean isAgregMean;
+    /** user has validated the form ? */
+    public boolean isOk = false;
+    /** the name of the scenario */
+    public String name;
+    /** the max number of cell which can be built between 1 and 9 */
+    public int nMax;
+    /** the AHP matrix for rule weighting */
+    public AHP ahp;
+    /** true for average agregation, false for Yager agregation */
+    public boolean isAgregMean;
 
-    /** Creates new form NewScenarioDialog */
-    public NewScenarioDialog(java.awt.Frame parent, Project prj) {
+    /** 
+     * Creates new form NewScenarioDialog
+     * @param parent the parent frame
+     * @param prj the current project
+     */
+    public NewScenarioManualDialog(java.awt.Frame parent, Project prj) {
         super(parent, true);
         initComponents();
         setLocationRelativeTo(parent);
         getRootPane().setDefaultButton(createButton);
-
+        ruleSelectionPanel.setProject(prj);
     }
 
     /** This method is called from within the constructor to
@@ -54,20 +52,20 @@ public class NewScenarioDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle"); // NOI18N
-        setTitle(bundle.getString("NewScenarioDialog.title")); // NOI18N
+        setTitle(bundle.getString("NewScenarioManualDialog.title")); // NOI18N
 
-        jLabel1.setText(bundle.getString("NewScenarioDialog.jLabel1.text")); // NOI18N
+        jLabel1.setText(bundle.getString("NewScenarioManualDialog.jLabel1.text")); // NOI18N
 
-        nameTextField.setText(bundle.getString("NewScenarioDialog.nameTextField.text")); // NOI18N
+        nameTextField.setText(bundle.getString("NewScenarioManualDialog.nameTextField.text")); // NOI18N
 
-        cancelButton.setText(bundle.getString("NewScenarioDialog.cancelButton.text")); // NOI18N
+        cancelButton.setText(bundle.getString("NewScenarioManualDialog.cancelButton.text")); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
             }
         });
 
-        createButton.setText(bundle.getString("NewScenarioDialog.createButton.text")); // NOI18N
+        createButton.setText(bundle.getString("NewScenarioManualDialog.createButton.text")); // NOI18N
         createButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createButtonActionPerformed(evt);

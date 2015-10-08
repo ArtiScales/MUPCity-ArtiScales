@@ -1,34 +1,42 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.opengis.feature.type.AttributeType;
 
 /**
- *
- * @author gvuidel
+ * Set shapefile and fields associated with one predefined layer.
+ * 
+ * @author Gilles Vuidel
  */
 public class SetLayerDialog extends javax.swing.JDialog {
 
     private Project project;
     private Class attr1, attr2;
     
+    /** user has validated the dialog ? */
     public boolean isOk = false;
+    /** the selected predefined layer */
     public LayerDef layer;
+    /** the selected shapefile */
     public File file;
+    /** the corresponding attributes if any */
     public List<String> attrs;
+    
     /**
      * Creates new form SetLayerDialog
+     * @param parent the parent frame
+     * @param project the current project
      */
     public SetLayerDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
@@ -44,9 +52,9 @@ public class SetLayerDialog extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
-                doClose();
+                cancelButtonActionPerformed(e);
             }
         });
     }
@@ -74,11 +82,6 @@ public class SetLayerDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Set layer...");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                closeDialog(evt);
-            }
-        });
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -186,82 +189,85 @@ public class SetLayerDialog extends javax.swing.JDialog {
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         layer = (LayerDef) layerComboBox.getSelectedItem();
-        if(project.isLayerExist(layer.layer)) {
+        if(project.isLayerExist(layer.getLayer())) {
             int res = JOptionPane.showConfirmDialog(this, "This layer already exist. Do you want to replace it ?");
-            if(res != JOptionPane.YES_OPTION)
+            if(res != JOptionPane.YES_OPTION) {
                 return;
+            }
         }
         file = selectFilePanel.getSelectedFile();
-        attrs = new ArrayList<String>();
-        if(attr1 != null) attrs.add((String)attr1ComboBox.getSelectedItem());
-        if(attr2 != null) attrs.add((String)attr2ComboBox.getSelectedItem());
+        attrs = new ArrayList<>();
+        if(attr1 != null) {
+            attrs.add((String)attr1ComboBox.getSelectedItem());
+        }
+        if(attr2 != null) {
+            attrs.add((String)attr2ComboBox.getSelectedItem());
+        }
         isOk = true;
-        doClose();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_okButtonActionPerformed
     
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        doClose();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    /**
-     * Closes the dialog
-     */
-    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        doClose();
-    }//GEN-LAST:event_closeDialog
-
     private void layerComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_layerComboBoxActionPerformed
-        LayerDef layer = (LayerDef) layerComboBox.getSelectedItem();
-        if(layer == null)
+        layer = (LayerDef) layerComboBox.getSelectedItem();
+        if(layer == null) {
             return;
+        }
 
-        attr1Label.setVisible(layer.attrNames.size() > 0);
-        attr1ComboBox.setVisible(layer.attrNames.size() > 0);
-        attr2Label.setVisible(layer.attrNames.size() > 1);
-        attr2ComboBox.setVisible(layer.attrNames.size() > 1);
+        attr1Label.setVisible(layer.getAttrNames().size() > 0);
+        attr1ComboBox.setVisible(layer.getAttrNames().size() > 0);
+        attr2Label.setVisible(layer.getAttrNames().size() > 1);
+        attr2ComboBox.setVisible(layer.getAttrNames().size() > 1);
         attr1 = attr2 = null;
         
-        if(layer.attrNames.isEmpty())
+        if(layer.getAttrNames().isEmpty()) {
             return;
+        }
         
-        attr1Label.setText(layer.attrNames.get(0));
-        attr1 = layer.attrClasses.get(0);
-        if(layer.attrNames.size() < 2)
+        attr1Label.setText(layer.getAttrNames().get(0));
+        attr1 = layer.getAttrClasses().get(0);
+        if(layer.getAttrNames().size() < 2) {
             return;
-        attr2Label.setText(layer.attrNames.get(1));
-        attr2 = layer.attrClasses.get(1);
+        }
+        attr2Label.setText(layer.getAttrNames().get(1));
+        attr2 = layer.getAttrClasses().get(1);
     }//GEN-LAST:event_layerComboBoxActionPerformed
 
     private void selectFilePanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFilePanelActionPerformed
-        if(attr1 != null)
+        if(attr1 != null) {
             attr1ComboBox.setModel(getAttributes(selectFilePanel.getSelectedFile(), attr1));
-        if(attr2 != null)
+        }
+        if(attr2 != null) {
             attr2ComboBox.setModel(getAttributes(selectFilePanel.getSelectedFile(), attr2));
+        }
     }//GEN-LAST:event_selectFilePanelActionPerformed
     
     private DefaultComboBoxModel getAttributes(File file, Class cls) {
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         try {
-            
             ShapefileDataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
             List<AttributeType> attrs = dataStore.getSchema().getTypes();
-            for(AttributeType attr : attrs)
+            for(AttributeType attr : attrs) {
                 if(!Geometry.class.isAssignableFrom(attr.getBinding()) && 
-                        cls.isAssignableFrom(attr.getBinding()))
-                        model.addElement(attr.getName().getLocalPart());
+                        cls.isAssignableFrom(attr.getBinding())) {
+                    model.addElement(attr.getName().getLocalPart());
+                }
+            }
 
             dataStore.dispose();
             
-        } catch(Exception e) {
+        } catch(IOException e) {
+            Logger.getLogger(SetLayerDialog.class.getName()).log(Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(this, "An error occured while loading shapefile :\n" + e.getLocalizedMessage());
         }
         return model;
     }
     
-    private void doClose() {
-        setVisible(false);
-        dispose();
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox attr1ComboBox;

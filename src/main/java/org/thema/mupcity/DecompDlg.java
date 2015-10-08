@@ -1,13 +1,7 @@
-/*
- * DecompDlg.java
- *
- * Created on 7 décembre 2006, 09:16
- */
 
 package org.thema.mupcity;
 
 import com.vividsolutions.jts.geom.Envelope;
-import java.awt.Frame;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import org.thema.mupcity.rule.RuleParamDialog;
@@ -20,20 +14,30 @@ import org.thema.msca.MSGrid;
 import org.thema.msca.MSGridBuilder;
 
 /**
- *
+ * Dialog form for defining the decomposition parameters for the multiscale grid and the rules parameters.
+ * Launch the creation of the multiscale grid and the rules calculation.
+ * 
  * @author  Gilles Vuidel
  */
 public class DecompDlg extends javax.swing.JDialog {
     
-    double min;
-    double max;
-    int exp;
-    double seuilDensBuild;
-    boolean returnOk = false;
-    RectModShape bounds;
-    MainFrame main;
+    /** the minimum size of cells */
+    private double min;
+    /** the maximum size of cell */
+    private double max;
+    /** the factor between scale */
+    private int exp;
+    /** the minimal density for a cell to be built */
+    private double seuilDensBuild;
     
-    /** Creates new form DecompDlg */
+    private RectModShape bounds;
+    private MainFrame main;
+    
+    /** 
+     * Creates new form DecompDlg 
+     * @param parent the main frame
+     * @param bounds the current rectangular bounds
+     */
     public DecompDlg(MainFrame parent, RectModShape bounds) {
         super(parent, false);
         initComponents();
@@ -187,12 +191,11 @@ public class DecompDlg extends javax.swing.JDialog {
     private void decompButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decompButtonActionPerformed
         previewButtonActionPerformed(null);
         seuilDensBuild = Double.parseDouble(seuilDensBatiTextField.getText());
-        returnOk = true;
         
         setVisible(false);
         dispose();
 
-        main.decomp(this);
+        main.decomp(exp, max, min, seuilDensBuild);
     }//GEN-LAST:event_decompButtonActionPerformed
 
     private void previewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previewButtonActionPerformed
@@ -212,14 +215,13 @@ public class DecompDlg extends javax.swing.JDialog {
         bounds.setTransform(newTrans);
         max = msGrid.getResolutions().first();
         maxSizeTextField.setText(""+max);
-        if(bounds instanceof GridModShape)
+        if(bounds instanceof GridModShape) {
             ((GridModShape)bounds).setGridSize(max);
-        
-        //bounds.setRect(JTS.getEnvelope2D(msGrid.getGrid(min).getEnvelope(), DefaultGeographicCRS.WGS84));
+        }
     }//GEN-LAST:event_previewButtonActionPerformed
 
     private void ruleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleButtonActionPerformed
-        new RuleParamDialog((Frame)this.getParent(), Project.getProject().getRules()).setVisible(true);
+        new RuleParamDialog(main, main.getProject()).setVisible(true);
     }//GEN-LAST:event_ruleButtonActionPerformed
 
 

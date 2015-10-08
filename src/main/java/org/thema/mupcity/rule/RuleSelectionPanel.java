@@ -11,40 +11,46 @@ import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
 
 /**
- *
+ * Panel for selecting rules and configure rule weights.
+ * 
  * @author Gilles Vuidel
  */
 public class RuleSelectionPanel extends javax.swing.JPanel {
 
+    private Project project;
     private AHP ahp;
     
     public RuleSelectionPanel() {
         initComponents();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         // pour la phase de développement dans NetBeans
-        if(Project.getProject() == null) {
-            for(Rule rule : Project.RULES) {
-                model.addRow(new Object[]{rule, true, 1.0});
-            }
-        } else {
-            for(Rule rule : Project.getProject().getRules()) {
-                if(rule.isUsable()) {
-                    model.addRow(new Object[]{rule, true, 1.0});
-                }
-            }
+        for(Rule rule : Project.RULES) {
+            model.addRow(new Object[]{rule, true, 1.0});
         }
     }
     
-    public RuleSelectionPanel(Map<String, Double> coefRules) {
+    public RuleSelectionPanel(Project project, Map<String, Double> coefRules) {
+        this.project = project;
         initComponents();
         setCoefRules(coefRules);
     }
 
-    public void setCoefRules(Map<String, Double> coefRules) {
+    public void setProject(Project project) {
+        this.project = project;
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        for(Rule rule : project.getRules()) {
+            if(rule.isUsable(project)) {
+                model.addRow(new Object[]{rule, true, 1.0});
+            }
+        }
+    }
+
+    private void setCoefRules(Map<String, Double> coefRules) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setNumRows(0);
-        for(Rule rule : Project.getProject().getRules()) {
-            if(rule.isUsable()) {
+        for(Rule rule : project.getRules()) {
+            if(rule.isUsable(project)) {
                 if(coefRules.containsKey(rule.getName())) {
                     model.addRow(new Object[]{rule, true, coefRules.get(rule.getName())});
                 } else {
@@ -180,8 +186,8 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_ahpButtonActionPerformed
 
     private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-        List<Scenario> scenarios = new ArrayList<Scenario>(Project.getProject().getScenarioAutos());
-        scenarios.addAll(Project.getProject().getScenarios());
+        List<Scenario> scenarios = new ArrayList<Scenario>(project.getScenarioAutos());
+        scenarios.addAll(project.getScenarios());
         if(scenarios.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No scenarios");
             return;

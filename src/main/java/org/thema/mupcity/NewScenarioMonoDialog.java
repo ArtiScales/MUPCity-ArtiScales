@@ -1,41 +1,43 @@
-/*
- * SimulationDialog.java
- *
- * Created on 8 juin 2007, 12:15
- */
 
 package org.thema.mupcity;
 
 import org.thema.mupcity.scenario.ScenarioAuto;
-import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Dialog form for creating new automatic monoscale scenario.
  * @author  Gilles Vuidel
  */
-public class MonoSimulationDialog extends javax.swing.JDialog {
+public class NewScenarioMonoDialog extends javax.swing.JDialog {
     
+    /** user has validated the form ? */
     public boolean returnOk = false;
 
-    public ScenarioAuto analyse;
+    /** the new scenario */
+    public ScenarioAuto scenario;
 
     /**
-     * Creates new form SimulationDialog
+     * Creates new form NewScenarioMonoDialog
+     * @param parent the parent frame
+     * @param project the current project
      */
-    public MonoSimulationDialog(java.awt.Frame parent, Project project) {
+    public NewScenarioMonoDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
         initComponents();
         setLocationRelativeTo(parent);
         if(!project.isDecomp()) {
-            JOptionPane.showMessageDialog(this, "No decomposition !");
+            JOptionPane.showMessageDialog(parent, "No decomposition !");
             setVisible(false);
         }
+        
+        ruleSelectionPanel.setProject(project);
+        
         DefaultComboBoxModel lstStart = new DefaultComboBoxModel();
 
-        for(Double res : project.getResolutions().descendingSet())
+        for(Double res : project.getResolutions().descendingSet()) {
             lstStart.addElement(res);
+        }
 
         scaleComboBox.setModel(lstStart);
         
@@ -63,33 +65,33 @@ public class MonoSimulationDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle"); // NOI18N
-        setTitle(bundle.getString("MonoSimulationDialog.title")); // NOI18N
+        setTitle(bundle.getString("NewScenarioMonoDialog.title")); // NOI18N
 
-        jLabel1.setText(bundle.getString("MonoSimulationDialog.jLabel1.text")); // NOI18N
+        jLabel1.setText(bundle.getString("NewScenarioMonoDialog.jLabel1.text")); // NOI18N
 
-        okButton.setText(bundle.getString("MonoSimulationDialog.okButton.text")); // NOI18N
+        okButton.setText(bundle.getString("NewScenarioMonoDialog.okButton.text")); // NOI18N
         okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okButtonActionPerformed(evt);
             }
         });
 
-        cancelButton.setText(bundle.getString("MonoSimulationDialog.cancelButton.text")); // NOI18N
+        cancelButton.setText(bundle.getString("NewScenarioMonoDialog.cancelButton.text")); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
             }
         });
 
-        nMaxTextField.setText(bundle.getString("MonoSimulationDialog.nMaxTextField.text")); // NOI18N
+        nMaxTextField.setText(bundle.getString("NewScenarioMonoDialog.nMaxTextField.text")); // NOI18N
 
-        jLabel3.setText(bundle.getString("MonoSimulationDialog.jLabel3.text")); // NOI18N
+        jLabel3.setText(bundle.getString("NewScenarioMonoDialog.jLabel3.text")); // NOI18N
 
-        jLabel4.setText(bundle.getString("MonoSimulationDialog.jLabel4.text")); // NOI18N
+        jLabel4.setText(bundle.getString("NewScenarioMonoDialog.jLabel4.text")); // NOI18N
 
-        nameTextField.setText(bundle.getString("MonoSimulationDialog.nameTextField.text")); // NOI18N
+        nameTextField.setText(bundle.getString("NewScenarioMonoDialog.nameTextField.text")); // NOI18N
 
-        noBuildCheckBox.setText(bundle.getString("MonoSimulationDialog.noBuildCheckBox.text")); // NOI18N
+        noBuildCheckBox.setText(bundle.getString("NewScenarioMonoDialog.noBuildCheckBox.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -163,7 +165,7 @@ public class MonoSimulationDialog extends javax.swing.JDialog {
         double res = (Double)scaleComboBox.getSelectedItem();
         int nbCell = Integer.parseInt(nMaxTextField.getText());
 
-        analyse = ScenarioAuto.createMonoScaleAnalysis(nameTextField.getText(), 
+        scenario = ScenarioAuto.createMonoScaleScenario(nameTextField.getText(), 
                 res, nbCell, ruleSelectionPanel.getAHP(), noBuildCheckBox.isSelected(), ruleSelectionPanel.isAgregMean());
         returnOk = true;
         dispose();

@@ -1,21 +1,39 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
 import java.util.List;
 import org.thema.mupcity.Project;
 
 /**
- *
- * @author gvuidel
+ * Main interface for rules.
+ * 
+ * @author Gilles Vuidel
  */
 public interface Rule {
     
-    public String getName();
-    public String getFullName();
-    public boolean isUsable();
-    public List<Project.Layers> getUsedLayers();
-    public void createRule(Project project);
+    /**
+     * @return the short name of the rule
+     */
+    String getName();
+    /**
+     * @return the full name of the rule, may be locale dependent
+     */
+    String getFullName();
+    /**
+     * Returns true if all layers needed by this rule exist in the project
+     * @param project the current project
+     * @return true if the rule can be used in this project
+     */
+    boolean isUsable(Project project);
+    
+    /**
+     * @return the layers needed by this rule
+     */
+    List<Project.Layers> getUsedLayers();
+    
+    /**
+     * Computes the grid layer for this rule
+     * @param project the current project
+     */
+    void createRule(Project project);
 }

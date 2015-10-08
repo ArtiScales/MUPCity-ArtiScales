@@ -1,46 +1,31 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.evaluation;
 
-
-import java.io.IOException;
-import org.thema.common.fuzzy.DiscreteFunction;
-import org.thema.common.param.ReflectObject;
-import org.thema.graph.SpatialGraph;
 import org.thema.msca.Cell;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
 
 /**
- *
- * @author gvuidel
+ * Evaluates the number of amenities inside a given distance 
+ * 
+ * @author Gilles Vuidel
  */
-public class NbAmenEvaluator extends Evaluator {
+public class NbAmenEvaluator extends AbstractAmenEvaluator {
+    
+    private double distMax;
 
-    @ReflectObject.NoParam
-    private Project project;
-    @ReflectObject.NoParam
-    private Project.Layers layer;
-    @ReflectObject.NoParam
-    private int level;
-    
-    @ReflectObject.NoParam
-    private transient DistAmenities distAmen;
-    
-    @ReflectObject.NoParam
-    private transient SpatialGraph graph;
-    
-    double distMax;
-
+    /**
+     * Creates a new NbAmenEvaluator.
+     * @param project the current project
+     * @param layer the layer of amenities
+     * @param level the level of amenity or -1 for all levels
+     * @param distMax the maximum distance
+     * @param x the abscisses of the membership function
+     * @param y the ordinates of the membership function
+     */
     public NbAmenEvaluator(Project project, Project.Layers layer, int level, double distMax, double[] x, double[] y ) {
-        super(new DiscreteFunction(x, y));
+        super(project, layer, level, x, y);
         this.distMax = distMax;
-        this.project = project;
-        this.layer = layer;
-        this.level = level;
     }
 
     @Override
@@ -50,55 +35,7 @@ public class NbAmenEvaluator extends Evaluator {
 
     @Override
     public String getShortName() {
-        return "NB_" + layer.toString() + "-" + level;
+        return "NB_" + getLayer().toString() + "-" + getLevel();
     }
-    
-    @Override
-    public boolean isUsable() {
-        return project.isLayerExist(layer);
-    }
-    
-    public void setGraph(SpatialGraph graph) {
-        this.graph = graph;
-        distAmen = null;
-    }
-    
-    private synchronized DistAmenities getDistAmen() {
-        if(distAmen == null)
-            try {
-                if(graph == null ||level != 1)
-                    distAmen = new DistAmenities(project, layer, level);
-                else
-                    distAmen = new DistAmenities(project, layer, level, graph);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        return distAmen;
-    }
-
-//    @Override
-//    public Double[] eval(final Scenario anal, final double mean) {
-//
-//        return grid.agregate(new AbstractAgregateOperation<Double[]>(4) {
-//            int nb = 0, nbInf = 0;
-//            double sum = 0;
-//            public void perform(Cell cell) {
-//                if(!isEvaluated(cell, anal))
-//                    return;
-//                int nbServ = distAmen.getNbAmen(cell, distMax);
-//                sum += nbServ;
-//                nb++;
-//                if(nbServ < mean && isNewBuild(cell, anal))
-//                    nbInf++;
-//            }
-//
-//            @Override
-//            public Double[] getResult() {
-//                return new Double[] {sum / nb, (double)nb, (double)nbInf};
-//            }
-//
-//        });
-//    }
-
 
 }

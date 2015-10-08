@@ -1,11 +1,3 @@
-/*
- * Project.java
- *
- * Created on 8 juin 2007, 09:37
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.thema.mupcity;
 
@@ -38,7 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.JTree.DynamicUtilTreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import org.thema.mupcity.rule.OriginDistance.EuclidianDistance;
+import org.thema.mupcity.rule.OriginDistance.EuclideanDistance;
 import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
 import org.thema.mupcity.scenario.ScenarioAuto;
 import org.thema.mupcity.scenario.ScenarioManual;
@@ -66,9 +58,11 @@ import org.thema.msca.*;
 import org.thema.msca.operation.*;
 import org.thema.mupcity.evaluation.*;
 
-
 /**
- *
+ * This class represents a MupCity project.
+ * It is serialized for saving project parameters.
+ * It implements also TreeNode for viewing the project tree in the MainFrame.
+ * 
  * @author Gilles Vuidel
  */
 public class Project extends AbstractTreeNode {
@@ -77,10 +71,16 @@ public class Project extends AbstractTreeNode {
     public static final String TYPE_FIELD = "type"; //NOI18N
     public static final String SPEED_FIELD = "speed"; //NOI18N
     
+    /**
+     * Predefined layers used by some rules
+     */
     public enum Layers {
         BUILD, ROAD, TRAIN_STATION, BUS_STATION, FACILITY, LEISURE, RESTRICT
     }
     
+    /**
+     * Predefined layers definition
+     */
     public static final List<LayerDef> LAYERS = Arrays.asList(
         new LayerDef(Layers.BUILD, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("BUILDINGS"), new FeatureStyle(Color.gray, Color.black)),
         new LayerDef(Layers.ROAD, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("ROAD NETWORK"), new LineStyle(Color.black), SPEED_FIELD, Number.class),
@@ -88,37 +88,36 @@ public class Project extends AbstractTreeNode {
         new LayerDef(Layers.TRAIN_STATION, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("TRAIN STATIONS"), new PointStyle(Color.black, Color.red)), 
         new LayerDef(Layers.FACILITY, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Facilities"), new PointStyle(Color.yellow.darker()), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
         new LayerDef(Layers.LEISURE, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("LEISURE"), new PointStyle(Color.blue), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
-//        new LayerDef(Layers.GREEN, "Green areas", new FeatureStyle(new Color(118, 179, 0), new Color(170, 203, 0))),
-//        new LayerDef(Layers.WORK, "Working areas", new FeatureStyle(Color.DARK_GRAY, Color.gray), "job", Number.class),
         new LayerDef(Layers.RESTRICT, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("non-developable area"), new FeatureStyle(Color.orange, Color.gray))
-//        new LayerDef(Layers.WATER, "Water", new FeatureStyle(new Color(1, 155, 255), new Color(1, 155, 255))),
-//        new LayerDef(Layers.AGRICULTURE, "Agriculture", new FeatureStyle(Color.YELLOW.darker(), Color.gray))
         );
     
+    /** Grid layer name for initial build */
     public static final String BUILD = "build"; //NOI18N
+    /** Grid layer name for initial build density */
     public static final String BUILD_DENS = "build_dens"; //NOI18N
-    public static final String MORPHO_RULE = "morpho";
-    
-    public static final String ZONE = "zone";
-    public static final String NOBUILD_DENS = "no_build_dens";
+    /** Grid layer name for morphological rule */
+    public static final String MORPHO_RULE = "morpho"; //NOI18N
+    /** Grid layer name for zone */
+    public static final String ZONE = "zone"; //NOI18N
+    /** Grid layer name for restricted area density */
+    public static final String NOBUILD_DENS = "no_build_dens"; //NOI18N
 
-    public static final String EVAL = "eval";
-    public static final String SIMUL = "analyse";
-    public static final String SCENARIO = "scenario";
+    public static final String EVAL = "eval"; //NOI18N
+    public static final String SIMUL = "analyse"; //NOI18N
+    public static final String SCENARIO = "scenario"; //NOI18N
     
     public static final String NODE_ZONE = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Zone_etude");
     public static final String NODE_DECOMP = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Decomposition");
     public static final String NODE_SCENARIO = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Scenarios");
     public static final String NODE_ANALYSE = java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Analyses");
 
-    public static final TreeMap<Object, Color> colorMap = new TreeMap<>();
-
+    public static final TreeMap<Object, Color> COLOR_MAP = new TreeMap<>();
     static {
-        colorMap.put(-1.0, new Color(220, 220, 220)); colorMap.put(0.0, Color.WHITE);
-        colorMap.put(1.0, new Color(100, 100, 100)); colorMap.put(2.0, new Color(0, 0, 0));
+        COLOR_MAP.put(-1.0, new Color(220, 220, 220)); COLOR_MAP.put(0.0, Color.WHITE);
+        COLOR_MAP.put(1.0, new Color(100, 100, 100)); COLOR_MAP.put(2.0, new Color(0, 0, 0));
     }
 
-    public static List<? extends Rule> RULES = Arrays.asList(new MorphoRule(), new RoadRule(), 
+    public static final List<? extends Rule> RULES = Arrays.asList(new MorphoRule(), new RoadRule(), 
             new Facility12Rule(1), new Facility12Rule(2), new Facility3Rule(), new PTRule(),
             new LeisureRule(1), new LeisureRule(2), new LeisureRule(3));
     
@@ -165,7 +164,7 @@ public class Project extends AbstractTreeNode {
         
         scenarioAutos = new ArrayList<>();
         scenarios = new ArrayList<>();
-        distType = OriginDistance.EuclidianDistance.class;
+        distType = OriginDistance.EuclideanDistance.class;
         
         try {
             ShapefileDataStore dataStore = new ShapefileDataStore(new File(dir, Layers.BUILD.toString() + ".shp").toURI().toURL());
@@ -186,7 +185,7 @@ public class Project extends AbstractTreeNode {
             final double seuilDensBuild) throws IOException {
         int nbRule = 0;
         for(Rule rule : rules.values()) {
-            if(rule.isUsable()) {
+            if(rule.isUsable(this)) {
                 nbRule++;
             }
         }
@@ -243,7 +242,7 @@ public class Project extends AbstractTreeNode {
 
         long t = System.currentTimeMillis();
         for(Rule rule : rules.values()) {
-            if(rule.isUsable()) {
+            if(rule.isUsable(this)) {
                 monitor.incProgress(1);
                 monitor.setNote("Create grid... rule " + rule.getFullName());
                 rule.createRule(this);
@@ -257,8 +256,8 @@ public class Project extends AbstractTreeNode {
     }
     
     public OriginDistance getDistance(Polygon origin, double maxCost) {
-        if(distType.equals(EuclidianDistance.class)) {
-            return new EuclidianDistance(origin);
+        if(distType.equals(EuclideanDistance.class)) {
+            return new EuclideanDistance(origin);
         } else {
             return new NetworkDistance(getSpatialGraph(), origin, maxCost);
         }
@@ -451,7 +450,7 @@ public class Project extends AbstractTreeNode {
         };
     }
     
-    public void setLayer(LayerDef layer, File file, List<String> attrs) throws Exception {
+    public void setLayer(LayerDef layer, File file, List<String> attrs) throws IOException, SchemaException {
         TaskMonitor mon = new TaskMonitor(null, "Create layer", "", 0, 2);
         mon.setMillisToDecideToPopup(0);
         if(coverages != null) { // remove from cache if exists
@@ -461,15 +460,15 @@ public class Project extends AbstractTreeNode {
         mon.setProgress(0);
         mon.setNote("Loading...");
         List<DefaultFeature> features = DefaultFeature.loadFeatures(file, false);
-        if(!layer.attrNames.isEmpty()) {
-            for(String attr : layer.attrNames) {
+        if(!layer.getAttrNames().isEmpty()) {
+            for(String attr : layer.getAttrNames()) {
                 if(!features.get(0).getAttributeNames().contains(attr)) {
                     DefaultFeature.addAttribute(attr, features, null);
                 }
             }
             for(DefaultFeature f : features) {
-                for(int i = 0; i < layer.attrNames.size(); i++) {
-                    f.setAttribute(layer.attrNames.get(i), f.getAttribute(attrs.get(i)));
+                for(int i = 0; i < layer.getAttrNames().size(); i++) {
+                    f.setAttribute(layer.getAttrNames().get(i), f.getAttribute(attrs.get(i)));
                 }
             }
         }
@@ -543,10 +542,10 @@ public class Project extends AbstractTreeNode {
     private void createGridLayer() {
         decompLayer = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Decomposition"));
         
-        decompLayer.addLayerFirst(createLayer(BUILD, new UniqueColorTable(colorMap), java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Built-up")));
+        decompLayer.addLayerFirst(createLayer(BUILD, new UniqueColorTable(COLOR_MAP), java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Built-up")));
 
         for(Rule rule : rules.values()) {
-            if(rule.isUsable()) {
+            if(rule.isUsable(this)) {
                 decompLayer.addLayerLast(createLayer(rule.getName(), null, rule.getFullName()));
             }
         }

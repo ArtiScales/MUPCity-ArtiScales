@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.thema.mupcity.rule;
 
 import com.vividsolutions.jts.geom.*;
@@ -19,31 +16,43 @@ import org.thema.graph.pathfinder.DijkstraPathFinder.CalculateListener;
 import org.thema.graph.pathfinder.EdgeWeighter;
 
 /**
- *
- * @author gvuidel
+ * Interface for calculating distances from an origin point.
+ * 
+ * @author Gilles Vuidel
  */
 public interface OriginDistance {
     
     /**
      * Return distance in meter
-     * @param dest
-     * @return 
+     * @param dest the destination point
+     * @return the distance between the origin and dest or Double.MAX_VALUE
      */
     public double getDistance(Point dest);
     /**
      * Return time distance in minutes
-     * @param dest
-     * @return 
+     * @param dest the destination point
+     * @return the time distance between the origin and dest or Double.MAX_VALUE
      */
     public double getTimeDistance(Point dest);
     
     
-    public class EuclidianDistance implements OriginDistance {
+    /**
+     * OriginDistance implementation for euclidean distance.
+     */
+    public class EuclideanDistance implements OriginDistance {
 
+        /**
+         * The speed in km.h-1
+         */
         public static double speed = 50; //km.h-1
-        Geometry origin;
+        private Geometry origin;
 
-        public EuclidianDistance(Geometry origin) {
+        /**
+         * Creates a new EuclideanDistance.
+         * 
+         * @param origin the origin point or polygon
+         */
+        public EuclideanDistance(Geometry origin) {
             this.origin = origin;
         }
 
@@ -59,6 +68,9 @@ public interface OriginDistance {
 
     }
     
+    /**
+     * OriginDistance implementation for network distance.
+     */
     public class NetworkDistance implements OriginDistance {
 
         private Geometry origin;
@@ -69,10 +81,9 @@ public interface OriginDistance {
 
         /**
          * Attention le polygone est supposé rectangle -> est égal à son enveloppe
-         * @param graph
-         * @param weighter
-         * @param origin
-         * @param maxCost 
+         * @param graph the network graph
+         * @param origin the origin as a Polygon, must be rectangular
+         * @param maxCost max distance in meter or in minutes for speeding up execution, or NaN to calculate on the whole network
          */
         public NetworkDistance(SpatialGraph graph, Polygon origin, double maxCost) {
             this.graph = graph;
@@ -80,6 +91,12 @@ public interface OriginDistance {
             this.maxCost = maxCost;
         }
         
+        /**
+         * Creates a new NetworkDistance.
+         * @param graph the network graph
+         * @param origin the point origin
+         * @param maxCost max distance in meter or in minutes for speeding up execution, or NaN to calculate on the whole network
+         */
         public NetworkDistance(SpatialGraph graph, Point origin, double maxCost) {
             this.graph = graph;
             this.origin = origin;
@@ -88,40 +105,52 @@ public interface OriginDistance {
 
         @Override
         public double getDistance(Point dest) {
-            if(origin.getEnvelopeInternal().contains(dest.getCoordinate()))
+            if(origin.getEnvelopeInternal().contains(dest.getCoordinate())) {
                 return 0;
+            }
             Double cost = graph.getCost(getDistPathFinder(), dest);
-            if(cost == null)
+            if(cost == null) {
                 return Double.MAX_VALUE;
-            else
+            } else {
                 return cost;
+            }
         }
         
         @Override
         public double getTimeDistance(Point dest) {
-            if(origin.getEnvelopeInternal().contains(dest.getCoordinate()))
+            if(origin.getEnvelopeInternal().contains(dest.getCoordinate())) {
                 return 0;
+            }
             Double cost = graph.getCost(getTimePathFinder(), dest);
-            if(cost == null)
+            if(cost == null) {
                 return Double.MAX_VALUE;
-            else
+            } else {
                 return cost;
+            }
         }
 
+        /**
+         * Sets dijkstra listener for stoping calculation at any time.
+         * If a listener is set the maxCost parameter is not used.
+         * This method must be called before {@link #getDistance} or {@link #getTimeDistance}
+         * @param dijkstraListener the listener or null
+         */
         public void setDijkstraListener(CalculateListener dijkstraListener) {
             this.dijkstraListener = dijkstraListener;
         }
 
         private synchronized DijkstraPathFinder getDistPathFinder() {
-            if(distPathfinder == null) 
+            if(distPathfinder == null) {
                 distPathfinder = calcPathFinder(DijkstraPathFinder.DIST_WEIGHTER);
+            }
             
             return distPathfinder;
         }
         
         private synchronized DijkstraPathFinder getTimePathFinder() {
-            if(timePathfinder == null) 
+            if(timePathfinder == null) {
                 timePathfinder = calcPathFinder(new TimeEdgeWeighter());
+            }
            
             return timePathfinder;
         }
@@ -135,15 +164,17 @@ public interface OriginDistance {
                 // tout ce qui est à l'intérieur est sans intérêt
                 //  si il n'y a pas d'arc qui intersecte l'origine on prend l'arc le plus proche
                 List<Edge> edges = graph.getEdgeSpatialIndex().query(origin.getEnvelopeInternal());
-                List<GraphLocation> edgeLoc = new ArrayList<GraphLocation>();
+                List<GraphLocation> edgeLoc = new ArrayList<>();
                 Geometry envelope = origin.getEnvelope();
                 GeometryFactory geomFac = new GeometryFactory();
-                for(Edge edge : edges) 
+                for(Edge edge : edges) { 
                     if(Util.getGeometry(edge).intersects(envelope)) {
                         Geometry inter = Util.getGeometry(edge).intersection(envelope);
-                        for(Coordinate coord : inter.getCoordinates())
+                        for(Coordinate coord : inter.getCoordinates()) {
                             edgeLoc.add(new GraphLocation(coord, geomFac.createPoint(coord), edge));
+                        }
                     }
+                }
                 
                 if(edgeLoc.isEmpty()) {
                     Edge edge = graph.getNearestEdge(origin);
@@ -154,25 +185,31 @@ public interface OriginDistance {
                     pathfinder = new DijkstraPathFinder(graph.getGraph(), edgeLoc, weighter);
                 }
             }
-            if(dijkstraListener != null)
+            if(dijkstraListener != null) {
                 pathfinder.calculate(dijkstraListener);
-            else
+            } else {
                 pathfinder.calculate(maxCost);
+            }
             return pathfinder;
         }
-    }
     
-    static class TimeEdgeWeighter implements EdgeWeighter {
+    
+        /**
+         * Time network weighter
+         */
+        private static class TimeEdgeWeighter implements EdgeWeighter {
 
-        @Override
-        public double getWeight(Edge e) {
-            return 60 * ((Util.getGeometry(e).getLength() / 1000) / ((Number)((Feature)e.getObject()).getAttribute(Project.SPEED_FIELD)).doubleValue());
-        }
+            @Override
+            public double getWeight(Edge e) {
+                return 60 * ((Util.getGeometry(e).getLength() / 1000) / ((Number)((Feature)e.getObject()).getAttribute(Project.SPEED_FIELD)).doubleValue());
+            }
 
-        @Override
-        public double getToGraphWeight(double dist) {
-            return 60 * ((dist / 1000) / EuclidianDistance.speed);
+            @Override
+            public double getToGraphWeight(double dist) {
+                return 60 * ((dist / 1000) / EuclideanDistance.speed);
+            }
+
         }
-        
+    
     }
 }

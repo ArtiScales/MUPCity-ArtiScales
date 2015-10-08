@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.scenario;
 
@@ -34,8 +30,9 @@ import org.thema.msca.*;
 import org.thema.msca.operation.*;
 
 /**
- *
- * @author gvuidel
+ * Base implementation for automatic scenario.
+ * 
+ * @author Gilles Vuidel
  */
 public class ScenarioAuto extends Scenario {
 
@@ -51,22 +48,42 @@ public class ScenarioAuto extends Scenario {
     // monoscale attributes
     private int nbCell;
 
-    protected ScenarioAuto(String name, AHP ahp, int nMax, boolean mean) {
+    /**
+     * Creates a new scenario.
+     * 
+     * @param name name of the scenario
+     * @param ahp the ahp matrix for rule weight
+     * @param nMax the max number of cell which can be built between 1 and 9
+     * @param mean true for average aggregation, yager agregation otherwise
+     */
+    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean) {
         super(name, ahp, nMax, mean);
     }
 
+    /**
+     * @return true if this scenario has no rule evaluation and so is random
+     */
     public boolean isRandom() {
         return getAHP().getCoefs().isEmpty();
     }
 
+    /**
+     * @return the number of newly built cells
+     */
     public int getNbNewBuild() {
         return nbCell;
     }
 
+    /**
+     * @return true if the scenario is not multiscale
+     */
     public boolean isMonoScale() {
         return monoScale;
     }
 
+    /**
+     * @return true if the scenario respect stricty the number of cells (nmax) and so unbuild cells
+     */
     public boolean isStrict() {
         return strict;
     }
@@ -75,8 +92,8 @@ public class ScenarioAuto extends Scenario {
      * Retourne vrai si la cellule est construite réellement
      * c à d si il y a du bati à l'intérieur
      * Code -1 ou 1
-     * @param c
-     * @return
+     * @param c the cell
+     * @return true if the cell is built initially
      */
     public final boolean isBuild(Cell c) {
         return Math.abs(c.getLayerValue(getResultLayerName())) == 1;
@@ -86,8 +103,8 @@ public class ScenarioAuto extends Scenario {
      * Retourne vrai si la cellule est noire (ou grise)
      * c à d si il y a du bati à l'intérieur ou bien va être construite
      * Code 1 ou 2
-     * @param c
-     * @return
+     * @param c the cell
+     * @return true if the cell is built (initially or newly)
      */
     public final boolean isBlack(Cell c) {
         return c.getLayerValue(getResultLayerName()) > 0;
@@ -97,8 +114,8 @@ public class ScenarioAuto extends Scenario {
      * Retourne vrai si la cellule n'est pas construite
      * et peut être construite (contrainte des zones non constructible)
      * Code 0
-     * @param c
-     * @return
+     * @param c the cell
+     * @return true if the cell is not built initially and does not intersect "too much" the no build area 
      */
     public final boolean canBeBuild(Cell c) {
         return !isBlack(c) &&
@@ -106,6 +123,10 @@ public class ScenarioAuto extends Scenario {
                     <= (1 - (monoScale ?  0.5 : getNMax() / Math.pow(Project.getProject().getCoefDecomp(), 2))));
     }
 
+    /**
+     * Computes the scenario result.
+     * @param msGrid the multi scale grid
+     */
     public void perform(MSGridBuilder msGrid) {
         initLayers(msGrid);
         
@@ -120,7 +141,11 @@ public class ScenarioAuto extends Scenario {
         }
     }
 
-    protected void performSim(MSGridBuilder msGrid) {
+    /**
+     * Computes the scenario for multi scales.
+     * @param msGrid the multi scale grid
+     */
+    private void performSim(MSGridBuilder msGrid) {
          AbstractLayerOperation op = new AbstractLayerOperation(4) {
             final int NBCELL = getNMax();
 
@@ -179,14 +204,14 @@ public class ScenarioAuto extends Scenario {
                     }
                 }
 
-                    while(nb < NBCELL && map.size() > 0) {
-                        List<Cell> cells = map.pollLastEntry().getValue();
-                        while(nb < NBCELL && !cells.isEmpty()) {
-                            cells.get(0).setLayerValue(simLayer, NEW_BUILD);
-                            cells.remove(0);
-                            nb++;
-                        }
+                while(nb < NBCELL && map.size() > 0) {
+                    List<Cell> cells = map.pollLastEntry().getValue();
+                    while(nb < NBCELL && !cells.isEmpty()) {
+                        cells.get(0).setLayerValue(simLayer, NEW_BUILD);
+                        cells.remove(0);
+                        nb++;
                     }
+                }
             }
         };
 
@@ -200,8 +225,11 @@ public class ScenarioAuto extends Scenario {
                     return c.getLayerValue(getResultLayerName()) == NEW_BUILD;
                 }
             })).firstEntry().getValue()).intValue();
-}
+    }
 
+    /**
+     * @return informations of this scenario
+     */
     public String getInfo() {
         String info = getName();
         if(monoScale) {
@@ -220,13 +248,17 @@ public class ScenarioAuto extends Scenario {
         return info;
     }
 
+    /**
+     * Computes the scenario for mono scale without rules (ie. random scenario)
+     * @param msGrid the multi scale grid
+     */
     private void performMonoRandom(MSGridBuilder msGrid) {
 
         final String simLayer = getResultLayerName();
 
         AbstractGrid grid = (AbstractGrid) msGrid.getGrid(startScale);
 
-        ProgressMonitor monitor = new ProgressMonitor(null, "Random MonoScale Analysis", "", 0, nbCell);
+        ProgressMonitor monitor = new ProgressMonitor(null, "Random MonoScale Scenario", "", 0, nbCell);
         int size = grid.getLayer(simLayer).getSampleModel().getWidth()
                     * grid.getLayer(simLayer).getSampleModel().getHeight();
         int nb = 0;
@@ -245,6 +277,10 @@ public class ScenarioAuto extends Scenario {
         monitor.close();
     }
 
+    /**
+     * Computes the scenario for mono scale
+     * @param msGrid the multi scale grid
+     */
     private void performMonoSimOptim(MSGridBuilder msGrid) {
         class CellEval implements Comparable<CellEval> {
             int id;
@@ -289,7 +325,7 @@ public class ScenarioAuto extends Scenario {
             }
         }
             
-        ProgressMonitor monitor = new ProgressMonitor(null, "MonoScale Analysis", "", 0, nbCell);
+        ProgressMonitor monitor = new ProgressMonitor(null, "MonoScale Scenario", "", 0, nbCell);
 
         PriorityQueue<CellEval> queue = new PriorityQueue<>();
         double min = Double.NaN;
@@ -353,7 +389,7 @@ public class ScenarioAuto extends Scenario {
 
         if(monoScale) {
             MSGrid grid = msGrid.getGrid(startScale);
-            RasterStyle style = new RasterStyle(new UniqueColorTable(Project.colorMap));
+            RasterStyle style = new RasterStyle(new UniqueColorTable(Project.COLOR_MAP));
             style.setDrawGrid(false);
             RasterLayer l = new RasterLayer(String.format("%s-%g", Project.SIMUL, startScale),
                 new RasterShape(grid.getRaster(getResultLayerName()),
@@ -375,7 +411,7 @@ public class ScenarioAuto extends Scenario {
                 layers.addLayerLast(l);
             }
         } else {
-            layers.addLayerFirst(Project.getProject().createLayer(getResultLayerName(), new UniqueColorTable(Project.colorMap),
+            layers.addLayerFirst(Project.getProject().createLayer(getResultLayerName(), new UniqueColorTable(Project.COLOR_MAP),
                     getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario")));
             layers.addLayerLast(Project.getProject().createLayer(getEvalLayerName(), null,  getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest")));
         }
@@ -398,31 +434,55 @@ public class ScenarioAuto extends Scenario {
     }
 
 
-    public static ScenarioAuto createMonoScaleAnalysis(String name, double scale,
+    /**
+     * Creates a new monoscale scenario.
+     * The method {@link #perform} must be called after to compute the result
+     * @param name the name of the scenario
+     * @param scale the scale (cell size)
+     * @param nbCell the number cell to build
+     * @param ahp the ahp matrix 
+     * @param useNoBuild use no build restriction layer ?
+     * @param mean if true use average agregation, yager otherwise
+     * @return the new scenario
+     */
+    public static ScenarioAuto createMonoScaleScenario(String name, double scale,
             int nbCell, AHP ahp, boolean useNoBuild, boolean mean) {
-        ScenarioAuto anal = new ScenarioAuto(name, ahp, 0, mean);
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean);
 
-        anal.monoScale = true;
-        anal.startScale = anal.endScale = scale;
-        anal.nbCell = nbCell;
-        anal.useNoBuild = useNoBuild;
+        scenario.monoScale = true;
+        scenario.startScale = scenario.endScale = scale;
+        scenario.nbCell = nbCell;
+        scenario.useNoBuild = useNoBuild;
 
-        return anal;
+        return scenario;
     }
 
-    public static ScenarioAuto createMultiScaleAnalysis(String name,
+    /**
+     * Creates a new multiscale scenario.
+     * The method {@link #perform} must be called after to compute the result
+     * @param name the name of the scenario
+     * @param startScale the first scale 
+     * @param endScale the last scale
+     * @param nMax the max number of cell which can be built between 1 and 9
+     * @param strict true if the scenario must respect stricty the number of cells (nmax) and so unbuild some cells
+     * @param ahp the ahp matrix 
+     * @param useNoBuild use no build restriction layer ?
+     * @param mean if true use average agregation, yager otherwise
+     * @return the new scenario
+     */
+    public static ScenarioAuto createMultiScaleScenario(String name,
             double startScale, double endScale, int nMax, boolean strict, 
             AHP ahp, boolean useNoBuild, boolean mean) {
-        ScenarioAuto anal = new ScenarioAuto(name, ahp, nMax, mean);
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean);
 
-        anal.monoScale = false;
-        anal.startScale = startScale;
-        anal.endScale = endScale;
-        anal.strict = strict;
-        anal.useNoBuild = useNoBuild;
-        anal.nbCell = 0;
+        scenario.monoScale = false;
+        scenario.startScale = startScale;
+        scenario.endScale = endScale;
+        scenario.strict = strict;
+        scenario.useNoBuild = useNoBuild;
+        scenario.nbCell = 0;
 
-        return anal;
+        return scenario;
     }
 
    

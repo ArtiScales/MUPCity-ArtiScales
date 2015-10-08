@@ -1,11 +1,5 @@
-/*
- * MainFrame.java
- *
- * Created on 7 mai 2007, 16:21
- */
 
 package org.thema.mupcity;
-
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -26,6 +20,7 @@ import javax.swing.JTextArea;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import org.geotools.feature.SchemaException;
 import org.thema.common.Config;
 import org.thema.common.JavaLoader;
 import org.thema.common.Util;
@@ -38,13 +33,13 @@ import org.thema.drawshape.layer.ShapeFileLayer;
 import org.thema.drawshape.style.SimpleStyle;
 import org.thema.drawshape.ui.MapInternalFrame;
 import org.thema.mupcity.evaluation.EvaluationDialog;
-import org.thema.mupcity.evaluation.EvaluatorSelectionPanel;
 import org.thema.mupcity.scenario.ScenarioAuto;
 import org.thema.mupcity.scenario.ScenarioFrame;
 import org.thema.mupcity.scenario.ScenarioManual;
 
 /**
- *
+ * The main frame of the software.
+ * 
  * @author  Gilles Vuidel
  */
 public class MainFrame extends javax.swing.JFrame {
@@ -91,21 +86,20 @@ public class MainFrame extends javax.swing.JFrame {
         newScenarioMenuItem = new javax.swing.JMenuItem();
         evalMenu = new javax.swing.JMenu();
         evalExpostMenuItem = new javax.swing.JMenuItem();
-        globalUrbainQualityMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         splitPane.setDividerLocation(150);
 
         tree.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                treeMouseClicked(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 treeMousePressed(evt);
             }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 treeMouseReleased(evt);
+            }
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                treeMouseClicked(evt);
             }
         });
         treeScrollPane.setViewportView(tree);
@@ -213,14 +207,6 @@ public class MainFrame extends javax.swing.JFrame {
         });
         evalMenu.add(evalExpostMenuItem);
 
-        globalUrbainQualityMenuItem.setText(bundle.getString("MainFrame.globalUrbainQualityMenuItem.text")); // NOI18N
-        globalUrbainQualityMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                globalUrbainQualityMenuItemActionPerformed(evt);
-            }
-        });
-        evalMenu.add(globalUrbainQualityMenuItem);
-
         menuBar.add(evalMenu);
 
         setJMenuBar(menuBar);
@@ -243,8 +229,8 @@ public class MainFrame extends javax.swing.JFrame {
         DefaultGroupLayer gl = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Layers"), true);
         
         for(LayerDef lDef : Project.LAYERS) {
-            if (project.isLayerExist(lDef.layer)) {
-                gl.addLayerLast(new FeatureLayer(lDef.desc, project.getLayerFeatures(lDef.layer), project.getBounds(), lDef.style));
+            if (project.isLayerExist(lDef.getLayer())) {
+                gl.addLayerLast(new FeatureLayer(lDef.getDesc(), project.getLayerFeatures(lDef.getLayer()), project.getBounds(), lDef.getStyle()));
             }
         }
         
@@ -253,7 +239,7 @@ public class MainFrame extends javax.swing.JFrame {
        return gl;
     }
 
-     private DefaultGroupLayer getZoneLayers() {
+    private DefaultGroupLayer getZoneLayers() {
         DefaultGroupLayer gl = getDefaultLayers();
         gl.addLayerLast(new DefaultLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Zone_layer"), project.getRectShape(), new SimpleStyle(new Color(255, 0, 255, 127))));
        return gl;
@@ -326,7 +312,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private void startSimMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startSimMenuItemActionPerformed
-        final SimulationDialog dlg = new SimulationDialog(this, project);
+        final NewScenarioAutoDialog dlg = new NewScenarioAutoDialog(this, project);
         dlg.setVisible(true);
         if(!dlg.returnOk) {
             return;
@@ -336,11 +322,11 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    project.performScenarioAuto(dlg.analyse);
+                    project.performScenarioAuto(dlg.scenario);
                     project.save();
                     updateTree();
                     updateMenu();
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(MainFrame.this, "Error :\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -369,7 +355,7 @@ public class MainFrame extends javax.swing.JFrame {
             project = Project.load(prjFile);
             tree.setModel(new DefaultTreeModel(project));
             updateMenu();
-        } catch (Exception e) {
+        } catch (IOException e) {
             Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, e);
 	    JOptionPane.showMessageDialog(null, "Impossible de lire le projet !\nDétails : " + e, "Erreur", JOptionPane.ERROR_MESSAGE);      
 	}
@@ -383,11 +369,8 @@ public class MainFrame extends javax.swing.JFrame {
         }
         NewProjectDialog dlg = new NewProjectDialog(this);
         dlg.setVisible(true);
-        if(dlg.project == null) {
-            return;
-        }
   
-        project = dlg.project;
+        project = dlg.getProject();
         tree.setModel(new DefaultTreeModel(project));
         updateMenu();
         
@@ -409,7 +392,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_addInfoLayerMenuItemActionPerformed
 
     private void monoSimMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monoSimMenuItemActionPerformed
-        final MonoSimulationDialog dlg = new MonoSimulationDialog(this, project);
+        final NewScenarioMonoDialog dlg = new NewScenarioMonoDialog(this, project);
         dlg.setVisible(true);
         if(!dlg.returnOk) {
             return;
@@ -419,10 +402,10 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    project.performScenarioAuto(dlg.analyse);
+                    project.performScenarioAuto(dlg.scenario);
                     project.save();
                     updateTree();
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(MainFrame.this, "Error :\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
                 } 
@@ -432,7 +415,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_monoSimMenuItemActionPerformed
 
     private void newScenarioMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newScenarioMenuItemActionPerformed
-        NewScenarioDialog dlg = new NewScenarioDialog(this, project);
+        NewScenarioManualDialog dlg = new NewScenarioManualDialog(this, project);
         dlg.setVisible(true);
         if(!dlg.isOk) {
             return;
@@ -443,7 +426,7 @@ public class MainFrame extends javax.swing.JFrame {
             updateTree();
             project.save();
             final ScenarioFrame frm = new ScenarioFrame(project.getScenario(dlg.name),
-                    getScenarioLayers(dlg.name), project.getMSGrid());
+                    getScenarioLayers(dlg.name), project);
             desktopPane.add(frm);
             frm.setMaximum(true);
             frm.setVisible(true);
@@ -542,7 +525,7 @@ public class MainFrame extends javax.swing.JFrame {
             if(node.getParent().toString().equals(Project.NODE_SCENARIO)) {
                 try {
                     final ScenarioFrame frm = new ScenarioFrame(project.getScenario(name),
-                            getScenarioLayers(name), project.getMSGrid());
+                            getScenarioLayers(name), project);
                     frm.setName(pathName);
                     desktopPane.add(frm);
                     frm.setMaximum(true);
@@ -589,7 +572,7 @@ public class MainFrame extends javax.swing.JFrame {
             public void run() {
                 try {
                     project.setLayer(dlg.layer, dlg.file, dlg.attrs);
-                } catch (Exception ex) {
+                } catch (IOException | SchemaException ex) {
                     Logger.getLogger(SetLayerDialog.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(MainFrame.this, "An error occured : \n" + ex);
                 }
@@ -601,39 +584,25 @@ public class MainFrame extends javax.swing.JFrame {
         new EvaluationDialog(this, project).setVisible(true);
     }//GEN-LAST:event_evalExpostMenuItemActionPerformed
 
-    private void globalUrbainQualityMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_globalUrbainQualityMenuItemActionPerformed
-        final EvaluatorSelectionPanel eSP = new EvaluatorSelectionPanel();
-        eSP.setVisible(true);
-       /* eSP.setVisible(true);
-        if(!eSP.returnOk)
-            return;
-
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    project.performScenarioAuto(dlg.analyse);
-                    project.save();
-                    updateTree();
-                    updateMenu();
-                } catch (Exception ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(MainFrame.this, "Error :\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }).start();*/
-
-    }//GEN-LAST:event_globalUrbainQualityMenuItemActionPerformed
-
-    public void decomp(final DecompDlg dlg) {
+    /**
+     * Removes previous decomposition, launches a new decomposition, saves the project and updates UI.
+     * 
+     * @param exp the factor between scale
+     * @param maxSize the max size of cells
+     * @param minSize the min size of cells
+     * @param seuilDensBuild the minimum density for a cell to be built
+     */
+    public void decomp(final int exp, final double maxSize, final double minSize, 
+            final double seuilDensBuild) {
         project.removeDecomp();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    project.decomp(dlg.exp, dlg.max, dlg.min, dlg.seuilDensBuild);
+                    project.decomp(exp, maxSize, minSize, seuilDensBuild);
                     project.save();
-                } catch (Throwable ex) {
+                } catch (IOException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(MainFrame.this, "An error occured :\n" + ex.getLocalizedMessage() + "\n");
                     project.removeDecomp();
@@ -645,12 +614,17 @@ public class MainFrame extends javax.swing.JFrame {
         }).start();
     }
 
-    void updateTree() {
+    /**
+     * Updates the tree by recreating the tree model
+     */
+    private void updateTree() {
         tree.setModel(new DefaultTreeModel(project));
     }
 
+    /**
+     * Updates the states (enable or disable) of menus
+     */
     private void updateMenu() {
-
         simMenu.setEnabled(project != null);
         addInfoLayerMenuItem.setEnabled(project != null);
         setLayerMenuItem.setEnabled(project != null);
@@ -661,11 +635,20 @@ public class MainFrame extends javax.swing.JFrame {
         startSimMenuItem.setEnabled(project.isDecomp());
         monoSimMenuItem.setEnabled(project.isDecomp());
         newScenarioMenuItem.setEnabled(project.isDecomp());
-
     }
 
+    /**
+     * @return the desktop pane used in this frame.
+     */
     public JDesktopPane getDesktopPane() {
         return desktopPane;
+    }
+
+    /**
+     * @return the current project
+     */
+    public Project getProject() {
+        return project;
     }
 
     private AbstractAction removeAnalyseAction = new AbstractAction(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Supprimer")) {
@@ -682,6 +665,7 @@ public class MainFrame extends javax.swing.JFrame {
                     updateTree();
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(MainFrame.this, "An error occured : \n" + ex);
                 }
             }
             
@@ -699,7 +683,6 @@ public class MainFrame extends javax.swing.JFrame {
     private AbstractAction statDecompAction = new AbstractAction(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Statistique")) {
         @Override
         public void actionPerformed(ActionEvent e) {
-
             JOptionPane.showMessageDialog(MainFrame.this, new JScrollPane(new JTextArea(project.getStatDecomp())));
         }
     };
@@ -718,6 +701,7 @@ public class MainFrame extends javax.swing.JFrame {
                     updateTree();
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(MainFrame.this, "An error occured : \n" + ex);
                 }
             }
 
@@ -725,6 +709,8 @@ public class MainFrame extends javax.swing.JFrame {
     };
 
     /**
+     * Main entry point of the software.
+     * 
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -732,7 +718,6 @@ public class MainFrame extends javax.swing.JFrame {
         PreferencesDialog.initLanguage();
 
         JavaLoader.launchGUI(MainFrame.class, args.length == 0, 1024);
-
     }
     
     
@@ -743,7 +728,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem evalExpostMenuItem;
     private javax.swing.JMenu evalMenu;
     private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenuItem globalUrbainQualityMenuItem;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem monoSimMenuItem;

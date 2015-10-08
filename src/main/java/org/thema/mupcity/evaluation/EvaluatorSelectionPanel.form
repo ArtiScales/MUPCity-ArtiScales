@@ -104,9 +104,6 @@
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Yager"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="YagerRadioButtonActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JRadioButton" name="meanRadioButton">
       <Properties>

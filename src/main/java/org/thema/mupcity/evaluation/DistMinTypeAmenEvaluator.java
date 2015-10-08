@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.evaluation;
 
@@ -27,31 +23,32 @@ import org.thema.mupcity.Project;
 import org.thema.mupcity.rule.OriginDistance;
 
 /**
- *
- * @author gvuidel
+ * Evaluates the average minimum distance to each type of amenities.
+ * 
+ * @author Gilles Vuidel
  */
 public class DistMinTypeAmenEvaluator extends Evaluator {
 
-    @ReflectObject.NoParam
-    private Project project;
     @ReflectObject.NoParam
     private Project.Layers layer;
     @ReflectObject.NoParam
     private int level;
     
-    @ReflectObject.NoParam
     private transient HashSet types;
-    @ReflectObject.NoParam
     private transient HashMapList<Node, Object> nodeTypes ;
-    @ReflectObject.NoParam
     private transient DefaultFeatureCoverage<DefaultFeature> facCov;
-        
-    @ReflectObject.NoParam
+    private transient Project project;
     private transient SpatialGraph graph;
     
-     
+    /**
+     * Creates a new DistMinTypeAmenEvaluator.
+     * @param project the current project
+     * @param layer the layer of amenities
+     * @param level the level of amenity or -1 for all levels
+     * @param x the abscisses of the membership function
+     * @param y the ordinates of the membership function
+     */
     public DistMinTypeAmenEvaluator(Project project, Project.Layers layer, int level, double[] x, double[] y ) {
-        
         super(new DiscreteFunction(x, y));
         this.project = project;
         this.layer = layer;
@@ -61,13 +58,15 @@ public class DistMinTypeAmenEvaluator extends Evaluator {
     @Override
     public void execute(Scenario scenario, SquareGrid grid, TaskMonitor monitor) {
         // initialisation du type de graph (walking distance) ou celui du projet
-        getGraph();
+        if (graph == null) {
+            graph = project.getSpatialGraph();
+        }
         //charge le coverage du layer suivant le niveau
         facCov = project.getCoverageLevel(layer, level);
         
         // only for optimize networkdistance
         // hashMapList liste de noeud avec comme object les attributs de Type 
-        nodeTypes = new HashMapList<Node, Object>();
+        nodeTypes = new HashMapList<>();
         types = new HashSet();
         for(Feature fac : facCov.getFeatures()) {
             types.add(fac.getAttribute(Project.TYPE_FIELD));
@@ -75,61 +74,62 @@ public class DistMinTypeAmenEvaluator extends Evaluator {
             if(location.isSnapToEdge()) {
                 nodeTypes.putValue(((Edge)location.getGraphElem()).getNodeA(), fac.getAttribute(Project.TYPE_FIELD));
                 nodeTypes.putValue(((Edge)location.getGraphElem()).getNodeB(), fac.getAttribute(Project.TYPE_FIELD));
-            } else
+            } else {
                 nodeTypes.putValue((Node)location.getGraphElem(), fac.getAttribute(Project.TYPE_FIELD));
+            }
         }
-        
            
         super.execute(scenario, grid, monitor);
     }
     
     @Override
     protected double eval(Scenario scenario, Cell cell) {        
-        HashMap<Object, Double> minDist = new HashMap<Object, Double>();
+        HashMap<Object, Double> minDist = new HashMap<>();
         final HashSet restTypes = new HashSet(types);
         OriginDistance origDistance = project.getDistance(cell.getGeometry(), Double.NaN);
-        if(origDistance instanceof OriginDistance.NetworkDistance)
+        if(origDistance instanceof OriginDistance.NetworkDistance) {
             ((OriginDistance.NetworkDistance)origDistance).setDijkstraListener(new DijkstraPathFinder.CalculateListener() {
                 @Override
                 public boolean currentNode(DijkstraPathFinder.DijkstraNode node) {
-                    if(nodeTypes.containsKey(node.node))
+                    if(nodeTypes.containsKey(node.node)) {
                         restTypes.removeAll(nodeTypes.get(node.node));
+                    }
                     return !restTypes.isEmpty();
                 }
             });
+        }
                               
-        for(Feature fac : facCov.getFeatures()) {
-            
-            // getTimeDistance  Calcul le temps de parcours utiliser pour "the average time-distance"
-            //double dist = origDistance.getTimeDistance((Point)fac.getGeometry());
-            
+        for(Feature fac : facCov.getFeatures()) {         
             // the average distance 
             double dist = origDistance.getDistance((Point)fac.getGeometry());
             Object type = fac.getAttribute(Project.TYPE_FIELD);
             if(minDist.containsKey(type)) {
                 double min = minDist.get(type);
-                if(dist < min)
+                if(dist < min) {
                     minDist.put(type, dist);
-            } else
-                minDist.put(type, dist);                    
+                }
+            } else {
+                minDist.put(type, dist);
+            }                    
         }
                 
-                double sum = 0;
-                for(Double val : minDist.values())
-                    sum += val;
+        double sum = 0;
+        for(Double val : minDist.values()) {
+            sum += val;
+        }
                 
-                return(sum / minDist.size());
+        return sum / minDist.size();
     }
-    
-      public void getGraph() {
-          if (graph == null || level != 1){
-              graph = project.getSpatialGraph();
-          }
-                  
-       }
-     
-     public void setGraph(SpatialGraph graph) {
-        this.graph = graph;
+
+    /**
+     * Sets the network graph.
+     * It will be used only if level == 1, else the project's network will be used
+     * @param graph the network to use for level 1 or null for using the project's network graph
+     */
+    public void setGraph(SpatialGraph graph) {
+        if(level == 1) {
+            this.graph = graph;
+        }
     }
 
     @Override

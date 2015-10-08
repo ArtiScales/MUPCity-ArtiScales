@@ -17,14 +17,16 @@ import org.thema.common.param.ParamEditor;
  */
 public class RuleParamDialog extends javax.swing.JDialog {
 
+    private Project project;
     private ParamEditor<Rule> currentEditor;
     
-    public RuleParamDialog(java.awt.Frame parent, Collection<Rule> rules) {
+    public RuleParamDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
+        this.project = project;
         initComponents();
         setLocationRelativeTo(parent);
         
-        ruleList.setModel(new DefaultComboBoxModel(rules.toArray()));
+        ruleList.setModel(new DefaultComboBoxModel(project.getRules().toArray()));
         
     }
 
@@ -117,7 +119,7 @@ public class RuleParamDialog extends javax.swing.JDialog {
             return;
         }
         Rule rule = (Rule) ruleList.getSelectedValue();
-        if(rule.isUsable()) {
+        if(rule.isUsable(project)) {
             currentEditor = new DefaultParamEditor<>(rule);
             paramPanel.add(currentEditor, BorderLayout.CENTER);
         } else {
@@ -127,7 +129,7 @@ public class RuleParamDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_ruleListValueChanged
 
     private void distButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_distButtonActionPerformed
-        new DistanceDialog((Frame)getParent(), Project.getProject()).setVisible(true);
+        new DistanceDialog((Frame)getParent(), project).setVisible(true);
     }//GEN-LAST:event_distButtonActionPerformed
 
    

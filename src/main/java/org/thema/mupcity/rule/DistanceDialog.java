@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.thema.mupcity.rule;
-
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -14,19 +9,24 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import org.thema.mupcity.Project;
-import org.thema.mupcity.rule.OriginDistance.EuclidianDistance;
+import org.thema.mupcity.rule.OriginDistance.EuclideanDistance;
 import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
 
 /**
- *
- * @author gvuidel
+ * Dialog form for choosing the type of distance for accessibility calculation :
+ * euclidean distance or network distance.
+ * 
+ * @author Gilles Vuidel
  */
 public class DistanceDialog extends javax.swing.JDialog {
 
+    private Project project;
     
-    Project project;
-    
-    /** Creates new form DistanceDialog */
+    /** 
+     * Creates new form DistanceDialog
+     * @param parent the parent frame
+     * @param project the current project
+     */
     public DistanceDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
         this.project = project;
@@ -39,15 +39,17 @@ public class DistanceDialog extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                doClose();
+                cancelButtonActionPerformed(e);
             }
         });
         
-        speedSpinner.setValue((int)EuclidianDistance.speed);
+        speedSpinner.setValue((int)EuclideanDistance.speed);
         netPrecSpinner.setValue(project.getNetPrecision());
-        if(project.getDistType().equals(NetworkDistance.class))
+        if(project.getDistType().equals(NetworkDistance.class)) {
             netRadioButton.setSelected(true);
+        }
         
         if(!project.isLayerExist(Project.Layers.ROAD)) {
             netRadioButton.setEnabled(false);
@@ -76,12 +78,6 @@ public class DistanceDialog extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         netPrecSpinner = new javax.swing.JSpinner();
 
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                closeDialog(evt);
-            }
-        });
-
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -98,7 +94,7 @@ public class DistanceDialog extends javax.swing.JDialog {
 
         buttonGroup1.add(euclidRadioButton);
         euclidRadioButton.setSelected(true);
-        euclidRadioButton.setText("Euclidian");
+        euclidRadioButton.setText("Euclidean");
 
         buttonGroup1.add(netRadioButton);
         netRadioButton.setText("Network");
@@ -186,25 +182,17 @@ public class DistanceDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        project.setDistType(euclidRadioButton.isSelected() ? EuclidianDistance.class : NetworkDistance.class);
-        EuclidianDistance.speed = (Integer)speedSpinner.getValue();
+        project.setDistType(euclidRadioButton.isSelected() ? EuclideanDistance.class : NetworkDistance.class);
+        EuclideanDistance.speed = (Integer)speedSpinner.getValue();
         project.setNetPrecision((Double)netPrecSpinner.getValue());
-        doClose();
+        setVisible(false);
+        dispose();
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        doClose();
-    }//GEN-LAST:event_cancelButtonActionPerformed
-
-    /** Closes the dialog */
-    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        doClose();
-    }//GEN-LAST:event_closeDialog
-
-    private void doClose() {
         setVisible(false);
         dispose();
-    }
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
