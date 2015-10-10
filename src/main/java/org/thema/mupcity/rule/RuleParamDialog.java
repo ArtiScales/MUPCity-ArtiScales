@@ -1,10 +1,27 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.rule;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.util.Arrays;
-import java.util.Collection;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextArea;
 import org.thema.mupcity.Project;
@@ -12,7 +29,8 @@ import org.thema.common.param.DefaultParamEditor;
 import org.thema.common.param.ParamEditor;
 
 /**
- *
+ * Dailog form for editing rules paramaters by reflection.
+ * 
  * @author Gilles Vuidel
  */
 public class RuleParamDialog extends javax.swing.JDialog {
@@ -20,6 +38,11 @@ public class RuleParamDialog extends javax.swing.JDialog {
     private Project project;
     private ParamEditor<Rule> currentEditor;
     
+    /**
+     * Creates new RuleParamDialog form. The dialog is model.
+     * @param parent the parent frame
+     * @param project the current project
+     */
     public RuleParamDialog(java.awt.Frame parent, Project project) {
         super(parent, true);
         this.project = project;

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.evaluation;
 
@@ -37,15 +55,15 @@ public class NbCellOnEnvelopeEvaluator extends Evaluator {
     @Override
     public void execute(Scenario scenario, SquareGrid grid, TaskMonitor monitor) {
         // créé une nouvelle couche pour stocker l'évaluation
-        Project.getProject().getMSGrid().addLayer(getEvalLayerName(scenario), DataBuffer.TYPE_FLOAT, Float.NaN);
-        Project.getProject().getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.ISEMPTY, 
-                getEvalLayerName(scenario), urbanBorder), true);
+        grid.addLayer(getEvalLayerName(scenario), DataBuffer.TYPE_FLOAT, Float.NaN);
+        grid.executeThreaded(new SimpleCoverageOperation(SimpleCoverageOperation.ISEMPTY, 
+                getEvalLayerName(scenario), urbanBorder));
     }
 
     /**
      * Sets the urban border.
      * Must be set before evaluation calculation
-     * @param urbanBorder a MultiLinestring representing the urban border
+     * @param urbanBorderGeom a MultiLinestring representing the urban border
      */
     public void setUrbanBorder(Geometry urbanBorderGeom) {
         List<Feature> features = new ArrayList<>();

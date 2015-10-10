@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.operation;
 
@@ -14,9 +32,12 @@ import org.thema.msca.operation.NbNbCellOperation;
  * Counts the number of white cells (free) touching a black cell (build) located in the 8 neighbors of the current cell
  * @author Gilles Vuidel
  */
-
 public class PBuildFreeOperation extends NbNbCellOperation {
 
+    /**
+     * Creates a new PBuildFreeOperation
+     * @param paramLayer the build grid layer name 
+     */
     public PBuildFreeOperation(String paramLayer) {
         super(new CellBuild(paramLayer), new CellFree(paramLayer));
     }
@@ -53,7 +74,7 @@ public class PBuildFreeOperation extends NbNbCellOperation {
     /**
      * Tests all combinations of black and white neighborhoods to find the max value of the operator : 34
      * 
-     * @param args 
+     * @param args no use
      */
     public static void main(String [] args) {
         SquareGrid grid = new SquareGrid(new Envelope(0, 5, 0, 5), 1);

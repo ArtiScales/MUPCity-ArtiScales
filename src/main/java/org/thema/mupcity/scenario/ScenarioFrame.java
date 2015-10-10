@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.scenario;
 
@@ -120,7 +138,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
         }
 
         double res = 0;
-        for(Layer l : scenario.getLayers().getLayers()) {
+        for(Layer l : scenario.getLayers(project.getMSGrid()).getLayers()) {
             if(l.isVisible()) {
                 String name = l.getName();
                 if(name.contains(",")) {
@@ -144,8 +162,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
                 return false;
             }
         } catch(Exception e) {
-            return true;
-            // TODO à corriger crefaire fonction getNbClusterGap
+            Logger.getLogger(ScenarioFrame.class.getName()).log(Level.WARNING, "", e);
         }
 
         return true;
@@ -345,7 +362,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
     private void undo() {
         try {
-            project.reloadLayer(scenario.getResultLayerName());
+            project.reloadGridLayer(scenario.getResultLayerName());
             refresh();
         } catch (IOException ex) {
             Logger.getLogger(ScenarioFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -355,7 +372,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
     
     private void save() {
         try {
-            project.saveLayer(scenario.getResultLayerName());
+            project.saveGridLayer(scenario.getResultLayerName());
         } catch (IOException ex) {
             Logger.getLogger(ScenarioFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Une erreur est survenue pendant l'enregistrement :\n" + ex.getLocalizedMessage());
@@ -364,7 +381,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
         mapViewer.getMap().clearSelection();
-        List<Layer> sceLayers = scenario.getLayers().getLayers();
+        List<Layer> sceLayers = scenario.getLayers(project.getMSGrid()).getLayers();
         List<Layer> gridLayers = ((GroupLayer)layers.getLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Grid"))).getLayers();
         int n = gridLayers.size();
         for(int i = 1; i < sceLayers.size(); i++) {
@@ -380,7 +397,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
     private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButtonActionPerformed
         mapViewer.getMap().clearSelection();
-        List<Layer> sceLayers = scenario.getLayers().getLayers();
+        List<Layer> sceLayers = scenario.getLayers(project.getMSGrid()).getLayers();
         List<Layer> gridLayers = ((GroupLayer)layers.getLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Grid"))).getLayers();
         int n = gridLayers.size();
         for(int i = 0; i < sceLayers.size()-1; i++) {
@@ -432,7 +449,7 @@ public class ScenarioFrame extends javax.swing.JInternalFrame implements ShapeSe
 
     private void updateNbNewBuild() {
         double res = 0;
-        for(Layer l : scenario.getLayers().getLayers()) {
+        for(Layer l : scenario.getLayers(project.getMSGrid()).getLayers()) {
             if(l.isVisible()) {
                 res = Double.parseDouble(l.getName().replace(",", "."));
             }

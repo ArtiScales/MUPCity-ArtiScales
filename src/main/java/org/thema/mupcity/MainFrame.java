@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package org.thema.mupcity;
 
@@ -44,6 +61,9 @@ import org.thema.mupcity.scenario.ScenarioManual;
  */
 public class MainFrame extends javax.swing.JFrame {
 
+    /**
+     * the current loaded project or null if no project is loaded
+     */
     private Project project;
     
     /** Creates new form MainFrame */
@@ -257,7 +277,7 @@ public class MainFrame extends javax.swing.JFrame {
         ScenarioAuto anal = project.getScenarioAuto(name);
         DefaultGroupLayer gl = getDefaultLayers();
         gl.addLayerLast(project.getGridLayer());
-        DefaultGroupLayer agl = anal.getLayers();
+        DefaultGroupLayer agl = anal.getLayers(project.getMSGrid());
         if(anal.isMonoScale()) {
             agl.getLayerFirst().setVisible(true);
         } else {
@@ -273,7 +293,7 @@ public class MainFrame extends javax.swing.JFrame {
         ScenarioManual sce = project.getScenario(name);
         DefaultGroupLayer gl = getDefaultLayers();
         gl.addLayerLast(project.getGridLayer());
-        gl.addLayerLast(sce.getLayers());
+        gl.addLayerLast(sce.getLayers(project.getMSGrid()));
 
        return gl;
     }
@@ -660,7 +680,7 @@ public class MainFrame extends javax.swing.JFrame {
                     java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Suppression..."), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if(res == JOptionPane.YES_OPTION) {
                 try {
-                    project.removeAnalysis(project.getScenarioAuto(analName));
+                    project.removeScenario(project.getScenarioAuto(analName));
                     project.save();
                     updateTree();
                 } catch (IOException ex) {

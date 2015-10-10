@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.rule;
 
@@ -27,9 +45,10 @@ public class Facility12Rule extends AbstractRule {
     @ReflectObject.NoParam
     private int level;
     
+    @ReflectObject.Name("Distance max to a facility")
     private double maxDistClust;
     
-    @ReflectObject.Name("Distance max between facility")
+    @ReflectObject.Name("Distance max between facility of the same cluster")
     private double distClust = 200;
     
     @ReflectObject.Name("Diversity function")
@@ -177,16 +196,16 @@ public class Facility12Rule extends AbstractRule {
         private List<DefaultFeature> facilities;
         private double distMin;
 
-        public ClusterFacility(List<DefaultFeature> facilities, double distMin) {
+        private ClusterFacility(List<DefaultFeature> facilities, double distMin) {
             this.facilities = facilities;
             this.distMin = distMin;
         }
 
-        public double getNbFacilities() {
+        private double getNbFacilities() {
             return facilities.size();
         }
 
-        public double getNbTypeFacilities() {
+        private double getNbTypeFacilities() {
             HashSet types = new HashSet();
             for(Feature f : facilities) {
                 types.add(f.getAttribute(Project.TYPE_FIELD));
@@ -194,7 +213,7 @@ public class Facility12Rule extends AbstractRule {
             return types.size();
         }
 
-        public double getDistMin() {
+        private double getDistMin() {
             return distMin;
         }
         
@@ -207,7 +226,7 @@ public class Facility12Rule extends AbstractRule {
         private MultiPoint geom;
 
         /** Creates a new instance of ClusterFeature */
-        public ClusterFeature(int id, List<DefaultFeature> facilities) {
+        private ClusterFeature(int id, List<DefaultFeature> facilities) {
             this.facilities = facilities;
             this.id = id;
             Point[] points = new Point[facilities.size()];
@@ -217,11 +236,7 @@ public class Facility12Rule extends AbstractRule {
             geom = new GeometryFactory().createMultiPoint(points);
         }
 
-        public int getNbFacilities() {
-            return facilities.size();
-        }
-
-        public List<DefaultFeature> getFacilities() {
+        private List<DefaultFeature> getFacilities() {
             return facilities;
         }
 

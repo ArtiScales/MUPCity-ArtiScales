@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.rule;
 
@@ -27,19 +45,19 @@ public interface OriginDistance {
      * @param dest the destination point
      * @return the distance between the origin and dest or Double.MAX_VALUE
      */
-    public double getDistance(Point dest);
+    double getDistance(Point dest);
     /**
      * Return time distance in minutes
      * @param dest the destination point
      * @return the time distance between the origin and dest or Double.MAX_VALUE
      */
-    public double getTimeDistance(Point dest);
+    double getTimeDistance(Point dest);
     
     
     /**
      * OriginDistance implementation for euclidean distance.
      */
-    public class EuclideanDistance implements OriginDistance {
+    class EuclideanDistance implements OriginDistance {
 
         /**
          * The speed in km.h-1
@@ -71,7 +89,7 @@ public interface OriginDistance {
     /**
      * OriginDistance implementation for network distance.
      */
-    public class NetworkDistance implements OriginDistance {
+    class NetworkDistance implements OriginDistance {
 
         private Geometry origin;
         private double maxCost;

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity;
 
@@ -18,6 +36,8 @@ public class NewScenarioAutoDialog extends javax.swing.JDialog {
     /** the new scenario */
     public ScenarioAuto scenario;
     
+    private Project project;
+    
     /**
      * Creates new form ScenarioAutoDialog
      * @param parent the parent frame
@@ -27,7 +47,8 @@ public class NewScenarioAutoDialog extends javax.swing.JDialog {
         super(parent, true);
         initComponents();
         setLocationRelativeTo(parent);
-
+        this.project = project;
+        
         if(!project.isDecomp()) {
             JOptionPane.showMessageDialog(parent, "No decomposition !");
             setVisible(false);
@@ -191,7 +212,7 @@ public class NewScenarioAutoDialog extends javax.swing.JDialog {
         String simName = nameTextField.getText();
 
         scenario = ScenarioAuto.createMultiScaleScenario(simName, start, end, 
-                nMax, strict, ruleSelectionPanel.getAHP(), noBuildCheckBox.isSelected(), ruleSelectionPanel.isAgregMean());
+                nMax, strict, ruleSelectionPanel.getAHP(), noBuildCheckBox.isSelected(), ruleSelectionPanel.isAgregMean(), project.getCoefDecomp());
         returnOk = true;
         setVisible(false);
         dispose();

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.rule;
 
@@ -20,6 +38,11 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
     private Project project;
     private AHP ahp;
     
+    /**
+     * Creates a new RuleSelectionPanel with default rules.
+     * Method {@link #setProject} must be called before using this panel.
+     * 
+     */
     public RuleSelectionPanel() {
         initComponents();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -28,13 +51,11 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
             model.addRow(new Object[]{rule, true, 1.0});
         }
     }
-    
-    public RuleSelectionPanel(Project project, Map<String, Double> coefRules) {
-        this.project = project;
-        initComponents();
-        setCoefRules(coefRules);
-    }
 
+    /**
+     * Sets the current project and update the rule table depending on rules that are usable with this project.
+     * @param project the current project
+     */
     public void setProject(Project project) {
         this.project = project;
         DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -60,6 +81,9 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * @return the selected rules name with their weight.
+     */
     public Map<String, Double> getCoefRules() {
        Map<String, Double> coefRules = new LinkedHashMap<>();
        DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -71,11 +95,17 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
        return coefRules;
     }
 
+    /**
+     * @return the AHP matrix
+     */
     public AHP getAHP() {
         updateAHP();
         return ahp;
     }
     
+    /**
+     * @return true if agregation is average, false for Yager agregation
+     */
     public boolean isAgregMean() {
         return meanCheckBox.isSelected();      
     }
@@ -174,6 +204,7 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
             } 
         }
     }
+    
     private void ahpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ahpButtonActionPerformed
         updateAHP();
         AHPDialog dlg = new AHPDialog(null, ahp);

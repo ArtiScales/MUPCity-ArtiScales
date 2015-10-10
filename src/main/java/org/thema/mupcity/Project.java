@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity;
 
@@ -42,6 +60,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.thema.common.JTS;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.common.swing.tree.AbstractTreeNode;
+import org.thema.data.GlobalDataStore;
 import org.thema.drawshape.GridModShape;
 import org.thema.drawshape.GridShape;
 import org.thema.drawshape.RectModShape;
@@ -57,6 +76,7 @@ import org.thema.graph.SpatialGraph;
 import org.thema.msca.*;
 import org.thema.msca.operation.*;
 import org.thema.mupcity.evaluation.*;
+import org.thema.mupcity.scenario.Scenario;
 
 /**
  * This class represents a MupCity project.
@@ -120,24 +140,24 @@ public class Project extends AbstractTreeNode {
     public static final List<? extends Rule> RULES = Arrays.asList(new MorphoRule(), new RoadRule(), 
             new Facility12Rule(1), new Facility12Rule(2), new Facility3Rule(), new PTRule(),
             new LeisureRule(1), new LeisureRule(2), new LeisureRule(3));
-    
-    private static Project project;
 
+    /*
+     *   Projects parameters stored in xml file
+     */
     private RectModShape bounds;    
-    
     private ArrayList<ShapeFileLayer> infoLayers;
-
     private LinkedHashMap<String, Rule> rules;
     private Class<? extends OriginDistance> distType;
     private double netPrecision;
-    
     private int coefDecomp;
-
     private List<ScenarioAuto> scenarioAutos;
     private List<ScenarioManual> scenarios;
-    
     private List<Evaluator> evaluators;
     
+    
+    /*
+     * Projects data that are not serialized in xml file.
+     */
     private transient File file;
     
     private transient MSGridBuilder<SquareGridExtent> msGrid;
@@ -145,12 +165,15 @@ public class Project extends AbstractTreeNode {
     private transient DefaultGroupLayer infoLayer;
     
     private transient HashMap<String, DefaultFeatureCoverage<DefaultFeature>> coverages;
-            
-    private transient CoordinateReferenceSystem crs;
 
     private transient SpatialGraph spatialGraph;
     
-    /** Creates a new instance of Project */
+    
+    /** 
+     * Creates a new instance of Project
+     * @param name project's name
+     * @param dir directory where creating the project
+     */
     private Project(String name, File dir)  {
         
         file = new File(dir, name + ".xml");
@@ -166,23 +189,32 @@ public class Project extends AbstractTreeNode {
         scenarios = new ArrayList<>();
         distType = OriginDistance.EuclideanDistance.class;
         
-        try {
-            ShapefileDataStore dataStore = new ShapefileDataStore(new File(dir, Layers.BUILD.toString() + ".shp").toURI().toURL());
-            crs = dataStore.getSchema().getCoordinateReferenceSystem();
-            dataStore.dispose();
-        } catch (IOException ex) {
-            Logger.getLogger(Project.class.getName()).log(Level.WARNING, null, ex);
-        }
+        
         
         infoLayers = new ArrayList<>();
     }
 
-    public void defineZone(Project zonePrj) {
+    /**
+     * Sets the bounds from another project.
+     * @param zonePrj another project
+     * @throws IllegalStateException if the project has already decomposition
+     */
+    public void setBounds(Project zonePrj) {
+        if(isDecomp()) {
+            throw new IllegalStateException("Cannot change bounds when the decomposition is already done.");
+        }
         bounds = zonePrj.bounds;
     }
     
-    public void decomp(int exp, double maxSize, double minSize, 
-            final double seuilDensBuild) throws IOException {
+    /**
+     * Creates the multiscale grid and calculates the rules.
+     * @param exp the factor between scale
+     * @param maxSize the max size of cells
+     * @param minSize the min size of cells
+     * @param seuilDensBuild the minimum of build density for a cell to be of state built
+     * @throws IOException 
+     */
+    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild) throws IOException {
         int nbRule = 0;
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
@@ -202,7 +234,7 @@ public class Project extends AbstractTreeNode {
                     trans.getTranslateX()-width/2,
                     trans.getTranslateY()-height/2, width, height)),
                 minSize, maxSize, exp, 4, new SquareGridFactory());
-        
+        msGrid.setCrs(getCRS());
         monitor.setNote("Create grid...");
         coefDecomp = exp;
         Envelope env = ((GridExtent)msGrid.getGrid(msGrid.getResolutions().first())).getInternalEnvelope();
@@ -236,8 +268,8 @@ public class Project extends AbstractTreeNode {
         if(isLayerExist(Layers.RESTRICT)) {
             monitor.incProgress(1);
             monitor.setNote("Create grid... restrict");
-            project.getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
-            project.getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, project.getCoverage(Layers.RESTRICT)), true);
+            getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
+            getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), true);
         }
 
         long t = System.currentTimeMillis();
@@ -251,10 +283,16 @@ public class Project extends AbstractTreeNode {
             }
         }
         
-        createGridLayer();
+        createDecompLayer();
         monitor.close();
     }
     
+    /**
+     * 
+     * @param origin the starting polygon 
+     * @param maxCost the maximum distance or Double.NaN for no limit
+     * @return a NetworkDistance or an EuclideanDistance depending on the projects parameters
+     */
     public OriginDistance getDistance(Polygon origin, double maxCost) {
         if(distType.equals(EuclideanDistance.class)) {
             return new EuclideanDistance(origin);
@@ -263,7 +301,15 @@ public class Project extends AbstractTreeNode {
         }
     }
     
+    /**
+     * Creates the graph network from the ROAD layer if it's not been already created and returns it.
+     * @return the graph network
+     * @throws IllegalStateException if no road layer is present in this project
+     */
     public synchronized SpatialGraph getSpatialGraph() {
+        if(!isLayerExist(Layers.ROAD)) {
+            throw new IllegalStateException("No road network layer is present");
+        }
         if(spatialGraph == null) {
             spatialGraph = new SpatialGraph(getCoverage(Layers.ROAD).getFeatures(), 
                     netPrecision == 0 ? null : new GeometryPrecisionReducer(new PrecisionModel(1/netPrecision)));
@@ -271,51 +317,87 @@ public class Project extends AbstractTreeNode {
         return spatialGraph;
     }
 
+    /**
+     * @return the implementation class for distance calculation : NetworkDistance or EuclideanDistance
+     */
     public Class<? extends OriginDistance> getDistType() {
         return distType;
     }
 
+    /**
+     * Sets the implementation class for distance calculation.
+     * @param distType the new implementation of distance class : NetworkDistance or EuclideanDistance
+     */
     public void setDistType(Class<? extends OriginDistance> distType) {
         this.distType = distType;
     }
 
+    /**
+     * @return the spatial precision for building the network graph, 0 for exact precision
+     */
     public double getNetPrecision() {
         return netPrecision;
     }
 
+    /**
+     * Set the spatial precision for building the network graph
+     * @param netPrecision the spatial precision, 0 for exact precision
+     */
     public void setNetPrecision(double netPrecision) {
         this.netPrecision = netPrecision;
+        spatialGraph = null;
     }
 
+    /**
+     * @return the factor between 2 scales of the grid
+     */
     public int getCoefDecomp() {
         return coefDecomp;
     }
 
+    /**
+     * Removes previous decomposition.
+     * Removes all scenarios and the multiscale grid.
+     */
     public void removeDecomp() {
         for(ScenarioManual sce : new ArrayList<>(scenarios)) {
             removeScenario(sce);
         }
         for(ScenarioAuto anal : new ArrayList<>(scenarioAutos)) {
-            removeAnalysis(anal);
+            removeScenario(anal);
         }
         coefDecomp = 0;
         msGrid = null;
     }
     
+    /**
+     * Adds a shepfile layer to the project.
+     * @param shapeFileLayer the shapefile layer to add
+     */
     public void addInfoLayer(ShapeFileLayer shapeFileLayer) {
         getInfoLayer();
         infoLayer.addLayerFirst(shapeFileLayer);
         infoLayers.add(shapeFileLayer);
     }
 
+    /**
+     * @return all automatic scenarios of the project, may be empty.
+     */
     public List<ScenarioAuto> getScenarioAutos() {
         return scenarioAutos;
     }
     
+    /**
+     * @return all manual scenarios of the project, may be empty.
+     */
     public List<ScenarioManual> getScenarios() {
         return scenarios;
     }
 
+    /**
+     * @param name the name of the scenario
+     * @return the automatic scenario or null if it does not exist
+     */
     public ScenarioAuto getScenarioAuto(String name) {
         for(ScenarioAuto anal : getScenarioAutos()) {
             if(anal.toString().equals(name)) {
@@ -325,6 +407,10 @@ public class Project extends AbstractTreeNode {
         return null;
     }
 
+    /**
+     * @param name the name of the scenario
+     * @return the manual scenario or null if it does not exist
+     */
     public ScenarioManual getScenario(String name) {
         for(ScenarioManual sce : scenarios) {
             if(sce.toString().equals(name)) {
@@ -334,32 +420,57 @@ public class Project extends AbstractTreeNode {
         return null;
     }
     
+    /**
+     * @return the projects rules
+     */
     public Collection<Rule> getRules() {
         return rules.values();
     }
 
+    /**
+     * Calculates the automatic scenario and add it to the project.
+     * @param analyse the scenario
+     */
     public void performScenarioAuto(final ScenarioAuto analyse) {
         analyse.perform(msGrid);
         scenarioAutos.add(analyse);
     }
 
+    /**
+     * Creates the manual scenario and add it to the project
+     * @param name the name
+     * @param nMax the number of cells which can be built, between 1 and 9
+     * @param ahp the ahp matrix for weighting rules
+     * @param mean true for agregating rules by average, false for yager agregation
+     */
     public void createManualScenario(String name, int nMax, AHP ahp, boolean mean) {
         ScenarioManual sce = new ScenarioManual(name, nMax, ahp, msGrid, mean);
         scenarios.add(sce);
     }
     
+    /**
+     * @return the set of grid resolution in descending order
+     * @throws IllegalStateException if the project has no decomposition
+     */
     public NavigableSet<Double> getResolutions() {
-        if(isDecomp()) {
-            return msGrid.getResolutions();
-        } else {
-            return null;
+        if(!isDecomp()) {
+            throw new IllegalStateException("Project has no decomposition");
         }
+            
+        return msGrid.getResolutions();
     }
     
+    /**
+     * @return the group layer of decomposition layers
+     */
     public GroupLayer getDecompLayer() {
         return decompLayer;
     }
     
+    /**
+     * Creates a grouplayer containing grid shapes for each resolution (scale) of the multiscale grid.
+     * @return a grouplayer of grid shapes
+     */
     public GroupLayer getGridLayer() {
         DefaultGroupLayer gridLayers = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Grid"));
         int i = msGrid.getResolutions().size();
@@ -381,34 +492,63 @@ public class Project extends AbstractTreeNode {
         return gridLayers;
     }
     
+    /**
+     * @return true if the project has already a decomposition (ie. a multiscale grid)
+     */
     public boolean isDecomp() {
         return msGrid != null;
     }
 
+    /**
+     * @return the multiscale grid, may be null if no decomposition has been calculated.
+     */
     public MSGridBuilder<SquareGridExtent> getMSGrid() {
         return msGrid;
     }
     
+    /**
+     * @return the rectangular bounds of the zone for the grid
+     */
     public Rectangle2D getBounds() {
         return bounds.getBounds();
     }
     
+    /**
+     * @return the rectangular shape representing the bounds of the zone for the grid
+     */
     public RectModShape getRectShape() {
         return bounds;
     }
     
+    /**
+     * @param name the predefined layer
+     * @return true if the predefined layer exists in this project
+     */
     public boolean isLayerExist(Layers name) {
         return new File(getDirectory(), name.toString()+".shp").exists();
     }
 
+    /**
+     * @return true if the project has a layer for restricted area and the decomposition has been already calculated
+     */
     public boolean hasNoBuild() {
-        return msGrid.getLayers().contains(NOBUILD_DENS);
+        return msGrid != null && msGrid.getLayers().contains(NOBUILD_DENS);
     }
     
-    public CoordinateReferenceSystem getCRS() {
-        return crs;
+    /**
+     * The CRS of the project is defined by the build layer set at project creation.
+     * @return the CRS associated with this project
+     */
+    public CoordinateReferenceSystem getCRS() throws IOException {
+        return GlobalDataStore.getCRS(new File(getDirectory(), Layers.BUILD.toString() + ".shp"));
     }
     
+    /**
+     * Loads data from a predefined layer.
+     * When the data are loaded, they are kept in cache for future retrieval.
+     * @param name the predefined layer
+     * @return the coverage data layer
+     */
     public synchronized DefaultFeatureCoverage<DefaultFeature> getCoverage(Layers name) {
         if(coverages == null) {
             coverages = new HashMap<>();
@@ -424,6 +564,13 @@ public class Project extends AbstractTreeNode {
         return coverages.get(name.toString());
     }
     
+    /**
+     * Loads data from a predefined layer and filtering by the level field.
+     * When the data are loaded, they are kept in cache for future retrieval.
+     * @param name the predefined layer
+     * @param level the level filter
+     * @return the coverage data layer
+     */
     public synchronized DefaultFeatureCoverage<DefaultFeature> getCoverageLevel(Layers layer, final int level) {
         if(coverages == null) {
             coverages = new HashMap<>();
@@ -441,6 +588,12 @@ public class Project extends AbstractTreeNode {
         return coverages.get(levelName);
     }
     
+    /**
+     * Creates a FeatureGetter from a predefined layer.
+     * Does not load the data, until the method {@link FeatureGetter.getFeatures} is called
+     * @param name the predefined layer
+     * @return a FeatureGetter for the predefined layer
+     */
     public FeatureGetter<DefaultFeature> getLayerFeatures(final Layers name) {
         return new FeatureGetter<DefaultFeature>() {
             @Override
@@ -450,6 +603,14 @@ public class Project extends AbstractTreeNode {
         };
     }
     
+    /**
+     * Sets the shapefile data associated with a predefined layer.
+     * @param layer the predefined layer
+     * @param file the shapefile containing the data
+     * @param attrs some shapefile fields name if needed for the layer, may be empty
+     * @throws IOException
+     * @throws SchemaException 
+     */
     public void setLayer(LayerDef layer, File file, List<String> attrs) throws IOException, SchemaException {
         TaskMonitor mon = new TaskMonitor(null, "Create layer", "", 0, 2);
         mon.setMillisToDecideToPopup(0);
@@ -480,22 +641,25 @@ public class Project extends AbstractTreeNode {
         
     }
 
-    public void removeAnalysis(ScenarioAuto anal) {
-        for(Layer l : anal.getLayers().getLayers()) {
+    /**
+     * Removes a scenario from the project.
+     * Removes grid layers associated with this scenario.
+     * @param anal the scenario to remove
+     */
+    public void removeScenario(Scenario scenario) {
+        for(Layer l : scenario.getLayers(getMSGrid()).getLayers()) {
             msGrid.removeLayer(l.getName());
         }
-
-        scenarioAutos.remove(anal);
-    }
-
-    public void removeScenario(ScenarioManual sce) {
-        for(Layer l : sce.getLayers().getLayers()) {
-            msGrid.removeLayer(l.getName());
+        if(scenario instanceof ScenarioAuto) {
+            scenarioAutos.remove((ScenarioAuto)scenario);
+        } else {
+            scenarios.remove((ScenarioManual)scenario);
         }
-
-        scenarios.remove(sce);
     }
-    
+
+    /**
+     * @return all available evaluators
+     */
     public List<Evaluator> getEvaluators() {
         if(evaluators == null) {
             evaluators = Arrays.asList((Evaluator)new MeanWhiteEvaluator(), new NbNearWhiteEvaluator(), 
@@ -528,6 +692,10 @@ public class Project extends AbstractTreeNode {
         return evaluators;
     }
 
+    /**
+     * Creates if not already created the group layers for user layers 
+     * @return the group layer for adding user layer
+     */
     public synchronized DefaultGroupLayer getInfoLayer() {
         if(infoLayer == null) {
             infoLayer = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Infos"));
@@ -538,21 +706,32 @@ public class Project extends AbstractTreeNode {
         return infoLayer;
     }
     
-    
-    private void createGridLayer() {
+    /**
+     * Create the multiscale grid layers for viewing in map.
+     */
+    private void createDecompLayer() {
         decompLayer = new DefaultGroupLayer(java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Decomposition"));
         
-        decompLayer.addLayerFirst(createLayer(BUILD, new UniqueColorTable(COLOR_MAP), java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Built-up")));
+        decompLayer.addLayerFirst(createMultiscaleLayers(BUILD, new UniqueColorTable(COLOR_MAP), 
+                java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Built-up"), getMSGrid()));
 
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
-                decompLayer.addLayerLast(createLayer(rule.getName(), null, rule.getFullName()));
+                decompLayer.addLayerLast(createMultiscaleLayers(rule.getName(), null, rule.getFullName(), getMSGrid()));
             }
         }
-
     }
     
-    public GroupLayer createLayer(String layerName, ColorBuilder colors, String viewLayerName) {
+    /**
+     * Creates a group layer for one multscale grid layer.
+     * This group layer contains one layer for each scale present in the multiscale grid.
+     * @param layerName the layer name in the multiscale grid
+     * @param colors the color map
+     * @param viewLayerName the name shown for this layer
+     * @param msGrid the multiscale grid
+     * @return the new group layers
+     */
+    public static GroupLayer createMultiscaleLayers(String layerName, ColorBuilder colors, String viewLayerName, MSGridBuilder<? extends MSGrid> msGrid) {
         DefaultGroupLayer gl = new DefaultGroupLayer(viewLayerName);
 
         int i = msGrid.getResolutions().size();
@@ -568,8 +747,8 @@ public class Project extends AbstractTreeNode {
             RasterLayer l = new RasterLayer(String.format("%g", res),
                 new RasterShape(msGrid.getGrid(res).getLayer(layerName).getImage().getData(),
                     org.geotools.geometry.jts.JTS.getEnvelope2D(msGrid.getGrid(res).getEnvelope(), 
-                        DefaultGeographicCRS.WGS84).getBounds2D(), style));
-            l.setCRS(crs);
+                        msGrid.getCrs()).getBounds2D(), style));
+            l.setCRS(msGrid.getCrs());
             l.setVisible(false);
             l.setDrawLegend(false);
             gl.addLayerFirst(l);
@@ -580,21 +759,38 @@ public class Project extends AbstractTreeNode {
         }
         return gl;
     }
-     
-
-    public void saveLayer(String layerName) throws IOException {
-        msGrid.saveLayer(getSubDir(), layerName);
+    
+    /**
+     * Save a layer of the grid.
+     * By default, the project saves all grid layers. This method is used for manual scenario to avoid to save all layers.
+     * 
+     * @param layerName the layer name in the multiscale grid
+     * @throws IOException 
+     */
+    public void saveGridLayer(String layerName) throws IOException {
+        msGrid.saveLayer(getGridDir(), layerName);
     }
 
-    public void reloadLayer(String layerName) throws IOException {
-        msGrid.reloadLayer(getSubDir(), layerName);
+    /**
+     * Reload a layer of the grid.
+     * This method is used for cancelling modification of a manual scenario.
+     * @param layerName the layer name in the multiscale grid
+     * @throws IOException 
+     */
+    public void reloadGridLayer(String layerName) throws IOException {
+        msGrid.reloadLayer(getGridDir(), layerName);
     }
 
+    /**
+     * Saves the project.
+     * Saves the xml project file and the multiscale grid if the decomposition is already done.
+     * @throws IOException 
+     */
     public void save() throws IOException {
         XStream xml = new XStream(new JDomDriver());
         if(isDecomp()) {
-            getSubDir().mkdir();
-            msGrid.save(getSubDir());
+            getGridDir().mkdir();
+            msGrid.save(getGridDir());
         }
         file = file.getAbsoluteFile();
         for(ShapeFileLayer l : infoLayers) { 
@@ -608,17 +804,23 @@ public class Project extends AbstractTreeNode {
         }
     }
 
-
+    /**
+     * Loads a project.
+     * @param file the xml project file
+     * @return the loaded project
+     * @throws IOException 
+     */
     public static Project load(File file) throws IOException {
         XStream xml = new XStream(new DomDriver());
+        Project project;
         try (FileReader fr = new FileReader(file)) {
             project = (Project)xml.fromXML(fr);
         }
 
         project.file = file;
         if(project.coefDecomp > 0) {
-            project.msGrid = MSGridBuilder.load(project.getSubDir());
-            project.createGridLayer();
+            project.msGrid = MSGridBuilder.load(project.getGridDir());
+            project.createDecompLayer();
         }
         
         // add new rules if not already exist in this project
@@ -631,7 +833,7 @@ public class Project extends AbstractTreeNode {
         return project; 
     }
     
-    private File getSubDir() {
+    private File getGridDir() {
         return new File(file.getParent(), "grid");
     }
 
@@ -640,6 +842,9 @@ public class Project extends AbstractTreeNode {
         return file != null ? file.getName() : java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Nouveau_projet");
     }
 
+    /**
+     * @return human readable stats on the decomposition
+     */
     public String getStatDecomp() {
         msGrid.addLayer("bati", DataBuffer.TYPE_BYTE, 0);
         msGrid.execute(new AbstractLayerOperation(4) {
@@ -662,11 +867,18 @@ public class Project extends AbstractTreeNode {
         return res.toString();
     }
 
+    /**
+     * Project tree has no parent.
+     * @return null
+     */
     @Override
     public TreeNode getParent() {
         return null;
     }
 
+    /**
+     * @return the children nodes of the tree project
+     */
     @Override
     protected List<TreeNode> getChildren() {
         List<TreeNode> vChildren = new ArrayList<>();
@@ -680,14 +892,23 @@ public class Project extends AbstractTreeNode {
         return vChildren;
     }
 
+    /**
+     * @return project directory
+     */
     public File getDirectory() {
         return file.getParentFile();
     }
 
-    public static Project getProject() {
-        return project;
-    }
-    
+    /**
+     * Creates a new project and saves it.
+     * @param name the name of the project
+     * @param dir the parent directory of the project
+     * @param buildFile the shapefile containing the buildings
+     * @param mon UI monitor
+     * @return the new project
+     * @throws IOException
+     * @throws SchemaException 
+     */
     public static Project createProject(String name, File dir, File buildFile, TaskMonitor mon) throws IOException, SchemaException {
         File directory = new File(dir, name);
         directory.mkdir();
@@ -702,13 +923,20 @@ public class Project extends AbstractTreeNode {
         DefaultFeature.saveFeatures(buildFeatures, new File(directory, Layers.BUILD+".shp"), crs);
         Project prj = new Project(name, directory);
         prj.save();
-        project = prj;
+
         return prj;
     }
     
-    private static class DistBorderOperation extends  AbstractOperation{
+    /**
+     * Binary operation returning 0 if the cell distance to the border is less than a given distance, 1 otherwise
+     */
+    private static class DistBorderOperation extends AbstractOperation {
         private int distBorder;
 
+        /**
+         * Creates a new DistBorderOperation with given distance from the border
+         * @param distBorder the distance in number of cell
+         */
         public DistBorderOperation(int distBorder) {
             super(true, 0);
             this.distBorder = distBorder;

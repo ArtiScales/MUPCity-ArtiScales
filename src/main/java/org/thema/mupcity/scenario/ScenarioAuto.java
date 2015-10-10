@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.scenario;
 
@@ -10,7 +28,6 @@ import javax.media.jai.operator.SubtractFromConstDescriptor;
 import javax.swing.ProgressMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.image.RasterShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
@@ -44,6 +61,7 @@ public class ScenarioAuto extends Scenario {
 
     // multiscale atributes
     private boolean strict;
+    private int coefDecomp;
 
     // monoscale attributes
     private int nbCell;
@@ -120,7 +138,7 @@ public class ScenarioAuto extends Scenario {
     public final boolean canBeBuild(Cell c) {
         return !isBlack(c) &&
                 (!useNoBuild || c.getLayerValue(Project.NOBUILD_DENS)
-                    <= (1 - (monoScale ?  0.5 : getNMax() / Math.pow(Project.getProject().getCoefDecomp(), 2))));
+                    <= (1 - (monoScale ?  0.5 : getNMax() / Math.pow(coefDecomp, 2))));
     }
 
     /**
@@ -142,7 +160,7 @@ public class ScenarioAuto extends Scenario {
     }
 
     /**
-     * Computes the scenario for multi scales.
+     * Computes the scenario for multiple scales.
      * @param msGrid the multi scale grid
      */
     private void performSim(MSGridBuilder msGrid) {
@@ -394,9 +412,9 @@ public class ScenarioAuto extends Scenario {
             RasterLayer l = new RasterLayer(String.format("%s-%g", Project.SIMUL, startScale),
                 new RasterShape(grid.getRaster(getResultLayerName()),
                     org.geotools.geometry.jts.JTS.getEnvelope2D(grid.getEnvelope(),
-                        DefaultGeographicCRS.WGS84).getBounds2D()));
+                        msGrid.getCrs()).getBounds2D()));
             l.setVisible(false);
-            l.setCRS(Project.getProject().getCRS());
+            l.setCRS(msGrid.getCrs());
             l.setStyle(style);
 
             layers.addLayerLast(l);
@@ -404,16 +422,17 @@ public class ScenarioAuto extends Scenario {
                 l = new RasterLayer(String.format("%s-%g", Project.EVAL, startScale),
                     new RasterShape(grid.getRaster(getEvalLayerName()),
                         org.geotools.geometry.jts.JTS.getEnvelope2D(grid.getEnvelope(),
-                            DefaultGeographicCRS.WGS84).getBounds2D()));
+                            msGrid.getCrs()).getBounds2D()));
                 l.setVisible(false);
                 l.setStyle(new RasterStyle(ColorRamp.RAMP_INVGRAY));
-                l.setCRS(Project.getProject().getCRS());
+                l.setCRS(msGrid.getCrs());
                 layers.addLayerLast(l);
             }
         } else {
-            layers.addLayerFirst(Project.getProject().createLayer(getResultLayerName(), new UniqueColorTable(Project.COLOR_MAP),
-                    getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario")));
-            layers.addLayerLast(Project.getProject().createLayer(getEvalLayerName(), null,  getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest")));
+            layers.addLayerFirst(Project.createMultiscaleLayers(getResultLayerName(), new UniqueColorTable(Project.COLOR_MAP),
+                    getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario"), msGrid));
+            layers.addLayerLast(Project.createMultiscaleLayers(getEvalLayerName(), null,  
+                    getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest"), msGrid));
         }
 
     }
@@ -468,11 +487,12 @@ public class ScenarioAuto extends Scenario {
      * @param ahp the ahp matrix 
      * @param useNoBuild use no build restriction layer ?
      * @param mean if true use average agregation, yager otherwise
+     * @param coefDecomp factor between scale of the multiscale grid decomposition
      * @return the new scenario
      */
     public static ScenarioAuto createMultiScaleScenario(String name,
             double startScale, double endScale, int nMax, boolean strict, 
-            AHP ahp, boolean useNoBuild, boolean mean) {
+            AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp) {
         ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean);
 
         scenario.monoScale = false;
@@ -481,6 +501,7 @@ public class ScenarioAuto extends Scenario {
         scenario.strict = strict;
         scenario.useNoBuild = useNoBuild;
         scenario.nbCell = 0;
+        scenario.coefDecomp = coefDecomp;
 
         return scenario;
     }

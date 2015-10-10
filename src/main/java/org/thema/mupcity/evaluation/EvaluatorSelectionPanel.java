@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2015 Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté
+ * http://thema.univ-fcomte.fr
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 package org.thema.mupcity.evaluation;
 
@@ -14,37 +32,37 @@ import org.thema.mupcity.Project;
  */
 public class EvaluatorSelectionPanel extends javax.swing.JPanel {
 
+    private Project project;
     private AHP ahp;
     
     /**
-     * Creates a new EvaluatorSelectionPanel with evaluators from the current project if it exists
+     * Creates a new EvaluatorSelectionPanel.
+     * The method {@link #setProject(org.thema.mupcity.Project) } must be called before using this panel.
      */
     public EvaluatorSelectionPanel() {
         initComponents();
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        // pour la phase de développement dans NetBeans
-        if(Project.getProject() != null) {
-            for(Evaluator eval : Project.getProject().getEvaluators()) {
-                if(eval.isUsable()) {
-                    model.addRow(new Object[]{eval, true, 1.0});
-                }
-            }
-        }
     }
     
     /**
-     * Creates a new EvaluatorSelectionPanel with evaluators from the current project 
-     * @param coefEvaluators the weight of each evaluator used
+     * Sets the current project and adds usable evaluators from the project.
+     * 
+     * @param project the project
      */
-    public EvaluatorSelectionPanel(Map<String, Double> coefEvaluators) {
-        initComponents();
-        setCoefEvaluators(coefEvaluators);
+    public void setProject(Project project) {
+        this.project = project;
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        for(Evaluator eval : project.getEvaluators()) {
+            if(eval.isUsable()) {
+                model.addRow(new Object[]{eval, true, 1.0});
+            }
+        }
     }
 
     private void setCoefEvaluators(Map<String, Double> coefEvaluators) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setNumRows(0);
-        for(Evaluator eval : Project.getProject().getEvaluators()) {
+        for(Evaluator eval : project.getEvaluators()) {
             if(coefEvaluators.containsKey(eval.getShortName())) { 
                 model.addRow(new Object[]{eval, true, coefEvaluators.get(eval.getShortName())});
             } else {
