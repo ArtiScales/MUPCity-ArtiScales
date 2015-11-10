@@ -54,7 +54,6 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 import org.thema.mupcity.scenario.ScenarioManual;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.SchemaException;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.thema.common.JTS;
@@ -567,7 +566,7 @@ public class Project extends AbstractTreeNode {
     /**
      * Loads data from a predefined layer and filtering by the level field.
      * When the data are loaded, they are kept in cache for future retrieval.
-     * @param name the predefined layer
+     * @param layer the predefined layer
      * @param level the level filter
      * @return the coverage data layer
      */
@@ -644,7 +643,7 @@ public class Project extends AbstractTreeNode {
     /**
      * Removes a scenario from the project.
      * Removes grid layers associated with this scenario.
-     * @param anal the scenario to remove
+     * @param scenario the scenario to remove
      */
     public void removeScenario(Scenario scenario) {
         for(Layer l : scenario.getLayers(getMSGrid()).getLayers()) {
@@ -662,8 +661,9 @@ public class Project extends AbstractTreeNode {
      */
     public List<Evaluator> getEvaluators() {
         if(evaluators == null) {
-            evaluators = Arrays.asList((Evaluator)new MeanWhiteEvaluator(), new NbNearWhiteEvaluator(), 
-                    new NbCellOnEnvelopeEvaluator(), new DistEnvelopeEvaluator(),
+            evaluators = Arrays.asList((Evaluator)new MeanWhiteEvaluator(),
+                    new NbCellOnEnvelopeEvaluator(), 
+                    new DistEnvelopeEvaluator(),
                     
                     new DistMinAmenEvaluator(this, Layers.FACILITY, 1, new double[] {0.0, 1000.0}, new double[] {1.0, 0.001}),
                     new DistMinAmenEvaluator(this, Layers.FACILITY, 2, new double[] {0.0, 2000.0}, new double[] {1.0, 0.001}), 

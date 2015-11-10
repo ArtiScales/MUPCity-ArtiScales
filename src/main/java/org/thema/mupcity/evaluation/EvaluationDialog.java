@@ -381,15 +381,11 @@ public class EvaluationDialog extends javax.swing.JDialog {
             SpatialGraph graph= new SpatialGraph(GlobalDataStore.getFeatures(netN1SelectFilePanel.getSelectedFile(), null, null),
                     new GeometryPrecisionReducer(new PrecisionModel(10)));
             for(Evaluator evaluator : project.getEvaluators()) {
-                if(evaluator instanceof DistMinAmenEvaluator) {
-                    ((DistMinAmenEvaluator)evaluator).setGraph(graph);
-                } else if(evaluator instanceof NbAmenEvaluator) {
-                    ((NbAmenEvaluator)evaluator).setGraph(graph);
+                if(evaluator instanceof AbstractAmenEvaluator) {
+                    ((AbstractAmenEvaluator)evaluator).setGraph(graph);
                 } else if(evaluator instanceof DistEnvelopeEvaluator) {
                     ((DistEnvelopeEvaluator)evaluator).setGraph(graph);
                     ((DistEnvelopeEvaluator)evaluator).setNetGeom(netGeom);
-                } else if(evaluator instanceof NbStationsEvaluator) {
-                    ((NbStationsEvaluator)evaluator).setGraph(graph);
                 }
             }
         }

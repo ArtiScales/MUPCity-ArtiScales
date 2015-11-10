@@ -81,7 +81,7 @@ public abstract class AbstractAmenEvaluator extends Evaluator {
      * @param graph may be null for using the project's network graph
      */
     public void setGraph(SpatialGraph graph) {
-        if(level == 1) {
+        if(level <= 1) {
             this.graph = graph;
             distAmen = null;
         }
