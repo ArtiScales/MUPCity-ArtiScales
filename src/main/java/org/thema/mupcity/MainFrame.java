@@ -19,6 +19,7 @@
 package org.thema.mupcity;
 
 import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyVetoException;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuItem;
@@ -68,6 +71,7 @@ public class MainFrame extends javax.swing.JFrame {
     
     /** Creates new form MainFrame */
     public MainFrame() {
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/org/thema/mupcity/mupcity_ico.png")));
         initComponents();
         tree.setModel(new DefaultTreeModel(null));
         setTitle("MUP-City " + JavaLoader.getVersion(MainFrame.class));
@@ -106,6 +110,8 @@ public class MainFrame extends javax.swing.JFrame {
         newScenarioMenuItem = new javax.swing.JMenuItem();
         evalMenu = new javax.swing.JMenu();
         evalExpostMenuItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -228,6 +234,18 @@ public class MainFrame extends javax.swing.JFrame {
         evalMenu.add(evalExpostMenuItem);
 
         menuBar.add(evalMenu);
+
+        helpMenu.setText(bundle.getString("MainFrame.helpMenu.text")); // NOI18N
+
+        aboutMenuItem.setText(bundle.getString("MainFrame.aboutMenuItem.text")); // NOI18N
+        aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(aboutMenuItem);
+
+        menuBar.add(helpMenu);
 
         setJMenuBar(menuBar);
 
@@ -604,6 +622,23 @@ public class MainFrame extends javax.swing.JFrame {
         new EvaluationDialog(this, project).setVisible(true);
     }//GEN-LAST:event_evalExpostMenuItemActionPerformed
 
+    private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
+        JOptionPane.showMessageDialog(this, "MUP-City " + JavaLoader.getVersion(MainFrame.class) + "\n\n" +
+                "Laboratoire ThéMA - CNRS - Université de Franche Comté\n\n" +
+                
+                "The conceptual bases of MUP-City have been set out by Pierre Frankhauser, Cécile Tannier, and Hélène Houot.\n"
+                + "The computer application has been created by Gilles Vuidel and Cécile Tannier.\n"
+                + "All were members of the research laboratory ThéMA in Besançon (France).\n" +
+                "\n" +
+                "Two other members of ThéMA have participated in the conception of the current version of the software :\n"
+                + "Maxime Frémond (as part of his PhD thesis) and Florian Litot (computer scientist).\n" +
+                "\n" +
+                "This research received financial support from France’s ministry for ecology,\n"
+                + "sustainable development and energy as part of the PREDIT 3 program.\n\n" +
+                "Mup-City is licensed under the GNU General Public License version 3.\n\n",
+                "About", JOptionPane.PLAIN_MESSAGE, new ImageIcon(getIconImage()));
+    }//GEN-LAST:event_aboutMenuItemActionPerformed
+
     /**
      * Removes previous decomposition, launches a new decomposition, saves the project and updates UI.
      * 
@@ -742,12 +777,14 @@ public class MainFrame extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem addInfoLayerMenuItem;
     private javax.swing.JMenuItem decompMenuItem;
     private javax.swing.JDesktopPane desktopPane;
     private javax.swing.JMenuItem evalExpostMenuItem;
     private javax.swing.JMenu evalMenu;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenu helpMenu;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem monoSimMenuItem;

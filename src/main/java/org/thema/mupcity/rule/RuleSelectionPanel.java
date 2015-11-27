@@ -75,10 +75,11 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
                 if(coefRules.containsKey(rule.getName())) {
                     model.addRow(new Object[]{rule, true, coefRules.get(rule.getName())});
                 } else {
-                    model.addRow(new Object[]{rule, false, Double.NaN});       
+                    model.addRow(new Object[]{rule, false, 0.0});       
                 }
-            }
+            } 
         }
+        meanCheckBoxActionPerformed(null);
     }
     
     /**
@@ -166,6 +167,11 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
         });
 
         meanCheckBox.setText(bundle.getString("RuleSelectionPanel.meanCheckBox.text")); // NOI18N
+        meanCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                meanCheckBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -232,6 +238,26 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
         setCoefRules(ahp.getCoefs());
         
     }//GEN-LAST:event_importButtonActionPerformed
+
+    private void meanCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_meanCheckBoxActionPerformed
+        double sum = 0;
+        int n = 0;
+        for(Double val : getCoefRules().values()) {
+            sum += val;
+            n++;
+        }
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        for(int i = 0; i < model.getRowCount(); i++) {
+            if((Boolean)model.getValueAt(i, 1)) {
+               double val = (Double)model.getValueAt(i, 2);
+               if(meanCheckBox.isSelected()) {
+                   model.setValueAt(val/sum, i, 2);
+               } else {
+                   model.setValueAt(n*val/sum, i, 2);
+               }
+            }
+        }
+    }//GEN-LAST:event_meanCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ahpButton;

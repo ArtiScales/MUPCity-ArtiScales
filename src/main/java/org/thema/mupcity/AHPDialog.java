@@ -122,6 +122,7 @@ public class AHPDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+        ahpEditor.validateValue();
         ahp = ahpEditor.getValue();
         isOk = true;
         setVisible(false);
