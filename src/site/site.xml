@@ -17,9 +17,10 @@
     <custom>
         <reflowSkin>
             <theme>bootswatch-spacelab</theme>
+            <protocolRelativeURLs>true</protocolRelativeURLs>
             <brand>
                 <name>MUP-City</name>
-                <href>http://sourcesup.renater.fr/mupcity/</href>
+                <href>https://sourcesup.renater.fr/mupcity/</href>
             </brand>
             <titleTemplate>%2$s | %1$s</titleTemplate>
         </reflowSkin>
