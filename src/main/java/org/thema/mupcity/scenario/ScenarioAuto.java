@@ -128,6 +128,10 @@ public class ScenarioAuto extends Scenario {
         return c.getLayerValue(getResultLayerName()) > 0;
     }
 
+    public final boolean isRemoved(Cell c) {
+        return c.getLayerValue(getResultLayerName()) == -1;
+    }
+    
     /**
      * Retourne vrai si la cellule n'est pas construite
      * et peut être construite (contrainte des zones non constructible)
@@ -171,9 +175,19 @@ public class ScenarioAuto extends Scenario {
             public void perform(Cell cell) {
                 String simLayer = getResultLayerName();
                 List<MSCell> lstCell = ((MSCell)cell).getChildren();
+                if(isRemoved(cell)) {
+                   for(MSCell c : lstCell) {
+                       if(isBuild(c)) {
+                           c.setLayerValue(simLayer, REM_BUILD);
+                       }
+                    } 
+                   return;
+                }
+                
                 if(!isBlack(cell) || lstCell.isEmpty()) {
                     return;
                 }
+                
                 byte nb = 0;
                 for(MSCell c : lstCell) {
                     if(isBlack(c)) {
