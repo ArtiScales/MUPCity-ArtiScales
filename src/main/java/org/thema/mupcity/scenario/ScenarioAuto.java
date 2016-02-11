@@ -66,6 +66,8 @@ public class ScenarioAuto extends Scenario {
     // monoscale attributes
     private int nbCell;
 
+    // random number generator for the shuffling (see perform)
+    private Random rnd;
     /**
      * Creates a new scenario.
      * 
@@ -74,8 +76,9 @@ public class ScenarioAuto extends Scenario {
      * @param nMax the max number of cell which can be built between 1 and 9
      * @param mean true for average aggregation, yager agregation otherwise
      */
-    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean) {
+    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed) {
         super(name, ahp, nMax, mean);
+        this.rnd = new Random(seed);
     }
 
     /**
@@ -195,7 +198,7 @@ public class ScenarioAuto extends Scenario {
                     }
                 }
 
-                Collections.shuffle(lstCell);
+                Collections.shuffle(lstCell, rnd);
                 TreeMap<Double, List<Cell>> map = new TreeMap<>();
                 // on enlève du bati
                 if(strict && nb > NBCELL) {
@@ -479,8 +482,8 @@ public class ScenarioAuto extends Scenario {
      * @return the new scenario
      */
     public static ScenarioAuto createMonoScaleScenario(String name, double scale,
-            int nbCell, AHP ahp, boolean useNoBuild, boolean mean) {
-        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean);
+            int nbCell, AHP ahp, boolean useNoBuild, boolean mean, long seed) {
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean, seed);
 
         scenario.monoScale = true;
         scenario.startScale = scenario.endScale = scale;
@@ -506,8 +509,8 @@ public class ScenarioAuto extends Scenario {
      */
     public static ScenarioAuto createMultiScaleScenario(String name,
             double startScale, double endScale, int nMax, boolean strict, 
-            AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp) {
-        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean);
+            AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp, long seed) {
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean, seed);
 
         scenario.monoScale = false;
         scenario.startScale = startScale;
