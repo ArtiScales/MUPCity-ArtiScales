@@ -143,12 +143,12 @@ public class Project extends AbstractTreeNode {
     /*
      *   Projects parameters stored in xml file
      */
-    private RectModShape bounds;    
-    private ArrayList<ShapeFileLayer> infoLayers;
-    private LinkedHashMap<String, Rule> rules;
-    private Class<? extends OriginDistance> distType;
-    private double netPrecision;
-    private int coefDecomp;
+    private RectModShape bounds;// bounds of the decomposition    
+    private ArrayList<ShapeFileLayer> infoLayers;// used layers
+    private LinkedHashMap<String, Rule> rules;// rules: to be defined before decomposition
+    private Class<? extends OriginDistance> distType;// euclidian, network distance, etc.
+    private double netPrecision;// for the topological construction of the network
+    private int coefDecomp;// decomposition coefficient
     private List<ScenarioAuto> scenarioAutos;
     private List<ScenarioManual> scenarios;
     private List<Evaluator> evaluators;
