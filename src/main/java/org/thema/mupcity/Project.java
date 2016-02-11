@@ -214,16 +214,29 @@ public class Project extends AbstractTreeNode {
      * @throws IOException 
      */
     public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild) throws IOException {
+    	this.decomp(exp, maxSize, minSize, seuilDensBuild, true);
+    }
+    /**
+     * Creates the multiscale grid and calculates the rules.
+     * @param exp the factor between scale
+     * @param maxSize the max size of cells
+     * @param minSize the min size of cells
+     * @param seuilDensBuild the minimum of build density for a cell to be of state built
+     * @throws IOException 
+     */
+    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, boolean monitoring) throws IOException {
         int nbRule = 0;
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
                 nbRule++;
             }
         }
-        
-        TaskMonitor monitor = new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3);
-        monitor.setMillisToPopup(0);
-        monitor.setMillisToDecideToPopup(0);
+        TaskMonitor monitor = null;
+        if (monitoring) {
+        	monitor = new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3);
+        	monitor.setMillisToPopup(0);
+        	monitor.setMillisToDecideToPopup(0);
+        }
 
         AffineTransform trans = bounds.getTransform();
         double width = XAffineTransform.getScaleX0(trans);
@@ -234,14 +247,19 @@ public class Project extends AbstractTreeNode {
                     trans.getTranslateY()-height/2, width, height)),
                 minSize, maxSize, exp, 4, new SquareGridFactory());
         msGrid.setCrs(getCRS());
-        monitor.setNote("Create grid...");
+        if (monitoring) {
+        	monitor.setNote("Create grid...");
+        }
         coefDecomp = exp;
         Envelope env = ((GridExtent)msGrid.getGrid(msGrid.getResolutions().first())).getInternalEnvelope();
         bounds = new RectModShape(new Rectangle2D.Double(-0.5, -0.5, 1, 1), new AffineTransform(env.getWidth(), 0, 0, env.getHeight(), env.centre().x, env.centre().y));
-
-        monitor.incProgress(1);
+        if (monitoring) {
+        	monitor.incProgress(1);
+        }
         msGrid.addDynamicLayer(ZONE, new DistBorderOperation(4));
-        monitor.setNote("Create grid... build");
+        if (monitoring) {
+        	monitor.setNote("Create grid... build");
+        }
         msGrid.addLayer(BUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
         msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
         msGrid.addLayer(BUILD, DataBuffer.TYPE_SHORT, 0.0);
@@ -265,8 +283,10 @@ public class Project extends AbstractTreeNode {
         }, true);
         
         if(isLayerExist(Layers.RESTRICT)) {
-            monitor.incProgress(1);
-            monitor.setNote("Create grid... restrict");
+        	if (monitoring) {
+        		monitor.incProgress(1);
+        		monitor.setNote("Create grid... restrict");
+        	}
             getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
             getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), true);
         }
@@ -274,8 +294,10 @@ public class Project extends AbstractTreeNode {
         long t = System.currentTimeMillis();
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
-                monitor.incProgress(1);
-                monitor.setNote("Create grid... rule " + rule.getFullName());
+            	if (monitoring) {
+            		monitor.incProgress(1);
+            		monitor.setNote("Create grid... rule " + rule.getFullName());
+            	}
                 rule.createRule(this);
                 System.out.println(rule.getFullName() + " : " + (System.currentTimeMillis() - t) / 60000.0 + " minutes");
                 t = System.currentTimeMillis();
@@ -283,7 +305,9 @@ public class Project extends AbstractTreeNode {
         }
         
         createDecompLayer();
-        monitor.close();
+        if (monitoring) {
+        	monitor.close();
+        }
     }
     
     /**
@@ -912,13 +936,17 @@ public class Project extends AbstractTreeNode {
     public static Project createProject(String name, File dir, File buildFile, TaskMonitor mon) throws IOException, SchemaException {
         File directory = new File(dir, name);
         directory.mkdir();
-        mon.setProgress(1);
-        mon.setNote("Loading data...");
+        if (mon != null) {
+        	mon.setProgress(1);
+        	mon.setNote("Loading data...");
+        }
         List<DefaultFeature> buildFeatures = DefaultFeature.loadFeatures(buildFile, false);
               
         CoordinateReferenceSystem crs = new ShapefileDataStore(buildFile.toURI().toURL()).getSchema().getCoordinateReferenceSystem();
         
-        mon.setNote("Saving data...");
+        if (mon != null) {
+        	mon.setNote("Saving data...");
+        }
         
         DefaultFeature.saveFeatures(buildFeatures, new File(directory, Layers.BUILD+".shp"), crs);
         Project prj = new Project(name, directory);
