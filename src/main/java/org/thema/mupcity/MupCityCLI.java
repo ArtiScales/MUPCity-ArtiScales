@@ -56,9 +56,11 @@ public class MupCityCLI {
 		// create empty AHP
 		AHP ahp = new AHP(items);
 		// create the scenario
-		project.performScenarioAuto(ScenarioAuto.createMultiScaleScenario(name, res.first(), res.last(), nMax, strict,
-				ahp, useNoBuild, mean, exp, seed));
+		ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(name, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
+		project.performScenarioAuto(scenario);
 		// save the project
 		project.save();
+		// save the evaluation grid
+		project.getMSGrid().saveRaster(scenario.getEvalLayerName(), dir);
 	}
 }

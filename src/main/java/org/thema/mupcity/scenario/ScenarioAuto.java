@@ -252,6 +252,7 @@ public class ScenarioAuto extends Scenario {
 
         TaskMonitor monitor = new TaskMonitor(null, "Initialize...", "", 0, 100);
         op.setMonitor(monitor);
+        // TODO pass the random generatoor to the execute method
         msGrid.execute(op);
         monitor.close();
         nbCell = ((Number)msGrid.agregate(new SimpleAgregateOperation.COUNT(4, new AcceptableCell() {
