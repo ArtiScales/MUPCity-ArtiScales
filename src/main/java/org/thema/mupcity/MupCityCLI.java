@@ -21,16 +21,15 @@ public class MupCityCLI {
 		int exp = Integer.parseInt(args[3]);
 		double minSize = Double.parseDouble(args[4]);
 		double maxSize = Double.parseDouble(args[5]);
-		int nMax = 5;// Add PARAM
-		boolean strict = true;// ADD
-		boolean useNoBuild = false;// ADD
-		boolean mean = true;// FALSE=>YAGER
-		boolean network = true;//ADD P
-		long seed = System.currentTimeMillis();// ADD P
-
-		File roadFile = new File(args[6]);
-		File facilityFile = new File(args[7]);
-		File leisureFile = new File(args[8]);
+		int nMax = Integer.parseInt(args[6]);
+		boolean strict = Boolean.parseBoolean(args[7]);
+		boolean useNoBuild = Boolean.parseBoolean(args[8]);
+		boolean mean = Boolean.parseBoolean(args[9]);//true => mean, false=>yager
+		boolean network = Boolean.parseBoolean(args[10]);//true => network distance, false => euclidian
+		long seed = Long.parseLong(args[11]);
+		File roadFile = new File(args[12]);
+		File facilityFile = new File(args[13]);
+		File leisureFile = new File(args[14]);
 		
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
 		// ADD RULES
@@ -39,11 +38,11 @@ public class MupCityCLI {
 		Project project = Project.createProject(name, dir, buildFile, mon);
 		// set layers and attributes for the decomposition
 		List<String> roadAttrs = Arrays.asList("PREC_PLANI");// SPEED(numeric)
-		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
+		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs, mon);
 		List<String> facilityAttrs = Arrays.asList("LEVEL", "NATURE");// LEVEL (numeric), TYPE (any)
-		project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs);
+		project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs, mon);
 		List<String> leisureAttrs = Arrays.asList("LEVEL", "NATURE");// LEVEL (numeric), TYPE (any)
-		project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs);
+		project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs, mon);
 		// dist type
 		project.setDistType((network)?OriginDistance.NetworkDistance.class:OriginDistance.EuclideanDistance.class);
 		// decomposition
