@@ -214,7 +214,13 @@ public class Project extends AbstractTreeNode {
      * @throws IOException 
      */
     public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild) throws IOException {
-    	this.decomp(exp, maxSize, minSize, seuilDensBuild, true);
+        int nbRule = 0;
+        for(Rule rule : rules.values()) {
+            if(rule.isUsable(this)) {
+                nbRule++;
+            }
+        }
+    	this.decomp(exp, maxSize, minSize, seuilDensBuild, new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3));
     }
     /**
      * Creates the multiscale grid and calculates the rules.
@@ -224,19 +230,9 @@ public class Project extends AbstractTreeNode {
      * @param seuilDensBuild the minimum of build density for a cell to be of state built
      * @throws IOException 
      */
-    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, boolean monitoring) throws IOException {
-        int nbRule = 0;
-        for(Rule rule : rules.values()) {
-            if(rule.isUsable(this)) {
-                nbRule++;
-            }
-        }
-        TaskMonitor monitor = null;
-        if (monitoring) {
-        	monitor = new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3);
-        	monitor.setMillisToPopup(0);
-        	monitor.setMillisToDecideToPopup(0);
-        }
+    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor) throws IOException {
+        monitor.setMillisToPopup(0);
+        monitor.setMillisToDecideToPopup(0);
 
         AffineTransform trans = bounds.getTransform();
         double width = XAffineTransform.getScaleX0(trans);
@@ -247,19 +243,13 @@ public class Project extends AbstractTreeNode {
                     trans.getTranslateY()-height/2, width, height)),
                 minSize, maxSize, exp, 4, new SquareGridFactory());
         msGrid.setCrs(getCRS());
-        if (monitoring) {
-        	monitor.setNote("Create grid...");
-        }
+        monitor.setNote("Create grid...");
         coefDecomp = exp;
         Envelope env = ((GridExtent)msGrid.getGrid(msGrid.getResolutions().first())).getInternalEnvelope();
         bounds = new RectModShape(new Rectangle2D.Double(-0.5, -0.5, 1, 1), new AffineTransform(env.getWidth(), 0, 0, env.getHeight(), env.centre().x, env.centre().y));
-        if (monitoring) {
-        	monitor.incProgress(1);
-        }
+        monitor.incProgress(1);
         msGrid.addDynamicLayer(ZONE, new DistBorderOperation(4));
-        if (monitoring) {
-        	monitor.setNote("Create grid... build");
-        }
+        monitor.setNote("Create grid... build");
         msGrid.addLayer(BUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
         msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
         msGrid.addLayer(BUILD, DataBuffer.TYPE_SHORT, 0.0);
@@ -283,10 +273,8 @@ public class Project extends AbstractTreeNode {
         }, true);
         
         if(isLayerExist(Layers.RESTRICT)) {
-        	if (monitoring) {
-        		monitor.incProgress(1);
-        		monitor.setNote("Create grid... restrict");
-        	}
+        	monitor.incProgress(1);
+        	monitor.setNote("Create grid... restrict");
             getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
             getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), true);
         }
@@ -294,10 +282,8 @@ public class Project extends AbstractTreeNode {
         long t = System.currentTimeMillis();
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
-            	if (monitoring) {
-            		monitor.incProgress(1);
-            		monitor.setNote("Create grid... rule " + rule.getFullName());
-            	}
+            	monitor.incProgress(1);
+            	monitor.setNote("Create grid... rule " + rule.getFullName());
                 rule.createRule(this);
                 System.out.println(rule.getFullName() + " : " + (System.currentTimeMillis() - t) / 60000.0 + " minutes");
                 t = System.currentTimeMillis();
@@ -305,9 +291,7 @@ public class Project extends AbstractTreeNode {
         }
         
         createDecompLayer();
-        if (monitoring) {
-        	monitor.close();
-        }
+        monitor.close();
     }
     
     /**
@@ -625,7 +609,7 @@ public class Project extends AbstractTreeNode {
             }
         };
     }
-    
+
     /**
      * Sets the shapefile data associated with a predefined layer.
      * @param layer the predefined layer
@@ -635,12 +619,22 @@ public class Project extends AbstractTreeNode {
      * @throws SchemaException 
      */
     public void setLayer(LayerDef layer, File file, List<String> attrs) throws IOException, SchemaException {
-        TaskMonitor mon = new TaskMonitor(null, "Create layer", "", 0, 2);
+    	this.setLayer(layer, file, attrs, new TaskMonitor(null, "Create layer", "", 0, 2));
+    }
+
+    /**
+     * Sets the shapefile data associated with a predefined layer.
+     * @param layer the predefined layer
+     * @param file the shapefile containing the data
+     * @param attrs some shapefile fields name if needed for the layer, may be empty
+     * @throws IOException
+     * @throws SchemaException 
+     */
+    public void setLayer(LayerDef layer, File file, List<String> attrs, TaskMonitor mon) throws IOException, SchemaException {
         mon.setMillisToDecideToPopup(0);
         if(coverages != null) { // remove from cache if exists
             coverages.remove(layer.getName());
         }
-
         mon.setProgress(0);
         mon.setNote("Loading...");
         List<DefaultFeature> features = DefaultFeature.loadFeatures(file, false);
@@ -657,11 +651,9 @@ public class Project extends AbstractTreeNode {
             }
         }
         mon.incProgress(1);
-        
         mon.setNote("Saving...");
         DefaultFeature.saveFeatures(features, new File(getDirectory(), layer.getName() + ".shp"));
         mon.close();
-        
     }
 
     /**
