@@ -15,6 +15,7 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 
 public class MupCityCLI {
 	public static void main(String[] args) throws IOException, SchemaException {
+		// get the attributes from the command line
 		String name = args[0];
 		File dir = new File(args[1]);
 		File buildFile = new File(args[2]);
@@ -30,11 +31,10 @@ public class MupCityCLI {
 		File roadFile = new File(args[12]);
 		File facilityFile = new File(args[13]);
 		File leisureFile = new File(args[14]);
-		
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
-		// ADD RULES
-		// ADD SEED
+		// empty monitor for CLI
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
+		// new project
 		Project project = Project.createProject(name, dir, buildFile, mon);
 		// set layers and attributes for the decomposition
 		List<String> roadAttrs = Arrays.asList("PREC_PLANI");// SPEED(numeric)
@@ -50,16 +50,15 @@ public class MupCityCLI {
 		// handle the rules
 		List<String> items = new ArrayList<>();
 		// get the names of the usable rules
-		for (Rule rule : project.getRules()) {
-			if (rule.isUsable(project)) {
-				items.add(rule.getName());
-			}
-		}
+		for (Rule rule : project.getRules()) if (rule.isUsable(project)) items.add(rule.getName());
+		// get the resolutions from the grid to pass them to the scenario
 		NavigableSet<Double> res = project.getMSGrid().getResolutions();
+		// create empty AHP
 		AHP ahp = new AHP(items);
 		// create the scenario
 		project.performScenarioAuto(ScenarioAuto.createMultiScaleScenario(name, res.first(), res.last(), nMax, strict,
 				ahp, useNoBuild, mean, exp, seed));
+		// save the project
 		project.save();
 	}
 }
