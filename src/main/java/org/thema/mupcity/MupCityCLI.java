@@ -31,11 +31,15 @@ public class MupCityCLI {
 		File roadFile = new File(args[12]);
 		File facilityFile = new File(args[13]);
 		File leisureFile = new File(args[14]);
+		double minX = Double.parseDouble(args[15]);
+		double minY = Double.parseDouble(args[16]);
+		double width = Double.parseDouble(args[17]);
+		double height = Double.parseDouble(args[18]);
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
 		// empty monitor for CLI
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 		// new project
-		Project project = Project.createProject(name, dir, buildFile, mon);
+		Project project = Project.createProject(name, dir, buildFile, minX, minY, width, height, mon);
 		// set layers and attributes for the decomposition
 		List<String> roadAttrs = Arrays.asList("PREC_PLANI");// SPEED(numeric)
 		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs, mon);

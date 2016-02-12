@@ -176,7 +176,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
         }
 
         try {
-            project = Project.createProject(nameTextField.getText(), dirSelectFilePanel.getSelectedFile(), buildSelectFilePane.getSelectedFile(), new TaskMonitor.EmptyMonitor());
+            project = Project.createProject(nameTextField.getText(), dirSelectFilePanel.getSelectedFile(), buildSelectFilePane.getSelectedFile(), 0,0,0,0, new TaskMonitor.EmptyMonitor());
             if(zonePrj != null) {
                 project.setBounds(zonePrj);
             }

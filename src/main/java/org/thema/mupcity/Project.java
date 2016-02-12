@@ -173,20 +173,32 @@ public class Project extends AbstractTreeNode {
      * @param dir directory where creating the project
      */
     private Project(String name, File dir)  {
-    	this(name, dir, 0, 0);
+    	this(name, dir, 0, 0, 0, 0);
+    	// TODO clean that up
+    	Envelope env = getCoverage(Layers.BUILD).getEnvelope();
+    	this.bounds = new GridModShape(new Rectangle2D.Double(-0.5, -0.5, 1, 1), new AffineTransform(env.getWidth(), 0, 0, env.getHeight(), env.centre().x, env.centre().y), 1);
+    }
+    /** 
+     * Creates a new instance of Project.
+     * @param name project's name
+     * @param dir directory where creating the project
+     */
+    private Project(String name, File dir, Envelope env)  {
+    	this(name, dir, env.getMinX(), env.getMinY(), env.getWidth(), env.getHeight());
     }
     /** 
      * Creates a new instance of Project.
      * The envelope is expanded by a given distance in all directions.
      * @param name project's name
      * @param dir directory where creating the project
-     * @param deltaX the distance to expand the envelope along the the X axis
-     * @param deltaY the distance to expand the envelope along the the Y axis
+     * @param minX
+     * @param minY
+     * @param width
+     * @param height
      */
-    private Project(String name, File dir, double deltaX, double deltaY) {
+    private Project(String name, File dir, double minX, double minY, double width, double height) {
         file = new File(dir, name + ".xml");
-        Envelope env = getCoverage(Layers.BUILD).getEnvelope();
-        env.expandBy(deltaX, deltaY);
+        Envelope env = new Envelope(minX, minX + width, minY, minY + height);
         bounds = new GridModShape(new Rectangle2D.Double(-0.5, -0.5, 1, 1), new AffineTransform(env.getWidth(), 0, 0, env.getHeight(), env.centre().x, env.centre().y), 1);
         rules = new LinkedHashMap<>();
         for(Rule rule : RULES) {
@@ -926,7 +938,7 @@ public class Project extends AbstractTreeNode {
      * @throws IOException
      * @throws SchemaException 
      */
-    public static Project createProject(String name, File dir, File buildFile, TaskMonitor mon) throws IOException, SchemaException {
+    public static Project createProject(String name, File dir, File buildFile, double origX, double origY, double width, double height, TaskMonitor mon) throws IOException, SchemaException {
         File directory = new File(dir, name);
         directory.mkdir();
         if (mon != null) {
@@ -942,7 +954,7 @@ public class Project extends AbstractTreeNode {
         }
         
         DefaultFeature.saveFeatures(buildFeatures, new File(directory, Layers.BUILD+".shp"), crs);
-        Project prj = new Project(name, directory);
+        Project prj = new Project(name, directory, origX, origY, width, height);
         prj.save();
 
         return prj;
