@@ -34,6 +34,7 @@ import org.thema.common.collection.HashMap2D;
 public class AHP {
     
     private HashMap2D<String, String, String> matrix;
+    private Map<String, Double> coefs;
 
     /**
      * Creates a new AHP matrix for the list of items
@@ -44,6 +45,8 @@ public class AHP {
     }
 
     /**
+     * This matrix must not be modified !!!
+     * If you modify it, call {@link #setMatrix(org.thema.common.collection.HashMap2D) } after.
      * @return the matrix comparison
      */
     public HashMap2D<String, String, String> getMatrix() {
@@ -56,13 +59,25 @@ public class AHP {
      */
     public void setMatrix(HashMap2D<String, String, String> matrix) {
         this.matrix = matrix;
+        coefs = null;
     }
 
+    public void setCoef(String var, double coef) {
+        if(!getCoefs().containsKey(var)) {
+            throw new IllegalArgumentException(var + "is unknown");
+        }
+        coefs.put(var, coef);
+    }
+    
     /**
      * Calculates the first eigenvector of the comparison matrix
      * @return the coefficient of each item
      */
     public Map<String, Double> getCoefs() {
+        if(coefs != null) {
+            return coefs;
+        }
+        
         int size = matrix.getKeys1().size();
         if(size == 0) {
             return Collections.EMPTY_MAP;
@@ -113,7 +128,8 @@ public class AHP {
                         + "\nValues" + Arrays.toString(new Matrix(mat).eig().getRealEigenvalues()));
             }
         }
-        HashMap<String, Double> coefs = new HashMap<>();
+        
+        coefs = new HashMap<>();
         for(i = 0; i < size; i++) {
             coefs.put(items.get(i), finalVector[i]);
         }

@@ -129,7 +129,7 @@ public class ScenarioAuto extends Scenario {
     }
 
     public final boolean isRemoved(Cell c) {
-        return c.getLayerValue(getResultLayerName()) == -1;
+        return c.getLayerValue(getResultLayerName()) == REM_BUILD;
     }
     
     /**

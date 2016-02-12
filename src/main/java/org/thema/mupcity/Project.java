@@ -187,9 +187,7 @@ public class Project extends AbstractTreeNode {
         scenarioAutos = new ArrayList<>();
         scenarios = new ArrayList<>();
         distType = OriginDistance.EuclideanDistance.class;
-        
-        
-        
+
         infoLayers = new ArrayList<>();
     }
 
@@ -212,8 +210,14 @@ public class Project extends AbstractTreeNode {
      * @param minSize the min size of cells
      * @param seuilDensBuild the minimum of build density for a cell to be of state built
      * @throws IOException 
+     * @throws IllegalStateException if a decomposition is already done
      */
     public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild) throws IOException {
+        
+        if(isDecomp()) {
+            throw new IllegalStateException("Decomposition is already done.");
+        }
+        
         int nbRule = 0;
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
@@ -424,6 +428,21 @@ public class Project extends AbstractTreeNode {
      */
     public Collection<Rule> getRules() {
         return rules.values();
+    }
+
+    /**
+     * Sets new rules
+     * @param rules the new rules 
+     * @throws IllegalStateException if a decomposition is already done
+     */
+    public void setRules(Collection<Rule> rules) {
+        if(isDecomp()) {
+            throw new IllegalStateException("Decomposition is already done.");
+        }
+        this.rules = new LinkedHashMap<>();
+        for(Rule rule : rules) {
+            this.rules.put(rule.getName(), rule);
+        }
     }
 
     /**
@@ -898,7 +917,16 @@ public class Project extends AbstractTreeNode {
     public File getDirectory() {
         return file.getParentFile();
     }
-
+    
+    public static LayerDef getLayerDef(Layers layer) {
+        for(LayerDef layerDef : LAYERS) {
+            if(layerDef.getLayer().equals(layer)) {
+                return layerDef;
+            }
+        }
+        throw new IllegalArgumentException(layer + " is unknown");
+    }
+    
     /**
      * Creates a new project and saves it.
      * @param name the name of the project

@@ -1,5 +1,11 @@
 ## Changelog
 
+##### version 1.2 
+- La modification manuelle des pondérations d'un scénario n'était pas prise en compte, ni enregistrée
+
+##### version 1.1.6 (16/10/2015)
+- Le mode stricte des scénarios n'était pas propagé à toutes les échelles
+
 ##### version 1.1.5 (16/10/2015)
 - pondération normalisée à 1 pour la moyenne arithmétique
 - les coefficients n'étaient pas mis à jour après l'édition de l'AHP
