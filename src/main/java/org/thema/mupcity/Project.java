@@ -167,29 +167,34 @@ public class Project extends AbstractTreeNode {
 
     private transient SpatialGraph spatialGraph;
     
-    
     /** 
-     * Creates a new instance of Project
+     * Creates a new instance of Project.
      * @param name project's name
      * @param dir directory where creating the project
      */
     private Project(String name, File dir)  {
-        
+    	this(name, dir, 0, 0);
+    }
+    /** 
+     * Creates a new instance of Project.
+     * The envelope is expanded by a given distance in all directions.
+     * @param name project's name
+     * @param dir directory where creating the project
+     * @param deltaX the distance to expand the envelope along the the X axis
+     * @param deltaY the distance to expand the envelope along the the Y axis
+     */
+    private Project(String name, File dir, double deltaX, double deltaY) {
         file = new File(dir, name + ".xml");
         Envelope env = getCoverage(Layers.BUILD).getEnvelope();
+        env.expandBy(deltaX, deltaY);
         bounds = new GridModShape(new Rectangle2D.Double(-0.5, -0.5, 1, 1), new AffineTransform(env.getWidth(), 0, 0, env.getHeight(), env.centre().x, env.centre().y), 1);
-
         rules = new LinkedHashMap<>();
         for(Rule rule : RULES) {
             rules.put(rule.getName(), rule);
-        }
-        
+        }        
         scenarioAutos = new ArrayList<>();
         scenarios = new ArrayList<>();
         distType = OriginDistance.EuclideanDistance.class;
-        
-        
-        
         infoLayers = new ArrayList<>();
     }
 
@@ -260,7 +265,6 @@ public class Project extends AbstractTreeNode {
                 if(dens > 0 && dens <= seuilDensBuild) {
                     cell.setLayerValue(BUILD, -1);
                 }
-
                 if(dens > seuilDensBuild) {
                     Cell parent = ((MSCell)cell).getParent();
                     if(parent == null || parent.getLayerValue(BUILD) == 1) {
@@ -271,14 +275,12 @@ public class Project extends AbstractTreeNode {
                 }
             }
         }, true);
-        
         if(isLayerExist(Layers.RESTRICT)) {
         	monitor.incProgress(1);
         	monitor.setNote("Create grid... restrict");
             getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
             getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), true);
         }
-
         long t = System.currentTimeMillis();
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
@@ -289,7 +291,6 @@ public class Project extends AbstractTreeNode {
                 t = System.currentTimeMillis();
             }
         }
-        
         createDecompLayer();
         monitor.close();
     }
