@@ -16,7 +16,7 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 public class MupCityCLI {
 	public static void main(String[] args) throws IOException, SchemaException {
 		// get the attributes from the command line
-		String name = args[0];
+		String name = args[0];		
 		File dir = new File(args[1]);
 		File buildFile = new File(args[2]);
 		int exp = Integer.parseInt(args[3]);
@@ -30,7 +30,7 @@ public class MupCityCLI {
 		long seed = Long.parseLong(args[11]);
 		File roadFile = new File(args[12]);
 		File facilityFile = new File(args[13]);
-		File leisureFile = new File(args[14]);
+		//File leisureFile = new File(args[14]);
 		double minX = Double.parseDouble(args[15]);
 		double minY = Double.parseDouble(args[16]);
 		double width = Double.parseDouble(args[17]);
@@ -45,16 +45,18 @@ public class MupCityCLI {
 		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs, mon);
 		List<String> facilityAttrs = Arrays.asList("LEVEL", "NATURE");// LEVEL (numeric), TYPE (any)
 		project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs, mon);
-		List<String> leisureAttrs = Arrays.asList("LEVEL", "NATURE");// LEVEL (numeric), TYPE (any)
-		project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs, mon);
+		//List<String> leisureAttrs = Arrays.asList("LEVEL", "NATURE");// LEVEL (numeric), TYPE (any)
+		//project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs, mon);
 		// dist type
 		project.setDistType((network)?OriginDistance.NetworkDistance.class:OriginDistance.EuclideanDistance.class);
 		// decomposition
 		project.decomp(exp, maxSize, minSize, seuilDensBuild, mon);
 		// handle the rules
 		List<String> items = new ArrayList<>();
+
 		// get the names of the usable rules
 		for (Rule rule : project.getRules()) if (rule.isUsable(project)) items.add(rule.getName());
+		System.out.println(items);
 		// get the resolutions from the grid to pass them to the scenario
 		NavigableSet<Double> res = project.getMSGrid().getResolutions();
 		// create empty AHP

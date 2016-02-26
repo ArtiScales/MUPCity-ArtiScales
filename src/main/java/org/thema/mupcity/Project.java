@@ -94,7 +94,7 @@ public class Project extends AbstractTreeNode {
      * Predefined layers used by some rules
      */
     public enum Layers {
-        BUILD, ROAD, TRAIN_STATION, BUS_STATION, FACILITY, LEISURE, RESTRICT
+        BUILD, ROAD, BUS_STATION, TRAIN_STATION, FACILITY, LEISURE, RESTRICT
     }
     
     /**
@@ -391,7 +391,7 @@ public class Project extends AbstractTreeNode {
     }
     
     /**
-     * Adds a shepfile layer to the project.
+     * Adds a shapefile layer to the project.
      * @param shapeFileLayer the shapefile layer to add
      */
     public void addInfoLayer(ShapeFileLayer shapeFileLayer) {
@@ -752,7 +752,7 @@ public class Project extends AbstractTreeNode {
     }
     
     /**
-     * Creates a group layer for one multscale grid layer.
+     * Creates a group layer for one multiscale grid layer.
      * This group layer contains one layer for each scale present in the multiscale grid.
      * @param layerName the layer name in the multiscale grid
      * @param colors the color map
@@ -832,7 +832,28 @@ public class Project extends AbstractTreeNode {
             xml.toXML(this, fw);
         }
     }
+    /**
+     * Overload to save on a chosen folder
+     * @param Folder the chosen folder 
+     * @throws IOException 
+     */
+    public void save(File chosenFile) throws IOException {
+        XStream xml = new XStream(new JDomDriver());
+        if(isDecomp()) {
+            chosenFile.mkdir();
+            msGrid.save(chosenFile);
+        }
+        file = file.getAbsoluteFile();
+        for(ShapeFileLayer l : infoLayers) { 
+            if(file.getParentFile().equals(l.getShapeFile().getParentFile())) {
+                l.setShapeFile(new File(l.getShapeFile().getName()));
+            }
+        }
 
+        try (FileWriter fw = new FileWriter(file)) {
+            xml.toXML(this, fw);
+        }
+    }
     /**
      * Loads a project.
      * @param file the xml project file

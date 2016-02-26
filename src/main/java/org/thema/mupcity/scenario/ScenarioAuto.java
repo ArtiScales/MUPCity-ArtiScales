@@ -21,6 +21,9 @@ package org.thema.mupcity.scenario;
 
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import javax.media.jai.Histogram;
 import javax.media.jai.ROI;
@@ -28,10 +31,15 @@ import javax.media.jai.operator.SubtractFromConstDescriptor;
 import javax.swing.ProgressMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.JDomDriver;
+
 import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.image.RasterShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
 import org.thema.drawshape.layer.RasterLayer;
+import org.thema.drawshape.layer.ShapeFileLayer;
 import org.thema.drawshape.style.RasterStyle;
 import org.thema.drawshape.style.table.ColorRamp;
 import org.thema.drawshape.style.table.UniqueColorTable;
@@ -312,7 +320,6 @@ public class ScenarioAuto extends Scenario {
 
         monitor.close();
     }
-
     /**
      * Computes the scenario for mono scale
      * @param msGrid the multi scale grid
@@ -454,7 +461,18 @@ public class ScenarioAuto extends Scenario {
         }
 
     }
+    /**
+     * Overload to save on a chosen folder
+     * @param Folder the chosen folder 
+     * @throws IOException 
+     */
+    public void save(Project project, File chosenFile) throws IOException {
 
+    	chosenFile.mkdirs();
+        project.getMSGrid().saveLayer(chosenFile,this.getResultLayerName());
+
+    }
+    
     @Override
     public final String getResultLayerName() {
         return getName() + "-" + Project.SIMUL;
