@@ -44,8 +44,8 @@ public class ExplorationTest {
 			
 			//definitiojn de la grille
 			// /3 pour réduire l'emprise et la durée des tests
-		double width = 52246.700000005076/3;
-		double height = 50546.80000000168/3;
+		double width = 52246.700000005076;
+		double height = 50546.80000000168;
 		double minX = 898590.4999999964;
 		double minY = 6661379.800000002;
 		String g = "G1";
@@ -200,7 +200,7 @@ public class ExplorationTest {
 							long seed = (long) Math.random();//outsourcing the seed
 							String titre = g+"--"+nname+"--"+nstrict+"--"+nahp;//part of the folder's name
 							int nameseed = se+1;//part of the folder's name
-					        File testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/"+g+"/"+nMax+"/"+titre+"/"+"réplication_"+nameseed);
+					        File testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/"+g+"/"+nMax+"/"+titre+"/"+"replication_"+nameseed);
 					        	NavigableSet<Double> res = project.getMSGrid().getResolutions();
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
 							project.performScenarioAuto(scenario);
