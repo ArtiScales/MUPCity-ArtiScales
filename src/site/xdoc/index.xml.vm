@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<document>
+    <body>
+        <img src="mupcity.png"/>
+        <section name="Multiscale urban planning for a sustainable city">
+            <p>
+                MUP-City is a computer application for identifying places where urbanization would be possible in accordance with a principle of fractal urbanization. It allows the user to  simulate residential development scenarios based on an existing urban pattern.
+                Additional planning rules introduce constraints on access to shops and services, natural and leisure facilities, and a constraint on proximity to the existing road network. MUP-City applies to European cities of 100 000–1000 000 inhabitants.
+            </p>
+            <p>
+                The conceptual bases of MUP-City have been set out by Pierre Frankhauser, Cécile Tannier, and Hélène Houot. The computer application has been created by Gilles Vuidel and Cécile Tannier. All were members of the research laboratory ThéMA in Besançon (France).
+                Two other members of ThéMA have participated in the conception of the current version of the computer application : Maxime Frémond (as part of his PhD thesis) and Florian Litot (computer scientist).
+            </p>
+            <p>
+                This research received financial support from France’s ministry for ecology, sustainable development and energy as part of the PREDIT 3 program.
+            </p>
+            <subsection name="Download">
+                <p>
+                    Download last development version : <a href="http://sourcesup.renater.fr/nexus/content/repositories/${project.artifactId}-releases/org/thema/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar">${project.artifactId}-${project.version}</a>
+                </p>
+                <p>
+                    View changelog : <a href="changelog.html">changelog</a>
+                </p>
+                <p>
+                    Download previous version : <a href="http://sourcesup.renater.fr/nexus/content/repositories/${project.artifactId}-releases/org/thema/${project.artifactId}/">Previous versions</a>
+                </p>
+            </subsection>
+        </section>
+    
+    </body>
+</document>
