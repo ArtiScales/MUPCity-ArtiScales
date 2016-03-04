@@ -1,13 +1,19 @@
 package org.thema.mupcity;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.Random;
+
 import org.geotools.feature.SchemaException;
 import org.thema.common.collection.HashMap2D;
 import org.thema.common.swing.TaskMonitor;
@@ -44,8 +50,8 @@ public class ExplorationTest {
 			
 			//definitiojn de la grille
 			// /3 pour réduire l'emprise et la durée des tests
-		double width = 52246.700000005076;
-		double height = 50546.80000000168;
+		double width = 52246.700000005076/3;
+		double height = 50546.80000000168/3;
 		double minX = 898590.4999999964;
 		double minY = 6661379.800000002;
 		String g = "G1";
@@ -196,8 +202,9 @@ public class ExplorationTest {
 						        mean = true;}
 				        else{mean = false;}
 
-						for (int se=0; se<=2;se++){
-							long seed = (long) Math.random();//outsourcing the seed
+						for (int se=0; se<=2;se++){     	
+							Random random=new Random();
+							long seed = random.nextLong();//outsourcing the seed
 							String titre = g+"--"+nname+"--"+nstrict+"--"+nahp;//part of the folder's name
 							int nameseed = se+1;//part of the folder's name
 					        File testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/"+g+"/"+nMax+"/"+titre+"/"+"replication_"+nameseed);
@@ -207,6 +214,13 @@ public class ExplorationTest {
 								// save the project
 							scenario.save(project, testFile);
 							project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile); //ne marchait pas dans la methode scenario.save mais marche ici..
+								// write the seed into a text file
+							Charset charset = Charset.forName("US-ASCII");
+							String nseed = String.valueOf(seed);
+							System.out.println(nseed);
+							File testFiletext = new File (testFile+"/writer");
+							try (BufferedWriter writer = Files.newBufferedWriter(testFiletext.toPath(), charset)){ 
+							writer.write(nseed);}
 							}
 			        	}
 					}	
