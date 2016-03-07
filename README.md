@@ -11,8 +11,6 @@
 
 ###TODO
  - le test ne peut pas aller jusqu'au bout car la mémoire sature (heap space, après env 120 scénarios simulés) . Trouver ce qui reste coincé dans la mémoire vive.
- - les raster d'évaluation sont vide
  - Virer les messages du moniteurs lors de chargement volumineux de couches
  - Il semble compliqué (et surtout très long) de réaliser les calculs avec des aménités de niveau 3. Possibilité d'optimisation de cette classe?
- 
- ###END
+
