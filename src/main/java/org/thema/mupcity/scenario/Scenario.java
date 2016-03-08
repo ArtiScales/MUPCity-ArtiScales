@@ -54,7 +54,7 @@ public abstract class Scenario {
 
     private AHP ahp;
     private int nMax;
-    private boolean mean;
+    protected boolean mean;
 
     protected transient DefaultGroupLayer layers;
 

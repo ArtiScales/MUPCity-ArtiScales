@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,16 +14,16 @@ import java.util.NavigableSet;
 import java.util.Random;
 
 import org.geotools.feature.SchemaException;
-import org.thema.common.collection.HashMap2D;
 import org.thema.common.swing.TaskMonitor;
-import org.thema.mupcity.Project.Layers;
 import org.thema.mupcity.rule.OriginDistance;
 import org.thema.mupcity.rule.Rule;
 import org.thema.mupcity.scenario.ScenarioAuto;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.math.Matrix;
-
+/**
+ * Create automatic tests and loop on defined values
+ * 
+ * @author Maxime Colomb
+ */
 
 public class ExplorationTest {
 		public static void main(String[] args) throws IOException, SchemaException {
@@ -174,7 +173,8 @@ public class ExplorationTest {
 	        ahpList.add(ahpS_Moy);
 			
 				//create new decomp
-	        project.decomp(exp, maxSize, minSize, seuilDensBuild, mon);		
+	        project.decomp(exp, maxSize, minSize, seuilDensBuild, mon);	
+	        project.save();
 				
 	        	//looping for scenarios
 				//loop on Nmax
@@ -194,33 +194,37 @@ public class ExplorationTest {
 							
 				        	//loop on the AHP
 					for (AHP ahp : ahpList ){
-				        String nahp = ahp.getName();
-				        int lgt = nahp.length();
 				        
+						String nahp = ahp.getName();
+				        int lgt = nahp.length();
 				        boolean mean ; //determination de par le nom de l'ahp si la methode de calcul sera avec mean ou Yager
-				        if (nahp.substring(lgt-3) == "Moy") {
+				        if (nahp.substring(lgt-3).equals("Moy")) {
 						        mean = true;}
 				        else{mean = false;}
-
 						for (int se=0; se<=2;se++){     	
 							Random random=new Random();
 							long seed = random.nextLong();//outsourcing the seed
 							String titre = g+"--"+nname+"--"+nstrict+"--"+nahp;//part of the folder's name
 							int nameseed = se+1;//part of the folder's name
 					        File testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/"+g+"/"+nMax+"/"+titre+"/"+"replication_"+nameseed);
-					        	NavigableSet<Double> res = project.getMSGrid().getResolutions();
+					        NavigableSet<Double> res = project.getMSGrid().getResolutions();
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
 							project.performScenarioAuto(scenario);
+		
 								// save the project
 							scenario.save(project, testFile);
 							project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile); //ne marchait pas dans la methode scenario.save mais marche ici..
+														
 								// write the seed into a text file
 							Charset charset = Charset.forName("US-ASCII");
 							String nseed = String.valueOf(seed);
-							System.out.println(nseed);
-							File testFiletext = new File (testFile+"/writer");
-							try (BufferedWriter writer = Files.newBufferedWriter(testFiletext.toPath(), charset)){ 
-							writer.write(nseed);}
+							File testFiletext = new File (testFile+"/nbseed");
+							try (BufferedWriter nbseed = Files.newBufferedWriter(testFiletext.toPath(), charset)){ 
+							nbseed.write(nseed);}
+							catch (IOException e){
+								e.printStackTrace();
+									}
+							
 							}
 			        	}
 					}	
@@ -228,3 +232,4 @@ public class ExplorationTest {
 			}		
 		}
 }
+

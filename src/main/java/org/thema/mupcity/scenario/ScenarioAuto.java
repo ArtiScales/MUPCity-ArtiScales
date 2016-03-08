@@ -289,6 +289,12 @@ public class ScenarioAuto extends Scenario {
         if(useNoBuild) {
             info += "Prends en compte les zones non-constructibles.\n";
         }
+        if (mean){
+        	info+= "evaluation selon des moyennes agrégées.\n";
+        }
+        else{
+        	info+= "evaluation selon l'aggrégation de Yager.\n";
+        }
         return info;
     }
 
