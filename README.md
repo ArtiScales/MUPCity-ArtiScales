@@ -1,4 +1,4 @@
-changement de ce Commit : 
+changement du Commit : (je l'ai mis dans le champ d ucommint, mais je sais pas si c'est entièrement consultable)
 création des méthodes pour analyser les données
 	ScenarioAuto.extractEvalAnal
 	variables dans project et autre méthodes associés
