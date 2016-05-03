@@ -81,7 +81,7 @@ public class ExplorationTest {
 				//create a new project
 			File dirgrid = new File(dir+"/"+g);
 			dirgrid.mkdir();
-			Project.SetExploTest(true);
+			//Project.SetExploTest(true); ça fou la merde enfait
 			Project project = Project.createProject(name, dirgrid, buildFile, minX, minY, width, height, mon);
 			
 			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
@@ -246,8 +246,6 @@ public class ExplorationTest {
 					        NavigableSet<Double> res = project.getMSGrid().getResolutions();
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
 							project.performScenarioAuto(scenario);
-
-
 								// save the project
 							//scenario.save(testFile,project);
 							//project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile);	pas besoin de ces couches					
