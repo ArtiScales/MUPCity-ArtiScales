@@ -46,6 +46,7 @@ import org.thema.common.Config;
 import org.thema.common.JavaLoader;
 import org.thema.common.Util;
 import org.thema.common.swing.PreferencesDialog;
+import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.AbstractSelectableShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
 import org.thema.drawshape.layer.DefaultLayer;
@@ -610,7 +611,7 @@ public class MainFrame extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    project.setLayer(dlg.layer, dlg.file, dlg.attrs);
+                    project.setLayer(dlg.layer, dlg.file, dlg.attrs,new TaskMonitor(null, "Create layer", "", 0, 2));
                 } catch (IOException | SchemaException ex) {
                     Logger.getLogger(SetLayerDialog.class.getName()).log(Level.SEVERE, null, ex);
                     JOptionPane.showMessageDialog(MainFrame.this, "An error occured : \n" + ex);

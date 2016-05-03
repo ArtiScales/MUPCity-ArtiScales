@@ -94,7 +94,7 @@ public class Project extends AbstractTreeNode {
      * Predefined layers used by some rules
      */
     public enum Layers {
-        BUILD, ROAD, BUS_STATION, TRAIN_STATION, FACILITY, LEISURE, RESTRICT
+        BUILD, ROAD, BUS_STATION, TRAIN_STATION, FACILITY, LEISURE, RESTRICT,EVAL_ANAL, TYPO
     }
     
     /**
@@ -107,9 +107,11 @@ public class Project extends AbstractTreeNode {
         new LayerDef(Layers.TRAIN_STATION, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("TRAIN STATIONS"), new PointStyle(Color.black, Color.red)), 
         new LayerDef(Layers.FACILITY, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("Facilities"), new PointStyle(Color.yellow.darker()), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
         new LayerDef(Layers.LEISURE, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("LEISURE"), new PointStyle(Color.blue), LEVEL_FIELD, Number.class, TYPE_FIELD, Object.class),
-        new LayerDef(Layers.RESTRICT, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("non-developable area"), new FeatureStyle(Color.orange, Color.gray))
-        );
-    
+        new LayerDef(Layers.RESTRICT, java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("non-developable area"), new FeatureStyle(Color.orange, Color.gray)),
+        new LayerDef(Layers.TYPO,"couche administrative pour discrétiser l'espace selon les types de tissus urbains",  new FeatureStyle(Color.orange, Color.gray))
+    		
+    		);
+
     /** Grid layer name for initial build */
     public static final String BUILD = "build"; //NOI18N
     /** Grid layer name for initial build density */
@@ -120,6 +122,12 @@ public class Project extends AbstractTreeNode {
     public static final String ZONE = "zone"; //NOI18N
     /** Grid layer name for restricted area density */
     public static final String NOBUILD_DENS = "no_build_dens"; //NOI18N
+    /** Grid layer name for ready-to-use output */
+    public static final String EVAL_ANAL = "eval_anal";
+    /** Grid layer name for administrative shape */
+    public static final String TYPO = "typo";
+   
+    public static boolean exploTest = false; //it does the folders needs of change if we're running an exploTest
 
     public static final String EVAL = "eval"; //NOI18N
     public static final String SIMUL = "analyse"; //NOI18N
@@ -485,7 +493,7 @@ public class Project extends AbstractTreeNode {
      */
     public GroupLayer getDecompLayer() {
         return decompLayer;
-    }
+    }    
     
     /**
      * Creates a grouplayer containing grid shapes for each resolution (scale) of the multiscale grid.
@@ -632,7 +640,7 @@ public class Project extends AbstractTreeNode {
      * @throws SchemaException 
      */
     public void setLayer(LayerDef layer, File file, List<String> attrs) throws IOException, SchemaException {
-    	this.setLayer(layer, file, attrs, new TaskMonitor(null, "Create layer", "", 0, 2));
+    	this.setLayer(layer, file, attrs, new TaskMonitor.EmptyMonitor());
     }
 
     /**
@@ -817,7 +825,10 @@ public class Project extends AbstractTreeNode {
      */
     public void save() throws IOException {
         XStream xml = new XStream(new JDomDriver());
-        if(isDecomp()) {
+        if (exploTest){
+        	msGrid.save(file);
+        }
+        if(isDecomp() && !exploTest) {
             getGridDir().mkdir();
             msGrid.save(getGridDir());
         }
@@ -882,7 +893,33 @@ public class Project extends AbstractTreeNode {
 
         return project; 
     }
-    
+    /**
+     * overload to loads a project on the exploration test.
+     * @overload if the project have a more complicate hierarchy and there's a 
+     * specific position for MSGrid.xml
+     * @param file the xml project file
+     * @return the loaded project
+     * @throws IOException 
+     */
+    public static Project load(File file, String complicated) throws IOException {
+    	XStream xml = new XStream(new DomDriver());
+        Project project;
+        try (FileReader fr = new FileReader(file)) {
+            project = (Project)xml.fromXML(fr);
+        }
+        project.file = file;
+       	File FMS = new File(file.getParentFile()+"/");
+        project.msGrid = MSGridBuilder.load(FMS);
+        project.createDecompLayer();
+        // add new rules if not already exist in this project
+        for(Rule rule : RULES) {
+            if(!project.rules.containsKey(rule.getName())) {
+                project.rules.put(rule.getName(), rule);
+            }
+        }
+
+        return project; 
+    }
     private File getGridDir() {
         return new File(file.getParent(), "grid");
     }
@@ -960,8 +997,12 @@ public class Project extends AbstractTreeNode {
      * @throws SchemaException 
      */
     public static Project createProject(String name, File dir, File buildFile, double origX, double origY, double width, double height, TaskMonitor mon) throws IOException, SchemaException {
-        File directory = new File(dir, name);
-        directory.mkdir();
+    	File directory = new File(dir.toString());
+    	if(!exploTest){
+        	directory = new File(dir, name);
+            directory.mkdir();
+        }
+
         if (mon != null) {
         	mon.setProgress(1);
         	mon.setNote("Loading data...");
@@ -980,7 +1021,10 @@ public class Project extends AbstractTreeNode {
 
         return prj;
     }
-    
+
+    public static void SetExploTest(boolean isExplo){
+    	exploTest = isExplo;
+    }
     /**
      * Binary operation returning 0 if the cell distance to the border is less than a given distance, 1 otherwise
      */

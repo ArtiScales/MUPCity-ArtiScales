@@ -19,6 +19,8 @@
 
 package org.thema.mupcity.scenario;
 
+import java.awt.geom.Rectangle2D;
+import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -34,6 +36,7 @@ import org.thema.mupcity.Project;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.JDomDriver;
+import com.vividsolutions.jts.geom.Envelope;
 
 import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.image.RasterShape;
@@ -43,15 +46,9 @@ import org.thema.drawshape.layer.ShapeFileLayer;
 import org.thema.drawshape.style.RasterStyle;
 import org.thema.drawshape.style.table.ColorRamp;
 import org.thema.drawshape.style.table.UniqueColorTable;
-import org.thema.msca.AbstractGrid;
-import org.thema.msca.Cell;
-import org.thema.msca.DefaultCell;
-import org.thema.msca.Grid;
-import org.thema.msca.MSCell;
-import org.thema.msca.MSGrid;
-import org.thema.msca.MSGridBuilder;
 import org.thema.msca.operation.AbstractLayerOperation;
 import org.thema.msca.*;
+import org.thema.msca.SquareGrid.SquareLayer;
 import org.thema.msca.operation.*;
 
 /**
@@ -472,13 +469,48 @@ public class ScenarioAuto extends Scenario {
      * @param Folder the chosen folder 
      * @throws IOException 
      */
-    public void save(Project project, File chosenFile) throws IOException {
+    public void save( File chosenFile, Project project) throws IOException {
 
     	chosenFile.mkdirs();
         project.getMSGrid().saveLayer(chosenFile,this.getResultLayerName());
 
     }
+    /**
+     * Overload the coming method to set an automatic 0 threshold
+     * @param project name of the concerned project
+     * @param dir where to save those layers
+     */
+    public void extractEvalAnal(File dir, Project project)throws IOException{
+    	int seuil = 0;
+    	this.extractEvalAnal(seuil,dir,project);
+    }
+    /**
+     * export a layer where are stored the "to-urbanise" cells with a 
+     * positive evaluation. For the needs of our analysis, we're doing 
+     * so for the three lower scales, but it can easily be changer
+     * @param seuil the value of the lowest evaluation accepted
+     * @param project name of the concerned project
+     * @param dir where to save those layers
+     * @throws IOException 
+     */
     
+    public void extractEvalAnal(int seuil, File dir, Project project) throws IOException{
+    	MSGridBuilder msGrid = project.getMSGrid();
+    	Collection<MSGrid> grids = msGrid.getGrids();
+    	Rectangle2D env = project.getBounds();
+		msGrid.addLayer(this.getAnalEvalName(),DataBuffer.TYPE_FLOAT, Float.NaN);
+    	for (MSGrid grid : grids){	
+	    	List<MSCell> cells = ((SquareGrid) grid).getCellIn(env);
+	    	for (Cell cell : cells){  	
+	    		if (cell.getLayerValue(this.getEvalLayerName()) > seuil && cell.getLayerValue(getResultLayerName()) == 2)
+		    	{
+	    			cell.setLayerValue(this.getAnalEvalName(), cell.getLayerValue(this.getEvalLayerName()));
+	 	    	}
+	    	}
+    	}
+    	msGrid.saveLayer(dir,this.getAnalEvalName());
+    }
+
     @Override
     public final String getResultLayerName() {
         return getName() + "-" + Project.SIMUL;
@@ -492,6 +524,9 @@ public class ScenarioAuto extends Scenario {
     @Override
     public final String getBuildFreeLayerName() {
         return getName() + "-" + Project.MORPHO_RULE;
+    }
+    public final String getAnalEvalName() {
+        return getName() + "-" + Project.EVAL_ANAL;
     }
 
 
