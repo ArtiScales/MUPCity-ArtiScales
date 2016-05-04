@@ -127,9 +127,7 @@ public class Project extends AbstractTreeNode {
     /** Grid layer name for administrative shape */
     public static final String TYPO = "typo";
    
-    public static boolean exploTest = false; //it does the folders needs of change if we're running an exploTest
-
-    public static final String EVAL = "eval"; //NOI18N
+     public static final String EVAL = "eval"; //NOI18N
     public static final String SIMUL = "analyse"; //NOI18N
     public static final String SCENARIO = "scenario"; //NOI18N
     
@@ -825,10 +823,7 @@ public class Project extends AbstractTreeNode {
      */
     public void save() throws IOException {
         XStream xml = new XStream(new JDomDriver());
-        if (exploTest){
-        	msGrid.save(file);
-        }
-        if(isDecomp() && !exploTest) {
+        if(isDecomp()) {
             getGridDir().mkdir();
             msGrid.save(getGridDir());
         }
@@ -997,12 +992,8 @@ public class Project extends AbstractTreeNode {
      * @throws SchemaException 
      */
     public static Project createProject(String name, File dir, File buildFile, double origX, double origY, double width, double height, TaskMonitor mon) throws IOException, SchemaException {
-    	File directory = new File(dir.toString());
-    	if(!exploTest){
-        	directory = new File(dir, name);
-            directory.mkdir();
-        }
-
+        File directory = new File(dir, name);
+        directory.mkdir();
         if (mon != null) {
         	mon.setProgress(1);
         	mon.setNote("Loading data...");
@@ -1022,9 +1013,6 @@ public class Project extends AbstractTreeNode {
         return prj;
     }
 
-    public static void SetExploTest(boolean isExplo){
-    	exploTest = isExplo;
-    }
     /**
      * Binary operation returning 0 if the cell distance to the border is less than a given distance, 1 otherwise
      */

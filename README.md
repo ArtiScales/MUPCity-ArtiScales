@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 **Changements Commit du 03/05 :** *(je l'ai mis dans le champ duc ommint, mais je sais pas si c'est entièrement consultable)*
 
 création des méthodes pour analyser les données
@@ -23,4 +24,21 @@ j'avais aussi ajouté des petites variables qui simplifiait les tests pour faire
 Dans le **package analyse**, des miettes de msca dans Main_analyse et la classe qui va vraiment faire les analyses, mais ou il n'y a pour l'instant rien dedans.
 
 PS : pour le nom des nouvelles couches et les méthodes et variables qui lui sont associés, je dois avouer qu'au début ça m'a fait assez rire de coder un truc qui s'appelle evalAnal, puis je m'y suis fait.. puis je viens de me rendre compte que vis à vis d'autre, ça pourrais porter à confusion ! Suivant vos retour, si c'est marrant ou pas, je changerai les nom pour un allongé evaluationAnalyse
+=======
+###MODIFICATIONS
+
+- Création de la classe ExplorationTest faisant des boucles pour simuler une réplication de trois scénarios par paramètres définies
+- Ajout/modif de méthodes dans AHP : 
+		setCoeff pour entrer directement les eigenvector
+		modif dans getCoeffs pour donner directement les vecteurs propres si ils sont définis
+		ajout de variables d'état
+- Ajout d'une methode ScenarioAuto.save(Project, File)
+- Erreur sur les layers exporté, la couche de bus était confondue avec la couche de train. Inversion dans l'enumeration de Project
+
+
+###TODO
+ - le test ne peut pas aller jusqu'au bout car la mémoire sature (heap space, après env 120 scénarios simulés) . Trouver ce qui reste coincé dans la mémoire vive.
+ - Virer les messages du moniteurs lors de chargement volumineux de couches
+ - Il semble compliqué (et surtout très long) de réaliser les calculs avec des aménités de niveau 3. Possibilité d'optimisation de cette classe?
+>>>>>>> 075c26f3aa2e1e26e2a6f7b96376bfd3373c3ef5
 
