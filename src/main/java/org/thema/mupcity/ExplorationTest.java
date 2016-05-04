@@ -81,7 +81,6 @@ public class ExplorationTest {
 				//create a new project
 			File dirgrid = new File(dir+"/"+g);
 			dirgrid.mkdir();
-			//Project.SetExploTest(true); ça fou la merde enfait
 			Project project = Project.createProject(name, dirgrid, buildFile, minX, minY, width, height, mon);
 			
 			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
