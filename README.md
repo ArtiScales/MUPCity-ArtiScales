@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 **Changements Commit du 03/05 :** *(je l'ai mis dans le champ duc ommint, mais je sais pas si c'est entièrement consultable)*
 
 création des méthodes pour analyser les données
@@ -40,5 +39,5 @@ PS : pour le nom des nouvelles couches et les méthodes et variables qui lui son
  - le test ne peut pas aller jusqu'au bout car la mémoire sature (heap space, après env 120 scénarios simulés) . Trouver ce qui reste coincé dans la mémoire vive.
  - Virer les messages du moniteurs lors de chargement volumineux de couches
  - Il semble compliqué (et surtout très long) de réaliser les calculs avec des aménités de niveau 3. Possibilité d'optimisation de cette classe?
->>>>>>> 075c26f3aa2e1e26e2a6f7b96376bfd3373c3ef5
+
 

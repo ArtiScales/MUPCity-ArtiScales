@@ -271,7 +271,7 @@ public class ExplorationTest {
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(),
 									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
 							project.performScenarioAuto(scenario);
-<<<<<<< HEAD
+
 
 							// save the project
 							// scenario.save(testFile,project);
@@ -287,19 +287,7 @@ public class ExplorationTest {
 
 							// write the seed into a text file, uselesse now as
 							// the seeds are fixed
-=======
-								// save the project
-							//scenario.save(testFile,project);
-							//project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile);	pas besoin de ces couches					
-							scenario.extractEvalAnal(testFile,project); 
-								//delete of the saved layer to unload the heap space
-							project.getMSGrid().removeLayer(titre+"-morpho");
-							project.getMSGrid().removeLayer(titre+"-eval_anal");
-							project.getMSGrid().removeLayer(titre+"-analyse");
-							project.getMSGrid().removeLayer(titre+"-eval");
-						
-								// write the seed into a text file, uselesse now as the seeds are fixed
->>>>>>> 075c26f3aa2e1e26e2a6f7b96376bfd3373c3ef5
+
 							Charset charset = Charset.forName("US-ASCII");
 							String nseed = String.valueOf(seed);
 							File testFiletext = new File(testFile + "/nbseed");
