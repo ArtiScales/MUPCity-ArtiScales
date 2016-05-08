@@ -22,10 +22,8 @@ import org.thema.mupcity.scenario.ScenarioAuto;
  * 
  * @author Maxime Colomb
  */
-
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
-
 		String folderData = "/home/mickael/data/mbrasebin/donnees/Donnee_Maxime/data/";
 		String folderOut =  folderData + "out/";
 		// définition des variables fixes
@@ -44,11 +42,8 @@ public class ExplorationTest {
 		File trainFile = new File(folderData + "gare_train_ICONE_docs_2015.shp");
 		File restrictFile = new File(folderData+"ICONE-zonesNU_AU.shp");
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
-		boolean isTest = false; // si l'on veut tester le programme, quelques
-								// shortcuts pour que ça aille plus vite
-		boolean memedos = true;// si l'on veut ou non une organisation dans des
-								// dossiers déocupant les scénario, ou
-								// uniquement les grilles
+		boolean isTest = false; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
+		boolean memedos = true;// si l'on veut ou non une organisation dans des dossiers déocupant les scénario, ou uniquement les grilles
 
 		// empty monitor
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
@@ -83,32 +78,20 @@ public class ExplorationTest {
 			File dirgrid = new File(dir + "/" + g);
 			dirgrid.mkdir();
 			Project project = Project.createProject(name, dirgrid, buildFile, minX, minY, width, height, mon);
-
-			project.setNetPrecision(0.1); // Le réseau routier apparait peut
-											// être un peu moins déformé avec
-											// cette contrainte, mais ce n'est
-											// pas pour ça qu'il n'y a plus de
-											// tache =0 dans fac3
+			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
 
 			// set layers and attributes for the decomposition
 			List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
-			List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL
-																		// (numeric),
-																		// TYPE
-																		// (any)
+			List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL (numeric), TYPE (any)
 			project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs);
-			List<String> leisureAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL
-																		// (numeric),
-																		// TYPE
-																		// (any)
+			List<String> leisureAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL (numeric), TYPE (any)
 			project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs);
 			List<String> emptyAttrs = Arrays.asList("");
 			project.setLayer(Project.LAYERS.get(Project.Layers.BUS_STATION.ordinal()), busFile, emptyAttrs);
 			project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
 			project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs);
-			project.setDistType(
-					(network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
+			project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
 
 			// setting of the six different AHP matrix
 			// we first take the names of the different working rules
@@ -133,10 +116,7 @@ public class ExplorationTest {
 			AHP ahpS_Moy = new AHP(items);
 			ahpS_Moy.realName = "ahpS_Moy";
 
-			HashMap<String, Double> coefsE_Yag = new HashMap<>();// collection
-																	// of the
-																	// eigenvector
-																	// values
+			HashMap<String, Double> coefsE_Yag = new HashMap<>();// collection of the eigenvector values
 			coefsE_Yag.put(items.get(8), 1.0);
 			coefsE_Yag.put(items.get(7), 1.0);
 			coefsE_Yag.put(items.get(6), 1.0);
@@ -146,8 +126,7 @@ public class ExplorationTest {
 			coefsE_Yag.put(items.get(2), 1.0);
 			coefsE_Yag.put(items.get(1), 1.0);
 			coefsE_Yag.put(items.get(0), 1.0);
-			ahpE_Yag.setCoeff(coefsE_Yag);// we force the vector to the ahp
-											// objects
+			ahpE_Yag.setCoeff(coefsE_Yag);// we force the vector to the ahp objects
 
 			HashMap<String, Double> coefsT_Yag = new HashMap<>();
 			coefsE_Yag.put(items.get(8), 0.458);
@@ -240,25 +219,11 @@ public class ExplorationTest {
 					for (AHP ahp : ahpList) {
 						String nahp = ahp.getName();
 						int lgt = nahp.length();
-						boolean mean; // determination de par le nom de l'ahp si
-										// la methode de calcul sera avec mean
-										// ou Yager
-						if (nahp.substring(lgt - 3).equals("Moy")) {
-							mean = true;
-						} else {
-							mean = false;
-						}
+						boolean mean; // determination de par le nom de l'ahp si la methode de calcul sera avec mean ou Yager
+						mean = (nahp.substring(lgt - 3).equals("Moy"));
 						for (long seed = 1; seed <= 3; seed++) {
-
-							String nameseed = "replication_" + seed;// part of
-																	// the
-																	// folder's
-																	// name
-							String titre = g + "--" + nname + "--" + nstrict + "--" + nahp + "--" + nameseed;// part
-																												// of
-																												// the
-																												// folder's
-																												// name
+							String nameseed = "replication_" + seed;// part of the folder's name
+							String titre = g + "--" + nname + "--" + nstrict + "--" + nahp + "--" + nameseed;// part of the folder's name
 							File testFile;
 							if (memedos) {
 								testFile = dirgrid;
@@ -266,28 +231,20 @@ public class ExplorationTest {
 								testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/" + g + "/"
 										+ nMax + "/" + titre);
 							}
-
 							NavigableSet<Double> res = project.getMSGrid().getResolutions();
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(),
 									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
 							project.performScenarioAuto(scenario);
-
-
 							// save the project
 							// scenario.save(testFile,project);
-							// project.getMSGrid().saveRaster(scenario.getEvalLayerName(),
-							// testFile); pas besoin de ces couches
+							// project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile); pas besoin de ces couches
 							scenario.extractEvalAnal(testFile, project);
-							// delete of the saved layer to unload the heap
-							// space
+							// delete of the saved layer to unload the heap space
 							project.getMSGrid().removeLayer(titre + "-morpho");
 							project.getMSGrid().removeLayer(titre + "-eval_anal");
 							project.getMSGrid().removeLayer(titre + "-analyse");
 							project.getMSGrid().removeLayer(titre + "-eval");
-
-							// write the seed into a text file, uselesse now as
-							// the seeds are fixed
-
+							// write the seed into a text file, uselesse now as the seeds are fixed
 							Charset charset = Charset.forName("US-ASCII");
 							String nseed = String.valueOf(seed);
 							File testFiletext = new File(testFile + "/nbseed");
