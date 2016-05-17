@@ -34,9 +34,7 @@ import org.thema.common.collection.HashMap2D;
 public class AHP {
     
     private HashMap2D<String, String, String> matrix;
-    private HashMap<String, Double> coefs;
-    boolean coefset = false;
-    String realName;
+    private Map<String, Double> coefs;
 
     /**
      * Creates a new AHP matrix for the list of items

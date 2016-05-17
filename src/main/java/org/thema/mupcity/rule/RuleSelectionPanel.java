@@ -22,6 +22,7 @@ package org.thema.mupcity.rule;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.thema.common.collection.HashMap2D;
 import org.thema.common.param.XMLObject;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.AHPDialog;
@@ -204,10 +205,16 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
         } else if(!rules.containsAll(ahp.getMatrix().getKeys1())) {
             HashSet<String> set = new HashSet<>(ahp.getMatrix().getKeys1());
             set.removeAll(rules);
+            HashMap2D<String, String, String> matrix = ahp.getMatrix();
             for(String rule : set)  {
-                ahp.getMatrix().removeKey1(rule);
-                ahp.getMatrix().removeKey2(rule);
+                matrix.removeKey1(rule);
+                matrix.removeKey2(rule);
             } 
+            ahp = new AHP(new ArrayList<>(rules));
+            ahp.setMatrix(matrix);
+        }
+        for(String rule : rules) {
+            ahp.setCoef(rule, getCoefRules().get(rule));
         }
     }
     
@@ -257,6 +264,7 @@ public class RuleSelectionPanel extends javax.swing.JPanel {
                }
             }
         }
+        
     }//GEN-LAST:event_meanCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
