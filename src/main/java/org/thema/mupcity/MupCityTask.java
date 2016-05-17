@@ -34,4 +34,11 @@ public class MupCityTask {
 				roadFile, facilityFile, leisureFile, busFile, trainFile, restrictFile, minX, minY, width, height,
 				ahpIndex, results);
 	}
+	public static void main(String[] args) throws IOException, SchemaException {
+		long seed = 42L;
+		File data = new File("/home/julien/mupcity/data");
+		File results = new File(data,"results"+File.separator+seed);
+		results.mkdirs();
+		MupCityTask.run(seed, data, results);
+	}
 }

@@ -89,9 +89,7 @@ public class PTRule extends AbstractRule {
                     }
                 }
                 cell.setLayerValue(getName(), Math.max(stationCount.getValue(nbStation), distanceStation.getValue(distMinTrain)));
-              
             }
         }, true);
     }
-    
 }

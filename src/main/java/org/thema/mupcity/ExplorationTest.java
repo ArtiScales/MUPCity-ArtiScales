@@ -24,11 +24,12 @@ import org.thema.mupcity.scenario.ScenarioAuto;
  */
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
-		String folderData = "/home/mickael/data/mbrasebin/donnees/Donnee_Maxime/data/";
+		String folderData = "/home/julien/mupcity/data/";
 		String folderOut =  folderData + "out/";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
+		dir.mkdirs();
 		File buildFile = new File(folderData + "BATI_AU.shp");
 		int exp = 3;
 		double minSize = 20;
@@ -42,7 +43,7 @@ public class ExplorationTest {
 		File trainFile = new File(folderData + "gare_train_ICONE_docs_2015.shp");
 		File restrictFile = new File(folderData+"ICONE-zonesNU_AU.shp");
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
-		boolean isTest = false; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
+		boolean isTest = true; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
 		boolean memedos = true;// si l'on veut ou non une organisation dans des dossiers déocupant les scénario, ou uniquement les grilles
 
 		// empty monitor
@@ -233,7 +234,7 @@ public class ExplorationTest {
 							}
 							NavigableSet<Double> res = project.getMSGrid().getResolutions();
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(),
-									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
+									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed, false, false);
 							project.performScenarioAuto(scenario);
 							// save the project
 							// scenario.save(testFile,project);
