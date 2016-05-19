@@ -201,7 +201,7 @@ public class ExplorationTest {
 			ahpList.add(ahpS_Moy);
 
 			// create new decomp
-			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon);
+			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, false);
 			project.save();
 			// looping for scenarios
 			// loop on Nmax

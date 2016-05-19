@@ -286,7 +286,7 @@ public class Project extends AbstractTreeNode {
                 nbRule++;
             }
         }
-    	this.decomp(exp, maxSize, minSize, seuilDensBuild, new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3));
+    	this.decomp(exp, maxSize, minSize, seuilDensBuild, new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3), true);
     }
     /**
      * Creates the multiscale grid and calculates the rules.
@@ -296,7 +296,7 @@ public class Project extends AbstractTreeNode {
      * @param seuilDensBuild the minimum of build density for a cell to be of state built
      * @throws IOException 
      */
-    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor) throws IOException {
+    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor, boolean threaded) throws IOException {
         monitor.setMillisToPopup(0);
         monitor.setMillisToDecideToPopup(0);
 
@@ -317,7 +317,7 @@ public class Project extends AbstractTreeNode {
         msGrid.addDynamicLayer(ZONE, new DistBorderOperation(4));
         monitor.setNote("Create grid... build");
         msGrid.addLayer(BUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
-        msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
+        msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), threaded);
         msGrid.addLayer(BUILD, DataBuffer.TYPE_SHORT, 0.0);
         msGrid.execute(new AbstractLayerOperation() {
             @Override

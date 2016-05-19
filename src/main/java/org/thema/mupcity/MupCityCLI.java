@@ -146,7 +146,7 @@ public class MupCityCLI {
 		ahpList.add(ahpS_Moy);
 
 		// create new decomp
-		project.decomp(exp, maxSize, minSize, seuilDensBuild, mon);
+		project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, false);
 //		project.save();
 		
 		String nname = "N" + nMax;// part of the folder's name
