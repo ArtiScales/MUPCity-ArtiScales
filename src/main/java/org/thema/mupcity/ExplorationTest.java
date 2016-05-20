@@ -1,4 +1,4 @@
-package org.thema.mupcity;
+	package org.thema.mupcity;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,8 +26,8 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
 
-		String folderData = "/home/mickael/data/mbrasebin/donnees/Donnee_Maxime/data/";
-		String folderOut =  folderData + "out/";
+		String folderData = "/home/mcolomb/informatique/MUP/explo/data/";
+		String folderOut =  "/media/mcolomb/Data_2/result_explo";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
@@ -248,7 +248,7 @@ public class ExplorationTest {
 						} else {
 							mean = false;
 						}
-						for (long seed = 1; seed <= 3; seed++) {
+						for (long seed = 1; seed <= 10; seed++) {
 
 							String nameseed = "replication_" + seed;// part of
 																	// the
@@ -263,7 +263,7 @@ public class ExplorationTest {
 							if (memedos) {
 								testFile = dirgrid;
 							} else {
-								testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/" + g + "/"
+								testFile = new File(dir + g + "/"
 										+ nMax + "/" + titre);
 							}
 
