@@ -24,32 +24,40 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.TreeMap;
+
 import javax.media.jai.Histogram;
 import javax.media.jai.ROI;
 import javax.media.jai.operator.SubtractFromConstDescriptor;
-import javax.swing.ProgressMonitor;
-import org.thema.mupcity.AHP;
-import org.thema.mupcity.Project;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.JDomDriver;
-import com.vividsolutions.jts.geom.Envelope;
 
 import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.image.RasterShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
 import org.thema.drawshape.layer.RasterLayer;
-import org.thema.drawshape.layer.ShapeFileLayer;
 import org.thema.drawshape.style.RasterStyle;
 import org.thema.drawshape.style.table.ColorRamp;
 import org.thema.drawshape.style.table.UniqueColorTable;
+import org.thema.msca.AbstractGrid;
+import org.thema.msca.Cell;
+import org.thema.msca.DefaultCell;
+import org.thema.msca.Grid;
+import org.thema.msca.MSCell;
+import org.thema.msca.MSGrid;
+import org.thema.msca.MSGridBuilder;
+import org.thema.msca.SquareGrid;
+import org.thema.msca.operation.AbstractAgregateOperation;
 import org.thema.msca.operation.AbstractLayerOperation;
-import org.thema.msca.*;
-import org.thema.msca.SquareGrid.SquareLayer;
-import org.thema.msca.operation.*;
+import org.thema.msca.operation.AcceptableCell;
+import org.thema.msca.operation.SimpleAgregateOperation;
+import org.thema.mupcity.AHP;
+import org.thema.mupcity.Project;
 
 /**
  * Base implementation for automatic scenario.
@@ -73,6 +81,8 @@ public class ScenarioAuto extends Scenario {
 
     // random number generator for the shuffling (see perform)
     private Random rnd;
+    private boolean threaded;
+    private boolean createMonitors;
     /**
      * Creates a new scenario.
      * 
@@ -82,8 +92,13 @@ public class ScenarioAuto extends Scenario {
      * @param mean true for average aggregation, yager agregation otherwise
      */
     private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed) {
+        this(name, ahp, nMax, mean, seed, true, true);
+    }
+    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed, boolean monitors, boolean threaded) {
         super(name, ahp, nMax, mean);
         this.rnd = new Random(seed);
+        this.createMonitors = monitors;
+        this.threaded = threaded;
     }
 
     /**
@@ -137,7 +152,7 @@ public class ScenarioAuto extends Scenario {
     }
 
     public final boolean isRemoved(Cell c) {
-        return c.getLayerValue(getResultLayerName()) == -1;
+        return c.getLayerValue(getResultLayerName()) == REM_BUILD;
     }
     
     /**
@@ -254,11 +269,11 @@ public class ScenarioAuto extends Scenario {
                 }
             }
         };
-
-        TaskMonitor monitor = new TaskMonitor(null, "Initialize...", "", 0, 100);
+        TaskMonitor monitor = (this.createMonitors) ? new TaskMonitor(null, "Initialize...", "", 0, 100) : new TaskMonitor.EmptyMonitor();
+        monitor.reset();
         op.setMonitor(monitor);
         // TODO pass the random generator to the execute method
-        msGrid.execute(op);
+        msGrid.execute(op, this.threaded);
         monitor.close();
         nbCell = ((Number)msGrid.agregate(new SimpleAgregateOperation.COUNT(4, new AcceptableCell() {
                 @Override
@@ -300,28 +315,22 @@ public class ScenarioAuto extends Scenario {
      * @param msGrid the multi scale grid
      */
     private void performMonoRandom(MSGridBuilder msGrid) {
-
         final String simLayer = getResultLayerName();
-
         AbstractGrid grid = (AbstractGrid) msGrid.getGrid(startScale);
-
-        ProgressMonitor monitor = new ProgressMonitor(null, "Random MonoScale Scenario", "", 0, nbCell);
+        //ProgressMonitor monitor = new ProgressMonitor(null, "Random MonoScale Scenario", "", 0, nbCell);
         int size = grid.getLayer(simLayer).getSampleModel().getWidth()
                     * grid.getLayer(simLayer).getSampleModel().getHeight();
         int nb = 0;
         while(nb < nbCell) {
-            monitor.setNote(nb + "/" + nbCell);
-            monitor.setProgress(nb);
-
+            //monitor.setNote(nb + "/" + nbCell);
+            //monitor.setProgress(nb);
             DefaultCell cell = new DefaultCell((int)(Math.random() * size), grid);
             if(canBeBuild(cell) && cell.getDistBorder() >= 4) {
                 cell.setLayerValue(simLayer, NEW_BUILD);
                 nb++;
             }
-
         }
-
-        monitor.close();
+        //monitor.close();
     }
     /**
      * Computes the scenario for mono scale
@@ -371,15 +380,15 @@ public class ScenarioAuto extends Scenario {
             }
         }
             
-        ProgressMonitor monitor = new ProgressMonitor(null, "MonoScale Scenario", "", 0, nbCell);
+        //ProgressMonitor monitor = new ProgressMonitor(null, "MonoScale Scenario", "", 0, nbCell);
 
         PriorityQueue<CellEval> queue = new PriorityQueue<>();
         double min = Double.NaN;
         for(int i = 0; i < nbCell; i++) {
-            monitor.setNote(i + "/" + nbCell);
-            monitor.setProgress(i+1);
+            //monitor.setNote(i + "/" + nbCell);
+            //monitor.setProgress(i+1);
             while(queue.isEmpty()) {
-                monitor.setNote("Queue empty -> report");
+                //monitor.setNote("Queue empty -> report");
                 Raster r = grid.getRaster(evalLayer);
 
                 RenderedImage mask = SubtractFromConstDescriptor.create(grid.getLayer(simLayer).getImage(), new double[] {1}, null);
@@ -426,7 +435,7 @@ public class ScenarioAuto extends Scenario {
                 i--;
             }
         }
-        monitor.close();
+        //monitor.close();
     }
 
     @Override
@@ -462,7 +471,6 @@ public class ScenarioAuto extends Scenario {
             layers.addLayerLast(Project.createMultiscaleLayers(getEvalLayerName(), null,  
                     getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest"), msGrid));
         }
-
     }
     /**
      * Overload to save on a chosen folder
@@ -470,10 +478,8 @@ public class ScenarioAuto extends Scenario {
      * @throws IOException 
      */
     public void save( File chosenFile, Project project) throws IOException {
-
     	chosenFile.mkdirs();
         project.getMSGrid().saveLayer(chosenFile,this.getResultLayerName());
-
     }
     /**
      * Overload the coming method to set an automatic 0 threshold
@@ -525,10 +531,10 @@ public class ScenarioAuto extends Scenario {
     public final String getBuildFreeLayerName() {
         return getName() + "-" + Project.MORPHO_RULE;
     }
+
     public final String getAnalEvalName() {
         return getName() + "-" + Project.EVAL_ANAL;
     }
-
 
     /**
      * Creates a new monoscale scenario.
@@ -544,12 +550,10 @@ public class ScenarioAuto extends Scenario {
     public static ScenarioAuto createMonoScaleScenario(String name, double scale,
             int nbCell, AHP ahp, boolean useNoBuild, boolean mean, long seed) {
         ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean, seed);
-
         scenario.monoScale = true;
         scenario.startScale = scenario.endScale = scale;
         scenario.nbCell = nbCell;
         scenario.useNoBuild = useNoBuild;
-
         return scenario;
     }
 
@@ -569,9 +573,8 @@ public class ScenarioAuto extends Scenario {
      */
     public static ScenarioAuto createMultiScaleScenario(String name,
             double startScale, double endScale, int nMax, boolean strict, 
-            AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp, long seed) {
-        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean, seed);
-
+            AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp, long seed, boolean monitor, boolean threaded) {
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean, seed, monitor, threaded);
         scenario.monoScale = false;
         scenario.startScale = startScale;
         scenario.endScale = endScale;
@@ -579,9 +582,6 @@ public class ScenarioAuto extends Scenario {
         scenario.useNoBuild = useNoBuild;
         scenario.nbCell = 0;
         scenario.coefDecomp = coefDecomp;
-
         return scenario;
     }
-
-   
 }

@@ -219,7 +219,7 @@ public class NewScenarioAutoDialog extends javax.swing.JDialog {
 		String simName = nameTextField.getText();
 		long seed = System.currentTimeMillis();
 		scenario = ScenarioAuto.createMultiScaleScenario(simName, start, end, nMax, strict, ruleSelectionPanel.getAHP(),
-				noBuildCheckBox.isSelected(), ruleSelectionPanel.isAgregMean(), project.getCoefDecomp(), seed);
+				noBuildCheckBox.isSelected(), ruleSelectionPanel.isAgregMean(), project.getCoefDecomp(), seed, true, true);
 		returnOk = true;
 		setVisible(false);
 		dispose();

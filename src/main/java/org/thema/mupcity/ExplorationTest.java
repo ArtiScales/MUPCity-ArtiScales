@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 
 import org.geotools.feature.SchemaException;
@@ -22,15 +23,14 @@ import org.thema.mupcity.scenario.ScenarioAuto;
  * 
  * @author Maxime Colomb
  */
-
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
-
 		String folderData = "/home/mcolomb/informatique/MUP/explo/data/";
 		String folderOut =  "/media/mcolomb/Data_2/result_explo";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
+		dir.mkdirs();
 		File buildFile = new File(folderData + "BATI_AU.shp");
 		int exp = 3;
 		double minSize = 20;
@@ -44,11 +44,8 @@ public class ExplorationTest {
 		File trainFile = new File(folderData + "gare_train_ICONE_docs_2015.shp");
 		File restrictFile = new File(folderData+"ICONE-zonesNU_AU.shp");
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
-		boolean isTest = false; // si l'on veut tester le programme, quelques
-								// shortcuts pour que ça aille plus vite
-		boolean memedos = true;// si l'on veut ou non une organisation dans des
-								// dossiers déocupant les scénario, ou
-								// uniquement les grilles
+		boolean isTest = true; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
+		boolean memedos = true;// si l'on veut ou non une organisation dans des dossiers déocupant les scénario, ou uniquement les grilles
 
 		// empty monitor
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
@@ -83,32 +80,20 @@ public class ExplorationTest {
 			File dirgrid = new File(dir + "/" + g);
 			dirgrid.mkdir();
 			Project project = Project.createProject(name, dirgrid, buildFile, minX, minY, width, height, mon);
-
-			project.setNetPrecision(0.1); // Le réseau routier apparait peut
-											// être un peu moins déformé avec
-											// cette contrainte, mais ce n'est
-											// pas pour ça qu'il n'y a plus de
-											// tache =0 dans fac3
+			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
 
 			// set layers and attributes for the decomposition
 			List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
-			List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL
-																		// (numeric),
-																		// TYPE
-																		// (any)
+			List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL (numeric), TYPE (any)
 			project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs);
-			List<String> leisureAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL
-																		// (numeric),
-																		// TYPE
-																		// (any)
+			List<String> leisureAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL (numeric), TYPE (any)
 			project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs);
 			List<String> emptyAttrs = Arrays.asList("");
 			project.setLayer(Project.LAYERS.get(Project.Layers.BUS_STATION.ordinal()), busFile, emptyAttrs);
 			project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
 			project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs);
-			project.setDistType(
-					(network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
+			project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
 
 			// setting of the six different AHP matrix
 			// we first take the names of the different working rules
@@ -121,93 +106,90 @@ public class ExplorationTest {
 
 			// setting on our six ahp objects
 			AHP ahpE_Yag = new AHP(items);// creation of the true objects
-			ahpE_Yag.realName = "ahpE_Yag";// putting a String name
 			AHP ahpT_Yag = new AHP(items);
-			ahpT_Yag.realName = "ahpT_Yag";
 			AHP ahpS_Yag = new AHP(items);
-			ahpS_Yag.realName = "ahpS_Yag";
 			AHP ahpE_Moy = new AHP(items);
-			ahpE_Moy.realName = "ahpE_Moy";
 			AHP ahpT_Moy = new AHP(items);
-			ahpT_Moy.realName = "ahpT_Moy";
 			AHP ahpS_Moy = new AHP(items);
-			ahpS_Moy.realName = "ahpS_Moy";
+			Map<AHP, String> ahpNames = new HashMap<>();
+			ahpNames.put(ahpE_Yag, "ahpE_Yag");
+			ahpNames.put(ahpT_Yag, "ahpT_Yag");
+			ahpNames.put(ahpS_Yag, "ahpS_Yag");
+			ahpNames.put(ahpE_Moy, "ahpE_Moy");
+			ahpNames.put(ahpT_Moy, "ahpT_Moy");
+			ahpNames.put(ahpS_Moy, "ahpS_Moy");
+			
+			//HashMap<String, Double> coefsE_Yag = new HashMap<>();// collection of the eigenvector values
+			ahpE_Yag.setCoef(items.get(8), 1.0);
+			ahpE_Yag.setCoef(items.get(7), 1.0);
+			ahpE_Yag.setCoef(items.get(6), 1.0);
+			ahpE_Yag.setCoef(items.get(5), 1.0);
+			ahpE_Yag.setCoef(items.get(4), 1.0);
+			ahpE_Yag.setCoef(items.get(3), 1.0);
+			ahpE_Yag.setCoef(items.get(2), 1.0);
+			ahpE_Yag.setCoef(items.get(1), 1.0);
+			ahpE_Yag.setCoef(items.get(0), 1.0);
+			//ahpE_Yag.setCoeff(coefsE_Yag);// we force the vector to the ahp objects
 
-			HashMap<String, Double> coefsE_Yag = new HashMap<>();// collection
-																	// of the
-																	// eigenvector
-																	// values
-			coefsE_Yag.put(items.get(8), 1.0);
-			coefsE_Yag.put(items.get(7), 1.0);
-			coefsE_Yag.put(items.get(6), 1.0);
-			coefsE_Yag.put(items.get(5), 1.0);
-			coefsE_Yag.put(items.get(4), 1.0);
-			coefsE_Yag.put(items.get(3), 1.0);
-			coefsE_Yag.put(items.get(2), 1.0);
-			coefsE_Yag.put(items.get(1), 1.0);
-			coefsE_Yag.put(items.get(0), 1.0);
-			ahpE_Yag.setCoeff(coefsE_Yag);// we force the vector to the ahp
-											// objects
+			//HashMap<String, Double> coefsT_Yag = new HashMap<>();
+			ahpT_Yag.setCoef(items.get(8), 0.458);
+			ahpT_Yag.setCoef(items.get(7), 0.458);
+			ahpT_Yag.setCoef(items.get(6), 0.458);
+			ahpT_Yag.setCoef(items.get(5), 3.625);
+			ahpT_Yag.setCoef(items.get(4), 1.199);
+			ahpT_Yag.setCoef(items.get(3), 1.199);
+			ahpT_Yag.setCoef(items.get(2), 1.199);
+			ahpT_Yag.setCoef(items.get(1), 0.202);
+			ahpT_Yag.setCoef(items.get(0), 0.202);
+			//ahpT_Yag.setCoeff(coefsT_Yag);
 
-			HashMap<String, Double> coefsT_Yag = new HashMap<>();
-			coefsE_Yag.put(items.get(8), 0.458);
-			coefsE_Yag.put(items.get(7), 0.458);
-			coefsE_Yag.put(items.get(6), 0.458);
-			coefsT_Yag.put(items.get(5), 3.625);
-			coefsT_Yag.put(items.get(4), 1.199);
-			coefsT_Yag.put(items.get(3), 1.199);
-			coefsT_Yag.put(items.get(2), 1.199);
-			coefsT_Yag.put(items.get(1), 0.202);
-			coefsT_Yag.put(items.get(0), 0.202);
-			ahpT_Yag.setCoeff(coefsT_Yag);
+			//HashMap<String, Double> coefsS_Yag = new HashMap<>();
+			ahpS_Yag.setCoef(items.get(8), 0.745);
+			ahpS_Yag.setCoef(items.get(7), 0.745);
+			ahpS_Yag.setCoef(items.get(6), 0.745);
+			ahpS_Yag.setCoef(items.get(5), 0.359);
+			ahpS_Yag.setCoef(items.get(4), 1.965);
+			ahpS_Yag.setCoef(items.get(3), 1.965);
+			ahpS_Yag.setCoef(items.get(2), 1.965);
+			ahpS_Yag.setCoef(items.get(1), 0.269);
+			ahpS_Yag.setCoef(items.get(0), 0.243);
+			//ahpS_Yag.setCoeff(coefsS_Yag);
 
-			HashMap<String, Double> coefsS_Yag = new HashMap<>();
-			coefsE_Yag.put(items.get(8), 0.745);
-			coefsE_Yag.put(items.get(7), 0.745);
-			coefsE_Yag.put(items.get(6), 0.745);
-			coefsS_Yag.put(items.get(5), 0.359);
-			coefsS_Yag.put(items.get(4), 1.965);
-			coefsS_Yag.put(items.get(3), 1.965);
-			coefsS_Yag.put(items.get(2), 1.965);
-			coefsS_Yag.put(items.get(1), 0.269);
-			coefsS_Yag.put(items.get(0), 0.243);
-			ahpS_Yag.setCoeff(coefsS_Yag);
+			//HashMap<String, Double> coefsE_Moy = new HashMap<>();
+			ahpE_Moy.setCoef(items.get(8), 0.111);
+			ahpE_Moy.setCoef(items.get(7), 0.111);
+			ahpE_Moy.setCoef(items.get(6), 0.111);
+			ahpE_Moy.setCoef(items.get(5), 0.111);
+			ahpE_Moy.setCoef(items.get(4), 0.111);
+			ahpE_Moy.setCoef(items.get(3), 0.111);
+			ahpE_Moy.setCoef(items.get(2), 0.111);
+			ahpE_Moy.setCoef(items.get(1), 0.111);
+			ahpE_Moy.setCoef(items.get(0), 0.111);
+			//ahpE_Moy.setCoeff(coefsE_Moy);
 
-			HashMap<String, Double> coefsE_Moy = new HashMap<>();
-			coefsE_Yag.put(items.get(8), 0.111);
-			coefsE_Yag.put(items.get(7), 0.111);
-			coefsE_Yag.put(items.get(6), 0.111);
-			coefsE_Moy.put(items.get(5), 0.111);
-			coefsE_Moy.put(items.get(4), 0.111);
-			coefsE_Moy.put(items.get(3), 0.111);
-			coefsE_Moy.put(items.get(2), 0.111);
-			coefsE_Moy.put(items.get(1), 0.111);
-			coefsE_Moy.put(items.get(0), 0.111);
-			ahpE_Moy.setCoeff(coefsE_Moy);
+			//HashMap<String, Double> coefsT_Moy = new HashMap<>();
+			ahpT_Moy.setCoef(items.get(8), 0.051);
+			ahpT_Moy.setCoef(items.get(7), 0.051);
+			ahpT_Moy.setCoef(items.get(6), 0.051);
+			ahpT_Moy.setCoef(items.get(5), 0.403);
+			ahpT_Moy.setCoef(items.get(4), 0.133);
+			ahpT_Moy.setCoef(items.get(3), 0.133);
+			ahpT_Moy.setCoef(items.get(2), 0.133);
+			ahpT_Moy.setCoef(items.get(1), 0.022);
+			ahpT_Moy.setCoef(items.get(0), 0.022);
+			//ahpT_Moy.setCoeff(coefsT_Moy);
 
-			HashMap<String, Double> coefsT_Moy = new HashMap<>();
-			coefsE_Yag.put(items.get(8), 0.051);
-			coefsE_Yag.put(items.get(7), 0.051);
-			coefsE_Yag.put(items.get(6), 0.051);
-			coefsT_Moy.put(items.get(5), 0.403);
-			coefsT_Moy.put(items.get(4), 0.133);
-			coefsT_Moy.put(items.get(3), 0.133);
-			coefsT_Moy.put(items.get(2), 0.133);
-			coefsT_Moy.put(items.get(1), 0.022);
-			coefsT_Moy.put(items.get(0), 0.022);
-			ahpT_Moy.setCoeff(coefsT_Moy);
-
-			HashMap<String, Double> coefsS_Moy = new HashMap<>();
-			coefsE_Yag.put(items.get(8), 0.083);
-			coefsE_Yag.put(items.get(7), 0.083);
-			coefsE_Yag.put(items.get(6), 0.083);
-			coefsS_Moy.put(items.get(5), 0.04);
-			coefsS_Moy.put(items.get(4), 0.218);
-			coefsS_Moy.put(items.get(3), 0.218);
-			coefsS_Moy.put(items.get(2), 0.218);
-			coefsS_Moy.put(items.get(1), 0.03);
-			coefsS_Moy.put(items.get(0), 0.027);
-			ahpS_Moy.setCoeff(coefsS_Moy);
+			//HashMap<String, Double> coefsS_Moy = new HashMap<>();
+			ahpS_Moy.setCoef(items.get(8), 0.083);
+			ahpS_Moy.setCoef(items.get(7), 0.083);
+			ahpS_Moy.setCoef(items.get(6), 0.083);
+			ahpS_Moy.setCoef(items.get(5), 0.04);
+			ahpS_Moy.setCoef(items.get(4), 0.218);
+			ahpS_Moy.setCoef(items.get(3), 0.218);
+			ahpS_Moy.setCoef(items.get(2), 0.218);
+			ahpS_Moy.setCoef(items.get(1), 0.03);
+			ahpS_Moy.setCoef(items.get(0), 0.027);
+			//ahpS_Moy.setCoeff(coefsS_Moy);
 
 			// list of AHP to loop in
 			List<AHP> ahpList = new ArrayList<AHP>();
@@ -219,7 +201,7 @@ public class ExplorationTest {
 			ahpList.add(ahpS_Moy);
 
 			// create new decomp
-			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon);
+			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, false);
 			project.save();
 			// looping for scenarios
 			// loop on Nmax
@@ -238,27 +220,13 @@ public class ExplorationTest {
 					}
 					// loop on the AHP
 					for (AHP ahp : ahpList) {
-						String nahp = ahp.getName();
+						String nahp = ahpNames.get(ahp);
 						int lgt = nahp.length();
-						boolean mean; // determination de par le nom de l'ahp si
-										// la methode de calcul sera avec mean
-										// ou Yager
-						if (nahp.substring(lgt - 3).equals("Moy")) {
-							mean = true;
-						} else {
-							mean = false;
-						}
+						boolean mean; // determination de par le nom de l'ahp si la methode de calcul sera avec mean ou Yager
+						mean = (nahp.substring(lgt - 3).equals("Moy"));
 						for (long seed = 1; seed <= 10; seed++) {
-
-							String nameseed = "replication_" + seed;// part of
-																	// the
-																	// folder's
-																	// name
-							String titre = g + "--" + nname + "--" + nstrict + "--" + nahp + "--" + nameseed;// part
-																												// of
-																												// the
-																												// folder's
-																												// name
+							String nameseed = "replication_" + seed;// part of the folder's name
+							String titre = g + "--" + nname + "--" + nstrict + "--" + nahp + "--" + nameseed;// part of the folder's name
 							File testFile;
 							if (memedos) {
 								testFile = dirgrid;
@@ -266,28 +234,20 @@ public class ExplorationTest {
 								testFile = new File(dir + g + "/"
 										+ nMax + "/" + titre);
 							}
-
 							NavigableSet<Double> res = project.getMSGrid().getResolutions();
 							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(),
-									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed);
+									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed, false, false);
 							project.performScenarioAuto(scenario);
-
-
 							// save the project
 							// scenario.save(testFile,project);
-							// project.getMSGrid().saveRaster(scenario.getEvalLayerName(),
-							// testFile); pas besoin de ces couches
+							// project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile); pas besoin de ces couches
 							scenario.extractEvalAnal(testFile, project);
-							// delete of the saved layer to unload the heap
-							// space
+							// delete of the saved layer to unload the heap space
 							project.getMSGrid().removeLayer(titre + "-morpho");
 							project.getMSGrid().removeLayer(titre + "-eval_anal");
 							project.getMSGrid().removeLayer(titre + "-analyse");
 							project.getMSGrid().removeLayer(titre + "-eval");
-
-							// write the seed into a text file, uselesse now as
-							// the seeds are fixed
-
+							// write the seed into a text file, uselesse now as the seeds are fixed
 							Charset charset = Charset.forName("US-ASCII");
 							String nseed = String.valueOf(seed);
 							File testFiletext = new File(testFile + "/nbseed");

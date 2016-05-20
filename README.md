@@ -1,4 +1,4 @@
-**Changements Commit du 03/05 :** *(je l'ai mis dans le champ duc ommint, mais je sais pas si c'est entièrement consultable)*
+**Changements Commit du 03/05 :** *(je l'ai mis dans le champ du commit, mais je sais pas si c'est consultable)*
 
 création des méthodes pour analyser les données
 	ScenarioAuto.extractEvalAnal
@@ -22,7 +22,8 @@ j'avais aussi ajouté des petites variables qui simplifiait les tests pour faire
 
 Dans le **package analyse**, des miettes de msca dans Main_analyse et la classe qui va vraiment faire les analyses, mais ou il n'y a pour l'instant rien dedans.
 
-PS : pour le nom des nouvelles couches et les méthodes et variables qui lui sont associés, je dois avouer qu'au début ça m'a fait assez rire de coder un truc qui s'appelle evalAnal, puis je m'y suis fait.. puis je viens de me rendre compte que vis à vis d'autre, ça pourrais porter à confusion ! Suivant vos retour, si c'est marrant ou pas, je changerai les nom pour un allongé evaluationAnalyse
+PS pour le nom des nouvelles couches et les méthodes et variables qui lui sont associés, je dois avouer qu'au début ça m'a fait assez rire de coder un truc qui s'appelle evalAnal, puis je m'y suis fait.. puis je viens de me rendre compte que vis à vis d'autre, ça pourrais porter à confusion ! Suivant vos retour, si c'est marrant ou pas, je changerai les nom pour un allongé evaluationAnalyse
+
 =======
 ###MODIFICATIONS
 
@@ -36,7 +37,6 @@ PS : pour le nom des nouvelles couches et les méthodes et variables qui lui son
 
 
 ###TODO
- - le test ne peut pas aller jusqu'au bout car la mémoire sature (heap space, après env 120 scénarios simulés) . Trouver ce qui reste coincé dans la mémoire vive.
  - Virer les messages du moniteurs lors de chargement volumineux de couches
  - Il semble compliqué (et surtout très long) de réaliser les calculs avec des aménités de niveau 3. Possibilité d'optimisation de cette classe?
 

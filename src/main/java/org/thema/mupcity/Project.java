@@ -19,21 +19,6 @@
 
 package org.thema.mupcity;
 
-import org.thema.mupcity.rule.Rule;
-import org.thema.mupcity.rule.LeisureRule;
-import org.thema.mupcity.rule.Facility12Rule;
-import org.thema.mupcity.rule.OriginDistance;
-import org.thema.mupcity.rule.PTRule;
-import org.thema.mupcity.rule.Facility3Rule;
-import org.thema.mupcity.rule.MorphoRule;
-import org.thema.mupcity.rule.RoadRule;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.io.xml.JDomDriver;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -42,16 +27,21 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.NavigableSet;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JTree.DynamicUtilTreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import org.thema.mupcity.rule.OriginDistance.EuclideanDistance;
-import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
-import org.thema.mupcity.scenario.ScenarioAuto;
-import org.thema.mupcity.scenario.ScenarioManual;
+
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -60,22 +50,69 @@ import org.thema.common.JTS;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.common.swing.tree.AbstractTreeNode;
 import org.thema.data.GlobalDataStore;
+import org.thema.data.feature.DefaultFeature;
+import org.thema.data.feature.DefaultFeatureCoverage;
+import org.thema.data.feature.Feature;
+import org.thema.data.feature.FeatureFilter;
+import org.thema.data.feature.FeatureGetter;
 import org.thema.drawshape.GridModShape;
 import org.thema.drawshape.GridShape;
 import org.thema.drawshape.RectModShape;
-import org.thema.data.feature.*;
 import org.thema.drawshape.image.RasterShape;
+import org.thema.drawshape.layer.DefaultGroupLayer;
+import org.thema.drawshape.layer.DefaultLayer;
+import org.thema.drawshape.layer.GroupLayer;
 import org.thema.drawshape.layer.Layer;
-import org.thema.drawshape.layer.*;
-import org.thema.drawshape.style.*;
+import org.thema.drawshape.layer.RasterLayer;
+import org.thema.drawshape.layer.ShapeFileLayer;
+import org.thema.drawshape.style.FeatureStyle;
+import org.thema.drawshape.style.LineStyle;
+import org.thema.drawshape.style.PointStyle;
+import org.thema.drawshape.style.RasterStyle;
+import org.thema.drawshape.style.SimpleStyle;
 import org.thema.drawshape.style.table.ColorBuilder;
 import org.thema.drawshape.style.table.ColorRamp;
 import org.thema.drawshape.style.table.UniqueColorTable;
 import org.thema.graph.SpatialGraph;
-import org.thema.msca.*;
-import org.thema.msca.operation.*;
-import org.thema.mupcity.evaluation.*;
+import org.thema.msca.Cell;
+import org.thema.msca.GridExtent;
+import org.thema.msca.MSCell;
+import org.thema.msca.MSGrid;
+import org.thema.msca.MSGridBuilder;
+import org.thema.msca.SquareGridExtent;
+import org.thema.msca.SquareGridFactory;
+import org.thema.msca.operation.AbstractLayerOperation;
+import org.thema.msca.operation.AbstractOperation;
+import org.thema.msca.operation.SimpleAgregateOperation;
+import org.thema.msca.operation.SimpleCoverageOperation;
+import org.thema.mupcity.evaluation.DistEnvelopeEvaluator;
+import org.thema.mupcity.evaluation.DistMinAmenEvaluator;
+import org.thema.mupcity.evaluation.DistMinTypeAmenEvaluator;
+import org.thema.mupcity.evaluation.Evaluator;
+import org.thema.mupcity.evaluation.MeanWhiteEvaluator;
+import org.thema.mupcity.evaluation.NbAmenEvaluator;
+import org.thema.mupcity.evaluation.NbCellOnEnvelopeEvaluator;
+import org.thema.mupcity.rule.Facility12Rule;
+import org.thema.mupcity.rule.Facility3Rule;
+import org.thema.mupcity.rule.LeisureRule;
+import org.thema.mupcity.rule.MorphoRule;
+import org.thema.mupcity.rule.OriginDistance;
+import org.thema.mupcity.rule.OriginDistance.EuclideanDistance;
+import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
+import org.thema.mupcity.rule.PTRule;
+import org.thema.mupcity.rule.RoadRule;
+import org.thema.mupcity.rule.Rule;
 import org.thema.mupcity.scenario.Scenario;
+import org.thema.mupcity.scenario.ScenarioAuto;
+import org.thema.mupcity.scenario.ScenarioManual;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.JDomDriver;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 /**
  * This class represents a MupCity project.
@@ -235,15 +272,21 @@ public class Project extends AbstractTreeNode {
      * @param minSize the min size of cells
      * @param seuilDensBuild the minimum of build density for a cell to be of state built
      * @throws IOException 
+     * @throws IllegalStateException if a decomposition is already done
      */
     public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild) throws IOException {
+        
+        if(isDecomp()) {
+            throw new IllegalStateException("Decomposition is already done.");
+        }
+        
         int nbRule = 0;
         for(Rule rule : rules.values()) {
             if(rule.isUsable(this)) {
                 nbRule++;
             }
         }
-    	this.decomp(exp, maxSize, minSize, seuilDensBuild, new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3));
+    	this.decomp(exp, maxSize, minSize, seuilDensBuild, new TaskMonitor(null, "Decomposition", "initialisation...", 0, nbRule+3), true);
     }
     /**
      * Creates the multiscale grid and calculates the rules.
@@ -253,7 +296,7 @@ public class Project extends AbstractTreeNode {
      * @param seuilDensBuild the minimum of build density for a cell to be of state built
      * @throws IOException 
      */
-    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor) throws IOException {
+    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor, boolean threaded) throws IOException {
         monitor.setMillisToPopup(0);
         monitor.setMillisToDecideToPopup(0);
 
@@ -274,7 +317,7 @@ public class Project extends AbstractTreeNode {
         msGrid.addDynamicLayer(ZONE, new DistBorderOperation(4));
         monitor.setNote("Create grid... build");
         msGrid.addLayer(BUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
-        msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), true);
+        msGrid.execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, BUILD_DENS, getCoverage(Layers.BUILD)), threaded);
         msGrid.addLayer(BUILD, DataBuffer.TYPE_SHORT, 0.0);
         msGrid.execute(new AbstractLayerOperation() {
             @Override
@@ -451,6 +494,21 @@ public class Project extends AbstractTreeNode {
      */
     public Collection<Rule> getRules() {
         return rules.values();
+    }
+
+    /**
+     * Sets new rules
+     * @param rules the new rules 
+     * @throws IllegalStateException if a decomposition is already done
+     */
+    public void setRules(Collection<Rule> rules) {
+        if(isDecomp()) {
+            throw new IllegalStateException("Decomposition is already done.");
+        }
+        this.rules = new LinkedHashMap<>();
+        for(Rule rule : rules) {
+            this.rules.put(rule.getName(), rule);
+        }
     }
 
     /**
@@ -980,7 +1038,16 @@ public class Project extends AbstractTreeNode {
     public File getDirectory() {
         return file.getParentFile();
     }
-
+    
+    public static LayerDef getLayerDef(Layers layer) {
+        for(LayerDef layerDef : LAYERS) {
+            if(layerDef.getLayer().equals(layer)) {
+                return layerDef;
+            }
+        }
+        throw new IllegalArgumentException(layer + " is unknown");
+    }
+    
     /**
      * Creates a new project and saves it.
      * @param name the name of the project
