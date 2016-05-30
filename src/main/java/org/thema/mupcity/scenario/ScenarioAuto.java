@@ -48,6 +48,7 @@ import org.thema.msca.AbstractGrid;
 import org.thema.msca.Cell;
 import org.thema.msca.DefaultCell;
 import org.thema.msca.Grid;
+import org.thema.msca.GridExtent;
 import org.thema.msca.MSCell;
 import org.thema.msca.MSGrid;
 import org.thema.msca.MSGridBuilder;
@@ -58,6 +59,8 @@ import org.thema.msca.operation.AcceptableCell;
 import org.thema.msca.operation.SimpleAgregateOperation;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Base implementation for automatic scenario.
@@ -503,7 +506,7 @@ public class ScenarioAuto extends Scenario {
     public void extractEvalAnal(int seuil, File dir, Project project) throws IOException{
     	MSGridBuilder msGrid = project.getMSGrid();
     	Collection<MSGrid> grids = msGrid.getGrids();
-    	Rectangle2D env = project.getBounds();
+    	Rectangle2D env = project.getBoundsOriginal();
 		msGrid.addLayer(this.getAnalEvalName(),DataBuffer.TYPE_FLOAT, Float.NaN);
     	for (MSGrid grid : grids){	
 	    	List<MSCell> cells = ((SquareGrid) grid).getCellIn(env);

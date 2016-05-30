@@ -187,6 +187,7 @@ public class Project extends AbstractTreeNode {
      *   Projects parameters stored in xml file
      */
     private RectModShape bounds;// bounds of the decomposition    
+    public RectModShape originalBounds;
     private ArrayList<ShapeFileLayer> infoLayers;// used layers
     private LinkedHashMap<String, Rule> rules;// rules: to be defined before decomposition
     private Class<? extends OriginDistance> distType;// euclidian, network distance, etc.
@@ -300,6 +301,7 @@ public class Project extends AbstractTreeNode {
         monitor.setMillisToPopup(0);
         monitor.setMillisToDecideToPopup(0);
 
+        originalBounds = bounds;
         AffineTransform trans = bounds.getTransform();
         double width = XAffineTransform.getScaleX0(trans);
         double height = XAffineTransform.getScaleY0(trans);
@@ -596,7 +598,12 @@ public class Project extends AbstractTreeNode {
     public Rectangle2D getBounds() {
         return bounds.getBounds();
     }
-    
+    /**
+     * @return the rectangular bounds of the zone for the grid without the extend
+     */
+    public Rectangle2D getBoundsOriginal() {
+        return originalBounds.getBounds();
+    }
     /**
      * @return the rectangular shape representing the bounds of the zone for the grid
      */

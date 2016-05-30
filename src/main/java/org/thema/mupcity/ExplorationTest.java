@@ -26,7 +26,7 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
 		String folderData = "/home/mcolomb/informatique/MUP/explo/data/";
-		String folderOut =  "/media/mcolomb/Data_2/result_explo";
+		String folderOut =  "/media/mcolomb/Data_2/resultTest";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
@@ -44,34 +44,49 @@ public class ExplorationTest {
 		File trainFile = new File(folderData + "gare_train_ICONE_docs_2015.shp");
 		File restrictFile = new File(folderData+"ICONE-zonesNU_AU.shp");
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
-		boolean isTest = true; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
+		boolean isTest = false; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
 		boolean memedos = true;// si l'on veut ou non une organisation dans des dossiers déocupant les scénario, ou uniquement les grilles
 
 		// empty monitor
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 
-		// definition de la grille
-		double width = 32243;
-		double height = 33602;
-		double minX = 911598;
-		double minY = 6670519;
+		double width = 32129;
+		double height = 32129;
+		double minX = 913098;
+		double minY = 6672019;
 		if (isTest) {
 			width = width / 6;
 			height = height / 6;
 		}
-		String g = "G1";
+		String g = "G0";
 		// variation de la grille -- 3 valeurs
-		for (int a = 0; a <= 2; a++) {
+		for (int a = 0; a <= 5; a++) {
 			switch (a) {
 			case 1:
-				minX = minX + 150;
-				g = "G2";
+				minX = minX + 1;
+				g = "G1";
 				System.out.println("première grille calculé");
 				break;
 			case 2:
+				minY = minY + 1;
+				g = "G2";
+				System.out.println("deuxième grille calculé");
+				break;
+			case 3:
+				minX = minX - 1;
+				g = "G3";
+				System.out.println("deuxième grille calculé");
+				break;
+			case 4:
+				minX = minX + 150;
+				minY = minY - 1;
+				g = "G4";
+				System.out.println("première grille calculé");
+				break;
+			case 5:
 				minX = minX - 200;
 				minY = minY + 100;
-				g = "G3";
+				g = "G5";
 				System.out.println("deuxième grille calculé");
 				break;
 			}
@@ -81,7 +96,6 @@ public class ExplorationTest {
 			dirgrid.mkdir();
 			Project project = Project.createProject(name, dirgrid, buildFile, minX, minY, width, height, mon);
 			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
-
 			// set layers and attributes for the decomposition
 			List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
