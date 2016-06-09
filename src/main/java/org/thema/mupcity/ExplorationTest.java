@@ -1,4 +1,4 @@
-package org.thema.mupcity;
+	package org.thema.mupcity;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,6 +27,8 @@ public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
 		String folderData = "/home/julien/mupcity/data-true/";
 		String folderOut =  folderData + "out2/";
+//		String folderData = "/home/mcolomb/informatique/MUP/explo/data/";
+//		String folderOut =  "/media/mcolomb/Data_2/resultTest";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
@@ -51,27 +53,44 @@ public class ExplorationTest {
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 		boolean threaded = true;
 		// definition de la grille
-		double width = 32243;
-		double height = 33602;
-		double minX = 911598;
-		double minY = 6670519;
+		double width = 32129;
+		double height = 32129;
+		double minX = 913098;
+		double minY = 6672019;
 		if (isTest) {
 			width = width / 20;
 			height = height / 20;
 		}
-		String g = "G1";
+		String g = "G0";
 		// variation de la grille -- 3 valeurs
 		for (int a = 0; a <= 0; a++) {
+//		for (int a = 0; a <= 5; a++) {
 			switch (a) {
 			case 1:
-				minX = minX + 150;
-				g = "G2";
+				minX = minX + 1;
+				g = "G1";
 				System.out.println("première grille calculé");
 				break;
 			case 2:
+				minY = minY + 1;
+				g = "G2";
+				System.out.println("deuxième grille calculé");
+				break;
+			case 3:
+				minX = minX - 1;
+				g = "G3";
+				System.out.println("deuxième grille calculé");
+				break;
+			case 4:
+				minX = minX + 150;
+				minY = minY - 1;
+				g = "G4";
+				System.out.println("première grille calculé");
+				break;
+			case 5:
 				minX = minX - 200;
 				minY = minY + 100;
-				g = "G3";
+				g = "G5";
 				System.out.println("deuxième grille calculé");
 				break;
 			}
@@ -81,7 +100,6 @@ public class ExplorationTest {
 			dirgrid.mkdir();
 			Project project = Project.createProject(name, dirgrid, buildFile, minX, minY, width, height, mon);
 			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
-
 			// set layers and attributes for the decomposition
 			List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs, mon);
@@ -217,7 +235,7 @@ public class ExplorationTest {
 						int lgt = nahp.length();
 						boolean mean; // determination de par le nom de l'ahp si la methode de calcul sera avec mean ou Yager
 						mean = (nahp.substring(lgt - 3).equals("Moy"));
-						for (long seed = 1; seed <= 3; seed++) {
+						for (long seed = 1; seed <= 10; seed++) {
 							String nameseed = "replication_" + seed;// part of the folder's name
 							String titre = g + "--" + nname + "--" + nstrict + "--" + nahp + "--" + nameseed;// part of the folder's name
 							File testFile = (memedos) ? dirgrid : new File(folderOut + g + "/" + nMax + "/" + titre);
