@@ -36,7 +36,7 @@ public class MupCityTask {
 	}
 	public static void main(String[] args) throws IOException, SchemaException {
 		long seed = 42L;
-		File data = new File("/home/julien/mupcity/data");
+		File data = new File("/home/julien/mupcity/data-true");
 		File results = new File(data,"results"+File.separator+seed);
 		results.mkdirs();
 		MupCityTask.run(seed, data, results);

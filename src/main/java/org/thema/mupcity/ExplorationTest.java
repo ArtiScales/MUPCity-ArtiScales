@@ -25,43 +25,43 @@ import org.thema.mupcity.scenario.ScenarioAuto;
  */
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
-		String folderData = "/home/julien/mupcity/data/";
-		String folderOut =  folderData + "out/";
+		String folderData = "/home/julien/mupcity/data-true/";
+		String folderOut =  folderData + "out2/";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
 		dir.mkdirs();
-		File buildFile = new File(folderData + "BATI_AU.shp");
+		File buildFile = new File(folderData, "BATI_AU.shp");
 		int exp = 3;
 		double minSize = 20;
 		double maxSize = 25273;
 		boolean useNoBuild = true;
 		boolean network = true;// true => network distance
-		File roadFile = new File(folderData + "route_sans_chemin.shp");
-		File facilityFile = new File(folderData + "CS_au_besac_sirene_2012.shp");
-		File leisureFile = new File(folderData + "loisirs.shp");
-		File busFile = new File(folderData + "stations_besac_tram_2015.shp");
-		File trainFile = new File(folderData + "gare_train_ICONE_docs_2015.shp");
-		File restrictFile = new File(folderData+"ICONE-zonesNU_AU.shp");
+		File roadFile = new File(folderData, "route_sans_chemin.shp");
+		File facilityFile = new File(folderData, "CS_au_besac_sirene_2012.shp");
+		File leisureFile = new File(folderData, "loisirs.shp");
+		File busFile = new File(folderData, "stations_besac_tram_2015.shp");
+		File trainFile = new File(folderData, "gare_train_ICONE_docs_2015.shp");
+		File restrictFile = new File(folderData, "ICONE-zonesNU_AU.shp");
 		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
 		boolean isTest = true; // si l'on veut tester le programme, quelques shortcuts pour que ça aille plus vite
-		boolean memedos = true;// si l'on veut ou non une organisation dans des dossiers déocupant les scénario, ou uniquement les grilles
+		boolean memedos = true;// si l'on veut ou non une organisation dans des dossiers découpant les scénario, ou uniquement les grilles
 
 		// empty monitor
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
-
+		boolean threaded = true;
 		// definition de la grille
 		double width = 32243;
 		double height = 33602;
 		double minX = 911598;
 		double minY = 6670519;
 		if (isTest) {
-			width = width / 6;
-			height = height / 6;
+			width = width / 20;
+			height = height / 20;
 		}
 		String g = "G1";
 		// variation de la grille -- 3 valeurs
-		for (int a = 0; a <= 2; a++) {
+		for (int a = 0; a <= 0; a++) {
 			switch (a) {
 			case 1:
 				minX = minX + 150;
@@ -84,15 +84,15 @@ public class ExplorationTest {
 
 			// set layers and attributes for the decomposition
 			List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
-			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
+			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs, mon);
 			List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL (numeric), TYPE (any)
-			project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs);
+			project.setLayer(Project.LAYERS.get(Project.Layers.FACILITY.ordinal()), facilityFile, facilityAttrs, mon);
 			List<String> leisureAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL (numeric), TYPE (any)
-			project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs);
+			project.setLayer(Project.LAYERS.get(Project.Layers.LEISURE.ordinal()), leisureFile, leisureAttrs, mon);
 			List<String> emptyAttrs = Arrays.asList("");
-			project.setLayer(Project.LAYERS.get(Project.Layers.BUS_STATION.ordinal()), busFile, emptyAttrs);
-			project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
-			project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs);
+			project.setLayer(Project.LAYERS.get(Project.Layers.BUS_STATION.ordinal()), busFile, emptyAttrs, mon);
+			project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs, mon);
+			project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs, mon);
 			project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
 
 			// setting of the six different AHP matrix
@@ -201,7 +201,7 @@ public class ExplorationTest {
 			ahpList.add(ahpS_Moy);
 
 			// create new decomp
-			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, false);
+			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, threaded);
 			project.save();
 			// looping for scenarios
 			// loop on Nmax
@@ -209,15 +209,8 @@ public class ExplorationTest {
 				String nname = "N" + nMax;// part of the folder's name
 				// loop on strict/basic
 				for (int s = 0; s <= 1; s++) {
-					String nstrict;// part of the folder's name
-					boolean strict;
-					if (s == 0) {
-						strict = true;
-						nstrict = "St";
-					} else {
-						strict = false;
-						nstrict = "Ba";
-					}
+					boolean strict = (s == 0);
+					String nstrict = (strict) ? "St" : "Ba";// part of the folder's name
 					// loop on the AHP
 					for (AHP ahp : ahpList) {
 						String nahp = ahpNames.get(ahp);
@@ -227,16 +220,9 @@ public class ExplorationTest {
 						for (long seed = 1; seed <= 3; seed++) {
 							String nameseed = "replication_" + seed;// part of the folder's name
 							String titre = g + "--" + nname + "--" + nstrict + "--" + nahp + "--" + nameseed;// part of the folder's name
-							File testFile;
-							if (memedos) {
-								testFile = dirgrid;
-							} else {
-								testFile = new File("/home/mcolomb/informatique/MUP/explo/result/testExplo/" + g + "/"
-										+ nMax + "/" + titre);
-							}
+							File testFile = (memedos) ? dirgrid : new File(folderOut + g + "/" + nMax + "/" + titre);
 							NavigableSet<Double> res = project.getMSGrid().getResolutions();
-							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(),
-									res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed, false, false);
+							ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed, false, threaded);
 							project.performScenarioAuto(scenario);
 							// save the project
 							// scenario.save(testFile,project);

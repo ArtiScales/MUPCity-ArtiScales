@@ -505,13 +505,12 @@ public class ScenarioAuto extends Scenario {
     	Collection<MSGrid> grids = msGrid.getGrids();
     	Rectangle2D env = project.getBounds();
 		msGrid.addLayer(this.getAnalEvalName(),DataBuffer.TYPE_FLOAT, Float.NaN);
-    	for (MSGrid grid : grids){	
+    	for (MSGrid grid : grids) {
 	    	List<MSCell> cells = ((SquareGrid) grid).getCellIn(env);
-	    	for (Cell cell : cells){  	
-	    		if (cell.getLayerValue(this.getEvalLayerName()) > seuil && cell.getLayerValue(getResultLayerName()) == 2)
-		    	{
-	    			cell.setLayerValue(this.getAnalEvalName(), cell.getLayerValue(this.getEvalLayerName()));
-	 	    	}
+	    	for (Cell cell : cells) {
+	    		double result = cell.getLayerValue(this.getResultLayerName());
+	    		double eval = cell.getLayerValue(this.getEvalLayerName());
+	    		if (/*eval > seuil && */result == NEW_BUILD) cell.setLayerValue(this.getAnalEvalName(), eval);
 	    	}
     	}
     	msGrid.saveLayer(dir,this.getAnalEvalName());
