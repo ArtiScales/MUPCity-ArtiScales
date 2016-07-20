@@ -297,7 +297,8 @@ public class Project extends AbstractTreeNode {
      * @param seuilDensBuild the minimum of build density for a cell to be of state built
      * @throws IOException 
      */
-    public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor, boolean threaded) throws IOException {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public void decomp(int exp, double maxSize, double minSize, final double seuilDensBuild, TaskMonitor monitor, boolean threaded) throws IOException {
         monitor.setMillisToPopup(0);
         monitor.setMillisToDecideToPopup(0);
 

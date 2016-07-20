@@ -26,7 +26,7 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
 		String folderData = "/home/mcolomb/informatique/MUP/explo/data/";
-		String folderOut =  "/media/mcolomb/Data_2/resultTest";
+		String folderOut =  "/media/mcolomb/Data_2/resultTest/cheminement/";
 		// définition des variables fixes
 		String name = "testExplo";
 		File dir = new File(folderOut);
@@ -50,10 +50,10 @@ public class ExplorationTest {
 		// empty monitor
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 
-		double width = 32129;
-		double height = 32129;
-		double minX = 913098;
-		double minY = 6672019;
+		double width = 28303;
+		double height = 21019;
+		double minX = 914760;
+		double minY = 6680157;
 		if (isTest) {
 			width = width / 6;
 			height = height / 6;
@@ -207,9 +207,9 @@ public class ExplorationTest {
 
 			// list of AHP to loop in
 			List<AHP> ahpList = new ArrayList<AHP>();
-			ahpList.add(ahpE_Yag);
-			ahpList.add(ahpT_Yag);
-			ahpList.add(ahpS_Yag);
+			//ahpList.add(ahpE_Yag);
+			//ahpList.add(ahpT_Yag);
+			//ahpList.add(ahpS_Yag);
 			ahpList.add(ahpE_Moy);
 			ahpList.add(ahpT_Moy);
 			ahpList.add(ahpS_Moy);
@@ -254,7 +254,8 @@ public class ExplorationTest {
 							project.performScenarioAuto(scenario);
 							// save the project
 							// scenario.save(testFile,project);
-							// project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile); pas besoin de ces couches
+							project.getMSGrid().saveRaster(scenario.getResultLayerName(), testFile);
+							project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile);
 							scenario.extractEvalAnal(testFile, project);
 							// delete of the saved layer to unload the heap space
 							project.getMSGrid().removeLayer(titre + "-morpho");
