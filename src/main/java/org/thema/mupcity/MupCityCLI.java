@@ -52,10 +52,16 @@ public class MupCityCLI {
 			}
 		}
 
+		AHP ahpE_Yag = new AHP(items);// creation of the true objects
+		AHP ahpT_Yag = new AHP(items);
+		AHP ahpS_Yag = new AHP(items);
 		AHP ahpE_Moy = new AHP(items);
 		AHP ahpT_Moy = new AHP(items);
 		AHP ahpS_Moy = new AHP(items);
 		Map<AHP, String> ahpNames = new HashMap<>();
+		ahpNames.put(ahpE_Yag, "ahpE_Yag");
+		ahpNames.put(ahpT_Yag, "ahpT_Yag");
+		ahpNames.put(ahpS_Yag, "ahpS_Yag");
 		ahpNames.put(ahpE_Moy, "ahpE_Moy");
 		ahpNames.put(ahpT_Moy, "ahpT_Moy");
 		ahpNames.put(ahpS_Moy, "ahpS_Moy");
@@ -96,9 +102,48 @@ public class MupCityCLI {
 		ahpS_Moy.setCoef(items.get(1), 0.03);
 		ahpS_Moy.setCoef(items.get(0), 0.027);
 		//ahpS_Moy.setCoeff(coefsS_Moy);
+		
+		//HashMap<String, Double> coefsE_Yag = new HashMap<>();// collection of the eigenvector values
+		ahpE_Yag.setCoef(items.get(8), 1.0);
+		ahpE_Yag.setCoef(items.get(7), 1.0);
+		ahpE_Yag.setCoef(items.get(6), 1.0);
+		ahpE_Yag.setCoef(items.get(5), 1.0);
+		ahpE_Yag.setCoef(items.get(4), 1.0);
+		ahpE_Yag.setCoef(items.get(3), 1.0);
+		ahpE_Yag.setCoef(items.get(2), 1.0);
+		ahpE_Yag.setCoef(items.get(1), 1.0);
+		ahpE_Yag.setCoef(items.get(0), 1.0);
+		//ahpE_Yag.setCoeff(coefsE_Yag);// we force the vector to the ahp objects
+
+		//HashMap<String, Double> coefsT_Yag = new HashMap<>();
+		ahpT_Yag.setCoef(items.get(8), 0.458);
+		ahpT_Yag.setCoef(items.get(7), 0.458);
+		ahpT_Yag.setCoef(items.get(6), 0.458);
+		ahpT_Yag.setCoef(items.get(5), 3.625);
+		ahpT_Yag.setCoef(items.get(4), 1.199);
+		ahpT_Yag.setCoef(items.get(3), 1.199);
+		ahpT_Yag.setCoef(items.get(2), 1.199);
+		ahpT_Yag.setCoef(items.get(1), 0.202);
+		ahpT_Yag.setCoef(items.get(0), 0.202);
+		//ahpT_Yag.setCoeff(coefsT_Yag);
+
+		//HashMap<String, Double> coefsS_Yag = new HashMap<>();
+		ahpS_Yag.setCoef(items.get(8), 0.745);
+		ahpS_Yag.setCoef(items.get(7), 0.745);
+		ahpS_Yag.setCoef(items.get(6), 0.745);
+		ahpS_Yag.setCoef(items.get(5), 0.359);
+		ahpS_Yag.setCoef(items.get(4), 1.965);
+		ahpS_Yag.setCoef(items.get(3), 1.965);
+		ahpS_Yag.setCoef(items.get(2), 1.965);
+		ahpS_Yag.setCoef(items.get(1), 0.269);
+		ahpS_Yag.setCoef(items.get(0), 0.243);
+		//ahpS_Yag.setCoeff(coefsS_Yag);
 
 		// list of AHP to loop in
 		List<AHP> ahpList = new ArrayList<AHP>();
+		ahpList.add(ahpE_Yag);
+		ahpList.add(ahpT_Yag);
+		ahpList.add(ahpS_Yag);
 		ahpList.add(ahpE_Moy);
 		ahpList.add(ahpT_Moy);
 		ahpList.add(ahpS_Moy);

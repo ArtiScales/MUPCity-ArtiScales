@@ -187,7 +187,7 @@ public class Project extends AbstractTreeNode {
      *   Projects parameters stored in xml file
      */
     private RectModShape bounds;// bounds of the decomposition    
-    public RectModShape originalBounds;
+    public static RectModShape originalBounds;
     private ArrayList<ShapeFileLayer> infoLayers;// used layers
     private LinkedHashMap<String, Rule> rules;// rules: to be defined before decomposition
     private Class<? extends OriginDistance> distType;// euclidian, network distance, etc.

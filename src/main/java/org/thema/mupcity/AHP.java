@@ -129,6 +129,7 @@ public class AHP {
         coefs = new HashMap<>();
         for(i = 0; i < size; i++) {
             coefs.put(items.get(i), finalVector[i]);
+            System.out.println("Added in AHP : " + items.get(i) + "  " + finalVector[i]);
         }
         return coefs;        
     }
