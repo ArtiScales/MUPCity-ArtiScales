@@ -2,22 +2,119 @@ package org.thema.mupcity.exp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.jai.RasterAccessor;
 
 import org.geotools.feature.SchemaException;
+import org.thema.mupcity.AHP;
 import org.thema.mupcity.analyse.RasterAnalyse;
+import org.thema.mupcity.rule.Rule;
 
 public class TotalTests {
 
 	public static void main(String[] args) throws Exception {
 		File fileData = new File("/home/mcolomb/informatique/MUP/explo/data/");
-		
-		//TestStabilite.main(fileData,new File("/media/mcolomb/Data_2/resultTest/sensibility/"));
+		File rootResult = new File("/media/mcolomb/Data_2/resultExplo/");
+		//Definiton des parametres
+		List<String> items = new ArrayList<>();
+		items.add("morpho");
+		items.add("road");
+		items.add("fac1");
+		items.add("fac2");
+		items.add("fac3");
+		items.add("pt");
+		items.add("lei1");
+		items.add("lei2");
+		items.add("lei3");
+		AHP ahpE_Moy = new AHP(items);
+		ahpE_Moy.setCoef(items.get(8), 0.111);
+		ahpE_Moy.setCoef(items.get(7), 0.111);
+		ahpE_Moy.setCoef(items.get(6), 0.111);
+		ahpE_Moy.setCoef(items.get(5), 0.111);
+		ahpE_Moy.setCoef(items.get(4), 0.111);
+		ahpE_Moy.setCoef(items.get(3), 0.111);
+		ahpE_Moy.setCoef(items.get(2), 0.111);
+		ahpE_Moy.setCoef(items.get(1), 0.111);
+		ahpE_Moy.setCoef(items.get(0), 0.111);
+
+		AHP ahpE_Yag = new AHP(items);
+		ahpE_Yag.setCoef(items.get(8), 1);
+		ahpE_Yag.setCoef(items.get(7), 1);
+		ahpE_Yag.setCoef(items.get(6), 1);
+		ahpE_Yag.setCoef(items.get(5), 1);
+		ahpE_Yag.setCoef(items.get(4), 1);
+		ahpE_Yag.setCoef(items.get(3), 1);
+		ahpE_Yag.setCoef(items.get(2), 1);
+		ahpE_Yag.setCoef(items.get(1), 1);
+		ahpE_Yag.setCoef(items.get(0), 1);
+
+		//		int Nmax = 5;
+		//		boolean moy=true;
+		//		boolean st=false;
+		//		AHP ahp = ahpE_Moy;
+		//		for (int i = 0; i < 4; i++) {
+		//			switch (i) {
+		//			case 1:
+		//				st = true;
+		//				break;
+		//			case 2:
+		//				Nmax = 6;
+		//				st = true;
+		//				break;
+		//			case 3:
+		//				Nmax=5;
+		//				moy = false;
+		//				st = false;
+		//				ahp = ahpE_Yag;
+		//				break;
+		//			}
+		//			Param param = new Param(Nmax, st, moy, ahp, 0, 1000);
+		//			File fileStab = new File(rootResult, "Stability");
+		//			fileStab.mkdir();
+		//			TestStabilite.main(fileData, fileStab, param);
+		//		}
+		//		
+		//		int Nmax = 6;
+		//		boolean moy = false;
+		//		boolean st = false;
+		//		AHP ahp = ahpE_Yag;
+		//		Param param = new Param(Nmax, st, moy, ahp, 0, 1000);
+		//		File fileStab = new File(rootResult, "Stability");
+		//		fileStab.mkdir();
+
+		//		TestStabilite.main(fileData, fileStab, param);
+
+		File fileGrid = new File(rootResult, "MouvGrid2");
+	//	File fileProj = new File(rootResult, "MouvProj");
+		fileGrid.mkdir();
+		int Nmax = 5;
+		boolean moy = true;
+		boolean st = false;
+		AHP ahp = ahpE_Moy;
+		//		for (int i = 0; i <= 2; i++) {
+		//			switch (i) {
+		//			case 1:
+		//				st = true;
+		//				break;
+		//			case 2:
+		//				Nmax = 6;
+		//				st = true;
+		//				break;
+		//			}
+
+		Param param = new Param(Nmax, st, moy, ahp, 0, 1);
+	//	OneSim.main(fileData, fileProj, param);
+		MouvGrid.main(fileData, fileGrid, param);
+
+		//MouvData.main(fileData, new File("/media/mcolomb/Data_2/resultTest/mouv_data/LAEA/"), param);
+
 		//ExplorationTest.main(fileData,new File("/media/mcolomb/Data_2/resultTest/tests_param/results/"));
-		MouvData.main(fileData,new File("/media/mcolomb/Data_2/resultTest/mouv_data/3m/"));
-		//MouvGrid.main(fileData,new File("/media/mcolomb/Data_2/resultTest/changement_grille/"));
-		//EffetSeuil.main(fileData,new File( "/media/mcolomb/Data_2/resultTest/test_180"));
+
+		//EffetSeuil.main(fileData,new File( "/media/mcolomb/Data_2/resultTest/test_seuil/St/N6"));
 		//RasterAnalyse total = new RasterAnalyse (new File("/media/mcolomb/Data_2/resultTest/"),"20");
+		//OneSim.main(fileData,new File("/media/mcolomb/Data_2/resultTest/mairie/"),param);
 	}
 }
+//}

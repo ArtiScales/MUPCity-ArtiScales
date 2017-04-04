@@ -74,7 +74,7 @@ public class LeisureRule extends AbstractRule {
 
     @Override
     public void createRule(final Project project) {
-        final DefaultFeatureCoverage<DefaultFeature> leiCov = project.getCoverageLevel(Layers.LEISURE, level);
+    	final DefaultFeatureCoverage<DefaultFeature> leiCov = project.getCoverageLevel(Layers.LEISURE, level);
         final HashSet types = new HashSet();
         for(Feature f : leiCov.getFeatures()) {
             types.add(f.getAttribute(Project.TYPE_FIELD));

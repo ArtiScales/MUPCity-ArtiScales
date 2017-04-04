@@ -116,13 +116,13 @@ public class EffetSeuil {
 			project.save();
 
 			//réplication du scénario N5-Ba-ahpS-Moy
-			int nMax = 5;
+			int nMax = 6;
 			boolean strict = true;
 			AHP ahp = ahpList.get(0);
 			boolean mean = true;
 			NavigableSet<Double> res = project.getMSGrid().getResolutions();
 
-			for (int zi = 42; zi <142; zi = zi+10){
+			for (int zi = 0; zi <=10; zi++){
 			long seed = zi;
 			String titre = new String("replication_numero-" + seed);
 			ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed, false, false);

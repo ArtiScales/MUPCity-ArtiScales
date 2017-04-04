@@ -11,6 +11,7 @@ import org.geotools.feature.SchemaException;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
+import org.thema.mupcity.analyse.RasterAnalyse;
 import org.thema.mupcity.rule.OriginDistance;
 import org.thema.mupcity.rule.Rule;
 import org.thema.mupcity.scenario.ScenarioAuto;
@@ -19,49 +20,47 @@ import com.google.common.io.Files;
 
 public class MouvGrid {
 
-	public static void main(File folderData, File folderOut) throws IOException, SchemaException {
+	public static void main(File folderData, File folderOut, Param param) throws Exception {
 
 		// définition des variables fixes
 
 		File dir = folderOut;
-
 		int exp = 3;
 		double minSize = 20;
 		double maxSize = 25273;
 		boolean useNoBuild = true;
 		boolean network = true;// true => network distance
-		String name = "testExplo";
+		String name = "testMouvGrid";
 		File buildFile = new File(folderData, "BATI_AU.shp");
-
 		File roadFile = new File(folderData, "route_sans_chemin.shp");
-		File facilityFile = new File(folderData, "CS_au_besac_sirene_2012.shp");
+		File facilityFile = new File(folderData, "CS_au_besac_sirene_20122.shp");
 		File leisureFile = new File(folderData, "loisirs.shp");
 		File busFile = new File(folderData, "stations_besac_tram_2015.shp");
 		File trainFile = new File(folderData, "gare_train_ICONE_docs_2015.shp");
 		File restrictFile = new File(folderData, "non_urba.shp");
-
-		double seuilDensBuild = 0.0;// NO PARAMETER FOR THAT
 		// empty monitor
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
-
-		for (int ii = 0; ii <= 17; ii++) {
+		boolean isTest = true;
+		for (int ii = 9; ii <= 16; ii++) {
 
 			// definition de la grille
 			int scale = 0;
 			String partName = "";
 
 			//variables to make it happened on different grid moves
-			int petitPlus = 0;
 			int jj = ii;
-
 			if (ii <= 8) {
 				scale = 20;
 				partName = "decal-20";
-			} else if (ii > 8) {
+			} else if (ii > 8 && ii<=16) {
+				scale = 60;
+				partName = "decal-60";
+				jj = ii - 8;
+			}
+			else if (ii > 16) {
 				scale = 180;
 				partName = "decal-180";
-				jj = ii - 8;
-				petitPlus = 1;
+				jj = ii - 16;
 			}
 
 			double width = 28303;
@@ -72,49 +71,54 @@ public class MouvGrid {
 			switch (jj) {
 			case 1:
 				minX = minX + scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 2:
 				minX = minX + scale;
 				minY = minY + scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 3:
 				minY = minY + scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 4:
 				minX = minX - scale;
 				minY = minY + scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 5:
 				minX = minX - scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 6:
 				minX = minX - scale;
 				minY = minY - scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 7:
 				minY = minY - scale;
-				dir = new File(folderOut, partName + "/G" + (jj + petitPlus));
 				break;
 			case 8:
 				minX = minX + scale;
 				minY = minY - scale;
-				dir = new File(folderOut, partName + "/G" + (ii + petitPlus));
 				break;
 			}
+			double maxX = minX + width;
+			double maxY = minY + height;
+
+			System.out.println(minX + " : minX - " + maxX + " : maxX - " + minY + " : minY - " + maxY + " : maxY");
+
+			if (isTest) {
+				width = width / 13;
+				height = height / 13;
+			}
+
+			dir = new File(folderOut, partName + "/G" + jj);
 			dir.mkdirs();
-			if (ii == 9) {
+			if (ii == 9 || ii == 17) { // the first simulation doesn't move, so we'll have to copy it and not redo the calculations
 				File[] aCopier = new File(folderOut, "decal-20/G0/").listFiles();
-				System.out.println(aCopier);
-				File copierVers = new File(folderOut, "decal-180/G0/");
+				File copierVers = new File(folderOut, "decal-"+scale+"/G0/");
 				copierVers.mkdirs();
 				for (File aCp : aCopier) {
-					Files.copy(aCp, copierVers);
+					File nf = new File(copierVers, aCp.getName());
+					if (nf.isFile()) {
+						Files.copy(aCp, nf);
+					}
 				}
 			}
 			// create a new project
@@ -133,49 +137,49 @@ public class MouvGrid {
 			project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
 			project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs); //provoque un GC limit overhead
 			project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
-			// setting of AHP matrix
-			List<String> items = new ArrayList<>();
-			for (Rule rule : project.getRules()) {
-				if (rule.isUsable(project)) {
-					items.add(rule.getName());
-				}
-			}
-			// setting on our six ahp objects
-			AHP ahpS_Moy = new AHP(items);
-			ahpS_Moy.setCoef(items.get(8), 0.083);
-			ahpS_Moy.setCoef(items.get(7), 0.083);
-			ahpS_Moy.setCoef(items.get(6), 0.083);
-			ahpS_Moy.setCoef(items.get(5), 0.04);
-			ahpS_Moy.setCoef(items.get(4), 0.218);
-			ahpS_Moy.setCoef(items.get(3), 0.218);
-			ahpS_Moy.setCoef(items.get(2), 0.218);
-			ahpS_Moy.setCoef(items.get(1), 0.03);
-			ahpS_Moy.setCoef(items.get(0), 0.027);
+			double seuilDensBuild = param.getSeuilDens();
 
-			// list of AHP to loop in
-			List<AHP> ahpList = new ArrayList<AHP>();
-			ahpList.add(ahpS_Moy);
 			project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, false);
-			project.save();
 
 			//réplication du scénario N5-Ba-ahpS-Moy
-			int nMax = 5;
-			boolean strict = false;
-			AHP ahp = ahpList.get(0);
-			boolean mean = true;
+			int nMax = param.getN();
+			boolean strict = param.isStrict();
+			AHP ahp = param.getAhp();
+			boolean mean = param.isMean();
 			NavigableSet<Double> res = project.getMSGrid().getResolutions();
-
 			long seed = 42;
+
 			String titre = new String("replication_numero-" + seed);
 			ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), nMax, strict, ahp, useNoBuild, mean, exp, seed, false, false);
 			project.performScenarioAuto(scenario);
 			scenario.extractEvalAnal(dir, project);
+
+			scenario.save(dir, project);
+			scenario.extractEvalAnal(dir, project);
+			project.getMSGrid().save(dir);
+			System.out.println("layers : " + project.getMSGrid().getLayers());
+			project.getMSGrid().saveRaster(titre + "-eval", dir);
+
 			// delete of the saved layer to unload the heap space
 			project.getMSGrid().removeLayer(titre + "-morpho");
 			project.getMSGrid().removeLayer(titre + "-eval_anal");
 			project.getMSGrid().removeLayer(titre + "-analyse");
 			project.getMSGrid().removeLayer(titre + "-eval");
+		}
 
+		for (Integer echl = 20; echl <= 180; echl = echl * 3) {
+			RasterAnalyse.echelle = echl.toString();
+			RasterAnalyse.discrete = true;
+			RasterAnalyse.cutBorder = true;
+			RasterAnalyse.sensibility = true;
+			for (int yo = 1; yo <= 2; yo++) {
+				if (yo == 1) {
+					RasterAnalyse.rootFile = new File(dir, "/decal-20/");
+				} else {
+					RasterAnalyse.rootFile = new File(dir, "/decal-180/");
+				}
+				RasterAnalyse.gridChange();
+			}
 		}
 	}
 }

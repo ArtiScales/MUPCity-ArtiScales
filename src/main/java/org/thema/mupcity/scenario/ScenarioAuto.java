@@ -483,6 +483,8 @@ public class ScenarioAuto extends Scenario {
     public void save( File chosenFile, Project project) throws IOException {
     	chosenFile.mkdirs();
         project.getMSGrid().saveLayer(chosenFile,this.getResultLayerName());
+        System.out.println("eval layer name in scenarioauto.save : "+this.getEvalLayerName());
+        project.getMSGrid().saveLayer(chosenFile,this.getEvalLayerName());
     }
     /**
      * Overload the coming method to set an automatic 0 threshold

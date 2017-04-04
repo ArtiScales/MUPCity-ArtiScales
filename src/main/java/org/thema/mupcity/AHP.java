@@ -21,10 +21,14 @@ package org.thema.mupcity;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
+
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.thema.common.collection.HashMap2D;
+
 
 /**
  * AHP matrix.
@@ -75,7 +79,10 @@ public class AHP {
             return coefs;
         }
         
-        int size = matrix.getKeys1().size();
+ 
+                
+       int size= matrix.getKeys1().size();
+ 
         if(size == 0) {
             return Collections.EMPTY_MAP;
         }
