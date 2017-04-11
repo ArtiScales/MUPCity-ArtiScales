@@ -9,12 +9,18 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentFeatureCollection;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.GeoTools;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -25,114 +31,112 @@ public class BougeData {
 
 	//TODO cette classe ne marche pas - réparer si l'on veut lancer des tests automatiques et ne pas tout faire à la main
 	public static void main(String[] args) throws IOException, MismatchedDimensionException, TransformException {
-
-		for (int ii = 1; ii <= 8; ii++) {
-			// définition des variables fixes
+		for (int ecart = 1; ecart <= 9; ecart = ecart * 3) {
 			File folderGen = new File("/media/mcolomb/Data_2/resultExplo/MouvData/");
-			File folderData = new File("/media/mcolomb/Data_2/resultExplo/MouvData/data0/data");
-			File dataFile = new File(folderGen, "/data" + (ii) + "/data");
-			dataFile.mkdirs();
-			File[] aCopier = folderData.listFiles();
+			File[] aCopier = new File(folderGen, "dataOriginel/").listFiles();
+			File copierVers = new File(folderGen, ecart+ "m/data0/data/");
+			copierVers.mkdirs();
 			for (File aCp : aCopier) {
-				File nf = new File(dataFile, aCp.getName());
-				Files.copy(aCp, nf);
+				File nf = new File(copierVers, aCp.getName());
+				if (aCp.isFile()) {
+					Files.copy(aCp, nf);
+				}
 			}
-			double ecart = 9;
-			double Xmouve = 0;
-			double Ymouve = 0;
-			switch (ii) {
-			case 1:
-				Xmouve = ecart;
-				Ymouve = 0;
-				break;
-			case 2:
-				Xmouve = ecart;
-				Ymouve = ecart;
-				break;
-			case 3:
-				Xmouve = 0;
-				Ymouve = ecart;
-				break;
-			case 4:
-				Xmouve = -ecart;
-				Ymouve = ecart;
-				break;
-			case 5:
-				Xmouve = -ecart;
-				Ymouve = 0;
-				break;
-			case 6:
-				Xmouve = -ecart;
-				Ymouve = -ecart;
-				break;
-			case 7:
-				Xmouve = 0;
-				Ymouve = -ecart;
-				break;
-			case 8:
-				Xmouve = ecart;
-				Ymouve = -ecart;
-				break;
-			}
-			for (File shFile : dataFile.listFiles()) {
-				if (shFile.toString().endsWith("shp")) {
-					System.out.println(shFile);
-					//					SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-					//					SimpleFeatureType LOCATION = builder.buildFeatureType();
-					//					SimpleFeatureBuilder ssh = new SimpleFeatureBuilder (LOCATION);
-					//					System.out.println(ssh);
-					ShapefileDataStore dataStore = new ShapefileDataStore(shFile.toURI().toURL());
+			for (int ii = 1; ii <= 8; ii++) {
+				// définition des variables fixes
+				File folderData= new File(folderGen,ecart+ "m/data0/data"); 
+				File dataFile = new File(folderGen,ecart+ "m/data" + (ii) + "/data");
+				dataFile.mkdirs();
+				File[] shpACopier = folderData.listFiles();
+				for (File aCp : shpACopier) {
+					File nf = new File(dataFile, aCp.getName());
+					Files.copy(aCp, nf);
+				}
+				double Xmouve = 0;
+				double Ymouve = 0;
+				switch (ii) {
+				case 1:
+					Xmouve = ecart;
+					Ymouve = 0;
+					break;
+				case 2:
+					Xmouve = ecart;
+					Ymouve = ecart;
+					break;
+				case 3:
+					Xmouve = 0;
+					Ymouve = ecart;
+					break;
+				case 4:
+					Xmouve = -ecart;
+					Ymouve = ecart;
+					break;
+				case 5:
+					Xmouve = -ecart;
+					Ymouve = 0;
+					break;
+				case 6:
+					Xmouve = -ecart;
+					Ymouve = -ecart;
+					break;
+				case 7:
+					Xmouve = 0;
+					Ymouve = -ecart;
+					break;
+				case 8:
+					Xmouve = ecart;
+					Ymouve = -ecart;
+					break;
+				}
+				for (File shFile : dataFile.listFiles()) {
+					if (shFile.toString().endsWith("shp")) {
+						ShapefileDataStore dataStore = new ShapefileDataStore(shFile.toURI().toURL());
 
-					AffineTransform2D translate = new AffineTransform2D(1, 0, 0, 1, Xmouve, Ymouve); //AffineTransform2D.getTranslateInstance(Xmouve, Ymouve);						//j'aimerais mettre direct une saloperie de shape dans translate.createTransformedShape(shape) mais je ne vois pas comment faire
+						AffineTransform2D translate = new AffineTransform2D(1, 0, 0, 1, Xmouve, Ymouve); //AffineTransform2D.getTranslateInstance(Xmouve, Ymouve);						//j'aimerais mettre direct une saloperie de shape dans translate.createTransformedShape(shape) mais je ne vois pas comment faire
 
-					ContentFeatureCollection shpFeatures = dataStore.getFeatureSource().getFeatures();
-					DefaultFeatureCollection newFeatures = new DefaultFeatureCollection();
-					SimpleFeatureType TYPE = shpFeatures.getSchema();
-					Object[] nouveaux = new Object[shpFeatures.size()];
-					int cpt = 0;
-					SimpleFeatureIterator iterator = shpFeatures.features();
-					try {
-						while (iterator.hasNext()) {
-							SimpleFeature feature = iterator.next();
-							Geometry geom = (Geometry) feature.getDefaultGeometry();
-							Geometry geomTransformed = JTS.transform(geom, translate);
-							feature.setDefaultGeometry(geomTransformed);
-							nouveaux[cpt] = feature;
-							newFeatures.add(feature);
-							//	System.out.println("objhect ici : "+nouveaux[cpt]);
-						}
-					} finally {
-						iterator.close();
-					}
-					//					 ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
-					//					SimpleFeatureBuilder myBuilder = new SimpleFeatureBuilder( TYPE,(org.opengis.feature.FeatureFactory) dataStoreFactory ) ;
-					//newFeatures.add(myBuilder.bui);
-
-					//newFeatures.add(SimpleFeatureBuilder.build( TYPE, nouveaux, null) );
-
-					Transaction transaction = new DefaultTransaction("create");
-
-					String typeName = dataStore.getTypeNames()[0];
-					//					SimpleFeatureSource featureSource = dataStore.getFeatureSource(typeName);
-					SimpleFeatureSource source = DataUtilities.source(newFeatures);
-					if (source instanceof SimpleFeatureStore) {
-						SimpleFeatureStore featureStore = (SimpleFeatureStore) source;
-						featureStore.setTransaction(transaction);
+						ContentFeatureCollection shpFeatures = dataStore.getFeatureSource().getFeatures();
+						DefaultFeatureCollection newFeatures = new DefaultFeatureCollection();
+						Object[] nouveaux = new Object[shpFeatures.size()];
+						int cpt = 0;
+						SimpleFeatureIterator iterator = shpFeatures.features();
 						try {
-							featureStore.addFeatures(newFeatures);
-							transaction.commit();
-						} catch (Exception problem) {
-							problem.printStackTrace();
-							transaction.rollback();
-
+							while (iterator.hasNext()) {
+								SimpleFeature feature = iterator.next();
+								Geometry geom = (Geometry) feature.getDefaultGeometry();
+								Geometry geomTransformed = JTS.transform(geom, translate);
+								feature.setDefaultGeometry(geomTransformed);
+								nouveaux[cpt] = feature;
+								newFeatures.add(feature);
+								cpt = +1;
+							}
 						} finally {
-							transaction.close();
-							System.out.println("cé fé");
+							iterator.close();
 						}
-						System.exit(0); // success!
-					} else {
-						System.out.println(typeName + " does not support read/write access");
-						System.exit(1);
+						Transaction transaction = new DefaultTransaction("create");
+						String typeName = dataStore.getTypeNames()[0];
+						SimpleFeatureSource featureSource = dataStore.getFeatureSource(typeName);
+						if (featureSource instanceof SimpleFeatureStore) {
+							SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+							featureStore.setTransaction(transaction);
+							try {
+//								FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2( GeoTools.getDefaultHints() );
+//								Filter filter = ff.like(null, "");
+//								featureStore.deleteFeatures();
+								featureStore.addFeatures(newFeatures);
+								transaction.commit();
+							} catch (Exception problem) {
+								problem.printStackTrace();
+								transaction.rollback();
+
+							} finally {
+								transaction.close();
+								System.out.println("	done");
+							}
+						} else {
+
+							System.out.println(typeName + " does not support read/write access");
+
+						}
 					}
 				}
 			}

@@ -100,7 +100,7 @@ public class TestStabilite {
 			if (i == 0) {
 				project.save(scenarIni);
 				scenario.save(scenarIni, project);
-				project.saveGridLayer(titre+"-eval");
+				project.saveGridLayer(titre + "-eval");
 			}
 			// delete of the saved layer to unload the heap space
 			project.getMSGrid().removeLayer(titre + "-morpho");

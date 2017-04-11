@@ -471,7 +471,6 @@ public class RasterAnalyse {
 		for (int i = 0; i <= 8; i++) {
 			File file = new File(rootFile + "/G" + i + "/replication_numero-42-eval_anal-" + echelle + ".0.tif");
 			listRepliFile.add(file);
-			System.out.println(listRepliFile);
 		}
 		mergeRasters(listRepliFile, "gridCompare");
 	}
