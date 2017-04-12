@@ -2,10 +2,15 @@ package org.thema.mupcity.analyse;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -32,7 +37,7 @@ public class BougeData {
 	//TODO cette classe ne marche pas - réparer si l'on veut lancer des tests automatiques et ne pas tout faire à la main
 	public static void main(String[] args) throws IOException, MismatchedDimensionException, TransformException {
 		for (int ecart = 1; ecart <= 9; ecart = ecart * 3) {
-			File folderGen = new File("/media/mcolomb/Data_2/resultExplo/MouvData/");
+			File folderGen = new File("/home/mickael/data/mbrasebin/workspace/mupcityCLI/src/main/resources/org/thema/mupcity/dataExample/MouvData/");
 			File[] aCopier = new File(folderGen, "dataOriginel/").listFiles();
 			File copierVers = new File(folderGen, ecart+ "m/data0/data/");
 			copierVers.mkdirs();
@@ -112,6 +117,54 @@ public class BougeData {
 						} finally {
 							iterator.close();
 						}
+						
+				        File newFile = new File(copierVers+shFile.getName());
+				        
+				        System.out.println(copierVers+shFile.getName());
+
+				        ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
+
+				        Map<String, Serializable> params = new HashMap<>();
+				        params.put("url", newFile.toURI().toURL());
+				        params.put("create spatial index", Boolean.TRUE);
+
+				        ShapefileDataStore newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
+
+				        /*
+				         * TYPE is used as a template to describe the file contents
+				         */
+				        newDataStore.createSchema(dataStore.getSchema());
+				        
+				        
+				        Transaction transaction = new DefaultTransaction("create");
+
+				        String typeName = newDataStore.getTypeNames()[0];
+				        SimpleFeatureSource featureSource = newDataStore.getFeatureSource(typeName);
+
+				        if (featureSource instanceof SimpleFeatureStore) {
+				            SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+
+				            featureStore.setTransaction(transaction);
+				            try {
+				                featureStore.addFeatures(newFeatures);
+				                transaction.commit();
+
+				            } catch (Exception problem) {
+				                problem.printStackTrace();
+				                transaction.rollback();
+
+				            } finally {
+				                transaction.close();
+				            }
+				      
+				        } else {
+				            System.out.println(typeName + " does not support read/write access");
+				            System.exit(1);
+				        }
+				    
+						
+						
+						/*
 						Transaction transaction = new DefaultTransaction("create");
 						String typeName = dataStore.getTypeNames()[0];
 						SimpleFeatureSource featureSource = dataStore.getFeatureSource(typeName);
@@ -136,7 +189,7 @@ public class BougeData {
 
 							System.out.println(typeName + " does not support read/write access");
 
-						}
+						}*/
 					}
 				}
 			}
