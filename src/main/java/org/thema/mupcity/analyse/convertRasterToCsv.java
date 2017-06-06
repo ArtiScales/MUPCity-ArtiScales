@@ -20,7 +20,7 @@ public class convertRasterToCsv {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		File rastFile = new File("/home/mcolomb/informatique/MUP/explo/enveloppes/N5-eval-NU.tif");
+		File rastFile = new File("/home/mcolomb/informatique/MUP/explo/enveloppes/evalE-moy-NU.tif");
 		ParameterValue<OverviewPolicy> policy = AbstractGridFormat.OVERVIEW_POLICY.createValue();
 		policy.setValue(OverviewPolicy.IGNORE);
 		ParameterValue<String> gridsize = AbstractGridFormat.SUGGESTED_TILE_SIZE.createValue();

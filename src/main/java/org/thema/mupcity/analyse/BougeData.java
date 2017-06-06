@@ -35,9 +35,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public class BougeData {
 
 	//TODO cette classe ne marche pas - réparer si l'on veut lancer des tests automatiques et ne pas tout faire à la main
-	public static void main(String[] args) throws IOException, MismatchedDimensionException, TransformException {
+	public static void main() throws IOException, MismatchedDimensionException, TransformException {
 		for (int ecart = 1; ecart <= 9; ecart = ecart * 3) {
-			File folderGen = new File("/home/mickael/data/mbrasebin/workspace/mupcityCLI/src/main/resources/org/thema/mupcity/dataExample/MouvData/");
+			System.out.println("start to move it move it");
+			File folderGen = new File("/media/mcolomb/Data_2/resultExplo/MouvData");
 			File[] aCopier = new File(folderGen, "dataOriginel/").listFiles();
 			File copierVers = new File(folderGen, ecart+ "m/data0/data/");
 			copierVers.mkdirs();
@@ -49,14 +50,8 @@ public class BougeData {
 			}
 			for (int ii = 1; ii <= 8; ii++) {
 				// définition des variables fixes
-				File folderData= new File(folderGen,ecart+ "m/data0/data"); 
 				File dataFile = new File(folderGen,ecart+ "m/data" + (ii) + "/data");
 				dataFile.mkdirs();
-				File[] shpACopier = folderData.listFiles();
-				for (File aCp : shpACopier) {
-					File nf = new File(dataFile, aCp.getName());
-					Files.copy(aCp, nf);
-				}
 				double Xmouve = 0;
 				double Ymouve = 0;
 				switch (ii) {
@@ -93,7 +88,7 @@ public class BougeData {
 					Ymouve = -ecart;
 					break;
 				}
-				for (File shFile : dataFile.listFiles()) {
+				for (File shFile : aCopier) {
 					if (shFile.toString().endsWith("shp")) {
 						ShapefileDataStore dataStore = new ShapefileDataStore(shFile.toURI().toURL());
 
@@ -118,9 +113,7 @@ public class BougeData {
 							iterator.close();
 						}
 						
-				        File newFile = new File(copierVers+shFile.getName());
-				        
-				        System.out.println(copierVers+shFile.getName());
+				        File newFile = new File(dataFile+"/"+shFile.getName());
 
 				        ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
 

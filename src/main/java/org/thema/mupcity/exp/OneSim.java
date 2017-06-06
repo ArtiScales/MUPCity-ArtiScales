@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.NavigableSet;
 
 import org.geotools.feature.SchemaException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
@@ -23,7 +25,7 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 
 public class OneSim {
 
-	public static void main(File folderData, File folderOut, Param param) throws IOException, SchemaException {
+	public static void main(File folderData, File folderOut, Param param) throws IOException, SchemaException, NoSuchAuthorityCodeException, FactoryException {
 		// TODO Auto-generated method stub
 
 		/**
@@ -32,16 +34,28 @@ public class OneSim {
 		 * @author Maxime Colomb
 		 */
 
-		File dir = new File(folderOut, "lambert");
-		String name = "Lambert";
-
-		for (int i = 0; i <= 1; i++) {
-			switch (i) {
-			case 1:
-				name = "LAEA";
-				dir = new File(folderOut, "LAEA");
-				break;
-			}
+		File dir = new File(folderOut, "Yag2");
+		String name = "Yag2";
+		//double minSize = 18;
+		
+//		for (int i = 0; i <= 3; i++) {
+//			switch (i) {
+//			case 1:
+//				name = "19m";
+//				dir = new File(folderOut, "19m");
+//				minSize = 19;
+//				break;
+//			case 2:
+//				name = "21m";
+//				dir = new File(folderOut, "21m");
+//				minSize = 21;
+//				break;
+//			case 3:
+//				name = "22m";
+//				dir = new File(folderOut, "22m");
+//				minSize = 22;
+//				break;
+//			}
 
 			dir.mkdirs();
 			File buildFile = new File(folderData, "BATI_AU.shp");
@@ -73,7 +87,7 @@ public class OneSim {
 
 			// create a new project
 			Project project = Project.createProject(name, dir, buildFile, minX, minY, width, height, mon);
-			project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
+			project.setNetPrecision(0); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus de tache =0 dans fac3
 			// set layers and attributes for the decomposition
 			List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 			project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
@@ -135,5 +149,5 @@ public class OneSim {
 			}
 		}
 
-	}
+	//}
 }

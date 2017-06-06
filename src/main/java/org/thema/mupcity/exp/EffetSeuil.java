@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.NavigableSet;
 
 import org.geotools.feature.SchemaException;
+import org.opengis.referencing.FactoryException;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;

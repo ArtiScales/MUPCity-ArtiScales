@@ -86,38 +86,41 @@ public class TotalTests {
 
 		//		TestStabilite.main(fileData, fileStab, param);
 
-		File fileGrid = new File(rootResult, "MouvGrid");
-		//	File fileProj = new File(rootResult, "MouvProj");
-		fileGrid.mkdir();
+		// File fileGrid = new File(rootResult, "MouvGrid");
+			File fileProj = new File(rootResult, "MouvProj");
+		File fileMvData = new File(rootResult, "MouvData");
+		File file19 = new File(rootResult,"tailleCell-ex");
+		
+
 		int Nmax = 5;
-		boolean moy = true;
+		boolean moy = false;
 		boolean st = false;
-		for (int i = 1; i <= 1; i++) {
-			if (i == 1) {
-				st = true;
-				Nmax = 6;
-				fileGrid = new File(rootResult, "MouvGridSt");
-			}
+//		for (int i = 0; i <= 1; i++) {
+//			if (i == 1) {
+//				st = true;
+//				Nmax = 6;
+//				fileMvData = new File(rootResult, "MouvDataSt");
+//			}
+//			fileMvData .mkdir();
+		AHP ahp = ahpE_Yag;
+//					for (int i = 0; i <= 2; i++) {
+//						switch (i) {
+//						case 1:
+//							st = true;
+//							break;
+//						case 2:
+//							Nmax = 6;
+//							st = true;
+//							break;
+//						}
 
-			AHP ahp = ahpE_Moy;
-			//		for (int i = 0; i <= 2; i++) {
-			//			switch (i) {
-			//			case 1:
-			//				st = true;
-			//				break;
-			//			case 2:
-			//				Nmax = 6;
-			//				st = true;
-			//				break;
-			//			}
 
+		
 			Param param = new Param(Nmax, st, moy, ahp, 0, 1);
-			//	OneSim.main(fileData, fileProj, param);
-			MouvGrid.main(fileData, fileGrid, param);
-		}
-		//MouvData.main(fileData, new File("/media/mcolomb/Data_2/resultTest/mouv_data/LAEA/"), param);
-
-		//ExplorationTest.main(fileData,new File("/media/mcolomb/Data_2/resultTest/tests_param/results/"));
+			MouvData.main(fileData,fileMvData,param);
+			//OneSim.main(fileData, file19, param);
+//			MouvGrid.main(fileData, fileGrid, param);
+		
 
 		//EffetSeuil.main(fileData,new File( "/media/mcolomb/Data_2/resultTest/test_seuil/St/N6"));
 		//RasterAnalyse total = new RasterAnalyse (new File("/media/mcolomb/Data_2/resultTest/"),"20");

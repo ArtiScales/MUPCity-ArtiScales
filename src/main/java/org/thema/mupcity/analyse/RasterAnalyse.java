@@ -40,6 +40,13 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class RasterAnalyse {
 
+	/**
+	 * This class contains several methods used for the analysis of the MUP-City outputs during the sensibility and stability tests raster outputs must contains the selected to urbanize cells mixed with the evaluation layer (output of the extract-eval-anal method) The raster
+	 * selected with the selectWith method are compared within the mergeRaster method There is two ways to compare rasters : if they are composed of the exact same grid, we will use the relative position of the cells within this grid. The "discrete" variable will be "false" and
+	 * CreateStats method will be used to calculate statistics if the rasters to compare are different, we use the DirectPosition object to locate the cells. The "discrete" variable will be "true" and SplitMergedTypo method will be used to calculate statistics
+	 * 
+	 */
+
 	public static File rootFile = new File("/media/mcolomb/Data_2/resultExplo/");
 	public static File discreteFile = new File("/home/mcolomb/informatique/MUP/explo/data/admin_typo.shp");
 	public static boolean discrete = false;
@@ -103,7 +110,7 @@ public class RasterAnalyse {
 			for (File fil : rootFile.listFiles()) {
 				Pattern ech = Pattern.compile("eval_anal-");
 				String[] list = ech.split(fil.toString());
-				if (fil.toString().contains(with) && list[1].equals(echelle + ".0.tif")) {
+				if (fil.toString().contains(with) && list.length > 1 && list[1].equals(echelle + ".0.tif")) {
 					listFile.add(fil);
 				}
 
@@ -297,6 +304,19 @@ public class RasterAnalyse {
 		}
 	}
 
+	/**
+	 * Count how many cells of 20m are included in cells of 180m
+	 * 
+	 * @author Maxime Colomb
+	 * @param cellRepetCentroid:
+	 * @param echelle:
+	 *            scale of the file
+	 * @param in:
+	 *            array of file to search in (can be null)
+	 * @return an ArrayList of File
+	 * @throws Exception
+	 * @throws IOException
+	 */
 	public static void compare180(Hashtable<DirectPosition2D, Integer> cellRepetCentroid, Hashtable<DirectPosition2D, Float> cellEvalCentroid, String namescenar) throws IOException {
 		Hashtable<DirectPosition2D, Integer> cellRepet180 = new Hashtable<DirectPosition2D, Integer>();
 		Hashtable<DirectPosition2D, Float> cellEval180 = new Hashtable<DirectPosition2D, Float>();
@@ -440,19 +460,19 @@ public class RasterAnalyse {
 	 */
 	public static void gridSensibility() throws Exception {
 		ArrayList<File> listRepliFile = new ArrayList<File>();
-		if (discrete == false) {
-			for (int i = 0; i <= 8; i++) {
-				File file = new File(rootFile + "/data" + i + "/replication_numero-basique_42-eval_anal-" + echelle + ".0.tif");
-				listRepliFile.add(file);
-			}
-			mergeRasters(listRepliFile, "gridSensibility");
-		} else {
-			for (int i = 0; i <= 8; i++) {
-				File file = new File(rootFile + "/data" + i + "/replication_numero-basique_42-eval_anal-" + echelle + ".0.tif");
-				listRepliFile.add(file);
-				mergeRasters(listRepliFile, "discreteSensibility_case-" + i);
-				listRepliFile = new ArrayList<File>();
-			}
+
+		for (int i = 0; i <= 8; i++) {
+			File file = new File(rootFile + "/data" + i + "/replication_numero-42-eval_anal-" + echelle + ".0.tif");
+			listRepliFile.add(file);
+		}
+		mergeRasters(listRepliFile, "gridSensibility");
+		discrete = true;
+		for (int i = 0; i <= 8; i++) {
+			ArrayList<File> singleCity = new ArrayList<File>();
+			File file = new File(rootFile + "/data" + i + "/replication_numero-42-eval_anal-" + echelle + ".0.tif");
+			singleCity.add(file);
+			mergeRasters(singleCity, "cityGen" + i);
+			listRepliFile = new ArrayList<File>();
 		}
 	}
 
@@ -467,12 +487,16 @@ public class RasterAnalyse {
 	 * @throws Exception
 	 */
 	public static void gridChange() throws Exception {
-		ArrayList<File> listRepliFile = new ArrayList<File>();
+
+		ArrayList<File> listRepliGen = new ArrayList<File>();
 		for (int i = 0; i <= 8; i++) {
+			ArrayList<File> listEachCity = new ArrayList<File>();
 			File file = new File(rootFile + "/G" + i + "/replication_numero-42-eval_anal-" + echelle + ".0.tif");
-			listRepliFile.add(file);
+			listEachCity.add(file);
+			mergeRasters(listEachCity, "cityGen" + i);
 		}
-		mergeRasters(listRepliFile, "gridCompare");
+		//mergeRasters(listRepliGen, "gridCompare");
+
 	}
 
 	/**
@@ -548,11 +572,14 @@ public class RasterAnalyse {
 
 			// in case of a move of the grid, we have to delete the border cells because they will be moved
 
-			double Xmin = 914760;
-			double Xmax = 943200;
-			double Ymin = 6680157;
-			double Ymax = 6701217;
-
+			//			double Xmin = 914760;
+			//			double Xmax = 943200;
+			//			double Ymin = 6680157;
+			//			double Ymax = 6701217;
+			double Xmin = 914568;
+			double Xmax = 943255;
+			double Ymin = 6679887;
+			double Ymax = 6701446;
 			if (cutBorder == true) {
 				int ecart = Integer.parseInt(echelle);
 				Xmin = Xmin + ecart;
@@ -641,7 +668,7 @@ public class RasterAnalyse {
 			writeGeotiffStabled(rasterStable.getAbsolutePath(), imagePixelDataStable, env);
 		}
 
-		//compare different size of cells
+		//compare different scales of cells
 		if (compare20_180 == true) {
 			compare180(cellRepetCentroid, cellEvalCentroid, nameScenar);
 
@@ -663,10 +690,11 @@ public class RasterAnalyse {
 			}
 		}
 
+		//création de statistiques pour une analyse discrétisé
 		if ((discrete == true || cutBorder == true) && (compare20_180 == false || compare20_60 == false)) {
 			splitMergedTypo(nameScenar, cellRepetCentroid, cellEvalCentroid);
 		}
-
+		//création de statistiques pour une analyse normale 
 		else if (discrete == false && (compare20_180 == false || compare20_60 == false)) {
 			createStats(nameScenar, histo, statNb, cellRepet, cellEval);
 		}
@@ -713,6 +741,7 @@ public class RasterAnalyse {
 
 		for (DirectPosition2D coord : cellRepet.keySet()) {
 			for (Object eachFeature : features.toArray()) {
+				//geotool way of create feature
 				SimpleFeatureImpl feature = (SimpleFeatureImpl) eachFeature;
 				Geometry geom = (Geometry) feature.getDefaultGeometry();
 				String city = feature.getAttribute("NOM_COM").toString();
@@ -745,7 +774,6 @@ public class RasterAnalyse {
 						}
 						nbByCity[3] = (double) valeval / evalByCity.get(city).size();
 						cellByCity.put(city, nbByCity);
-
 					} else {
 						//new cell in the city game
 						nbByCity[0] = (double) 1;
@@ -799,6 +827,10 @@ public class RasterAnalyse {
 		nameLine[5] = "typology of the city";
 
 		generateCsvFile(cellByCity, statFile, ("cellByCity" + nameScenar), nameLine);
+
+		if (nameScenar.contains("cityGen")) {
+			generateCsvFileCol(cellByCity, statFile, "cityInEachGrid");
+		}
 
 		listCellByTypo.add(cellRepetPeriCentre);
 		listCellByTypo.add(cellRepetBanlieue);
@@ -1243,79 +1275,103 @@ public class RasterAnalyse {
 				atest.add(dir2);
 				
 				mergeRasters(atest, "analyseProjection");
-				/*
-				//changement de la grille 
-				sensibility=true;
-				for (int yo = 1; yo <= 2; yo++) {
-				
-				if (yo == 1) {
-				rootFile = new File("/media/mcolomb/Data_2/resultTest/changement_grille/decal-20/");
-				} else {
-				rootFile = new File("/media/mcolomb/Data_2/resultTest/changement_grille/decal-180/");
-				}
-				
-				ArrayList<String> echelles = new ArrayList<String>();
-				for (Integer i = 20; i <= 180; i = i * 3) {
-				String nombre = i.toString();
-				echelles.add(nombre);
-				}
-				for (String scale : echelles) {
-				echelle = scale;
-				cutBorder = true;
-				gridChange();
-				}
-				
-				}
-				/*
-				//test_seuil pour la diff entre les tests avec et sans seuils
-				
-				rootFile = new File("/media/mcolomb/Data_2/resultTest/test_seuil/St/N6/results/");
-				ArrayList<String> echelles = new ArrayList<String>();
-				
-				for (Integer i = 20; i <= 180; i = i * 3) {
-				String nombre = i.toString();
-				echelles.add(nombre);
-				}
-				for (String scale : echelles) {
-				echelle = scale;
-				
-				for (int i = 2; i <= 6; i++) {
-				ArrayList<File> listFile = new ArrayList<File>();
-				for (int j = 0; j < 10; j++) {
-					File fileCool = new File(rootFile, ("seuil_10-" + i + "/replication_numero-" + j + "-eval_anal-" + echelle + ".0.tif"));
-					listFile.add(fileCool);
-				}
-				System.out.println(listFile);
-				mergeRasters(listFile, "test-seuil_10-" + i);
-				}
-				}
-				
-				
 				*/
+
+		//changement de la grille 
+		//				sensibility=true;
+		//				for (int yo = 0; yo <= 2; yo++) {
+		//				
+		//					if (yo == 0) {
+		//						rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-20/");
+		//					} else if ( yo == 1){
+		//						rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-60/");
+		//					}
+		//					else {
+		//						rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-180/");
+		//					}
+		//					
+		////					ArrayList<String> echelles = new ArrayList<String>();
+		////					for (Integer i = 20; i <= 180; i = i * 3) {
+		////					String nombre = i.toString();
+		////					echelles.add(nombre);
+		////					}
+		////					for (String scale : echelles) {
+		//					echelle = "20";
+		//					discrete = true;
+		//					cutBorder = true;
+		//					sensibility = true;
+		//					gridChange();
+		//					}
+		//				
+		//				}
+		discrete = true;
+		compare20_180 = true;
+		compare20_60 = true;
+		//for(Integer tc=22;tc<=22;tc=tc+1){
+		rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5YagBa");
+		//echelle = tc.toString();
+		for (Integer ech = 20; ech <= 180; ech = ech * 3) {
+			echelle = ech.toString();
+			String echStr = echelle + "m";
+			System.out.println("echelle :" + echStr);
+			//rootFile = new File(rootFile, echStr);
+			ArrayList<File> fileToTest = new ArrayList<File>();
+			fileToTest = selectWith("", null);
+			mergeRasters(fileToTest, echStr + "analyse");
+		}
+
+		//}
+
+		/*
+		//test_seuil pour la diff entre les tests avec et sans seuils
+		
+		rootFile = new File("/media/mcolomb/Data_2/resultTest/test_seuil/St/N6/results/");
+		ArrayList<String> echelles = new ArrayList<String>();
+		
+		for (Integer i = 20; i <= 180; i = i * 3) {
+		String nombre = i.toString();
+		echelles.add(nombre);
+		}
+		for (String scale : echelles) {
+		echelle = scale;
+		
+		for (int i = 2; i <= 6; i++) {
+		ArrayList<File> listFile = new ArrayList<File>();
+		for (int j = 0; j < 10; j++) {
+			File fileCool = new File(rootFile, ("seuil_10-" + i + "/replication_numero-" + j + "-eval_anal-" + echelle + ".0.tif"));
+			listFile.add(fileCool);
+		}
+		System.out.println(listFile);
+		mergeRasters(listFile, "test-seuil_10-" + i);
+		}
+		}
+		
+		
+		*/
 		//sensibilité de la grille
-		//
-		//		File root = rootFile;
-		//		discrete = true;
-		//		for (int decalage = 1; decalage <= 9; decalage = decalage * 3) {
-		//			rootFile = root;
-		//			rootFile = new File(rootFile + "/mouv_data/LAEA/" + decalage + "m");
-		//			sensibility = true;
-		//			switch (decalage) {
-		//			case 1:
-		//				echelle = "20";
-		//				break;
-		//			case 3:
-		//				echelle = "60";
-		//				break;
-		//			case 9:
-		//				echelle = "180";
-		//				break;
-		//			}
-		//
-		//			gridSensibility();
-		//
-		//
-		//		}
+
+		//				File root = rootFile;
+		//				discrete = false;
+		//				for (int decalage = 1; decalage <= 9; decalage = decalage * 3) {
+		//					rootFile = root;
+		//					rootFile = new File(rootFile + "/MouvData/" + decalage + "m");
+		//					sensibility = true;
+		//					switch (decalage) {
+		//					case 1:
+		//						echelle = "20";
+		//						break;
+		//					case 3:
+		//						echelle = "60";
+		//						break;
+		//					case 9:
+		//						echelle = "180";
+		//						break;
+		//					}
+		//		
+		//					gridSensibility();
+		//		
+		//		
+		//				}
 		/*
 		//test de réplications discrètisé
 		
@@ -1344,24 +1400,24 @@ public class RasterAnalyse {
 		//		replicationStab();
 		//		
 		//		}
-		discrete = false;
-		echelle = "20";
-		for (int i = 0; i <= 3; i++) {
-
-			rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N6MoySt");
-			switch (i) {
-			case 1:
-				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoySt");
-				break;
-			case 2:
-				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoyBa");
-				break;
-			case 3:
-				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5YagBa");
-				break;
-			}
-			replicationStab();
-		}
+		//		discrete = false;
+		//		echelle = "20";
+		//		for (int i = 0; i <= 3; i++) {
+		//
+		//			rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N6MoySt");
+		//			switch (i) {
+		//			case 1:
+		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoySt");
+		//				break;
+		//			case 2:
+		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoyBa");
+		//				break;
+		//			case 3:
+		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5YagBa");
+		//				break;
+		//			}
+		//			replicationStab();
+		//		}
 
 		/*ArrayList<File> listFil = new ArrayList<File>();
 		for (int i = 0; i <= 8; i++) {

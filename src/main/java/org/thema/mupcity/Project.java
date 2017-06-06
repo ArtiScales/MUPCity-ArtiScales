@@ -714,7 +714,9 @@ public class Project extends AbstractTreeNode {
 			coverages.put(levelName, new DefaultFeatureCoverage<>(getCoverage(layer).getFeatures(new FeatureFilter() {
 				@Override
 				public boolean accept(Feature f) {
-					if (((f.getAttribute(Project.TYPE_FIELD).equals("espace_vert_f2") || f.getAttribute(Project.TYPE_FIELD).equals("espace_vert_f3")) && level == 1)||( f.getAttribute(Project.TYPE_FIELD).equals("espace_vert_f3") && level == 2)){
+					if (((f.getAttribute(Project.TYPE_FIELD).equals("espace_vert_f2") 
+							|| f.getAttribute(Project.TYPE_FIELD).equals("espace_vert_f3")) && level == 1)
+							||( f.getAttribute(Project.TYPE_FIELD).equals("espace_vert_f3") && level == 2)){
 						return true;
 					} else {
 						return ((Number) f.getAttribute(Project.LEVEL_FIELD)).intValue() == level;
@@ -1133,9 +1135,9 @@ public class Project extends AbstractTreeNode {
 			mon.setNote("Loading data...");
 		}
 		List<DefaultFeature> buildFeatures = DefaultFeature.loadFeatures(buildFile, false);
-
+		System.out.println("srid : "+buildFeatures.get(1).getGeometry().getSRID());
 		CoordinateReferenceSystem crs = new ShapefileDataStore(buildFile.toURI().toURL()).getSchema().getCoordinateReferenceSystem();
-
+		//CoordinateReferenceSystem crs = CRS.decode("EPSG:3035");
 		if (mon != null) {
 			mon.setNote("Saving data...");
 		}

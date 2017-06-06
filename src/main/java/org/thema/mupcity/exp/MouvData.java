@@ -8,31 +8,34 @@ import java.util.List;
 import java.util.NavigableSet;
 
 import org.geotools.feature.SchemaException;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.operation.TransformException;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.mupcity.AHP;
 import org.thema.mupcity.Project;
+import org.thema.mupcity.analyse.BougeData;
 import org.thema.mupcity.rule.OriginDistance;
 import org.thema.mupcity.rule.Rule;
 import org.thema.mupcity.scenario.ScenarioAuto;
 
 public class MouvData {
 
-	public static void main(File folderData, File folderOut, Param param) throws IOException, SchemaException {
-
+	public static void main(File folderData, File folderOut, Param param) throws IOException, SchemaException, MismatchedDimensionException, TransformException{
+		BougeData.main();
 		for (int decalage = 1; decalage <= 9; decalage = decalage * 3) {
 			System.out.println("decal : " + decalage);
 			for (int ii = 0; ii <= 8; ii++) {
 				// définition des variables fixes
-
 				File dir = new File(folderOut, decalage + "m/data" + (ii));
 				File dirData = new File(dir, "/data");
 				int exp = 3;
 				double minSize = 20;
-				if(decalage==3){
-					minSize =60;
-				}
-				else if (decalage==9){
-					minSize=180;
+				if (decalage == 3) {
+					minSize = 60;
+				} else if (decalage == 9) {
+					minSize = 180;
 				}
 				double maxSize = 25273;
 				boolean useNoBuild = true;
@@ -55,10 +58,16 @@ public class MouvData {
 				double minX = 914760;
 				double minY = 6680157;
 
-				// create a new project
 
 				Project project = Project.createProject(name, dir, buildFile, minX, minY, width, height, mon);
-				project.setNetPrecision(0.1); // Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus detache =0 dans fac3
+				int y=0;
+					if(y==0 && ii==0){
+						project.setNetPrecision(0.1);
+					}
+					else{
+						project.setNetPrecision(0);
+					}
+				// Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus detache =0 dans fac3
 				// set layers and attributes for the decomposition
 				List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 				project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
@@ -71,32 +80,30 @@ public class MouvData {
 				project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
 				project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs); //provoque un GC limit overhead
 				project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
-				
+				// create a new project
+
 				project.decomp(exp, maxSize, minSize, seuilDensBuild, mon, false);
 				project.save();
-				
+
 				NavigableSet<Double> res = project.getMSGrid().getResolutions();
 				long seed = 42;
 
-				for (int jj = 0; jj < 2; jj++) {
-
-					String str = "strict";
-					boolean strict = true;
-					if (jj == 1) {
-						str = "basique";
-						strict = false;
-					}
-					String titre = new String("replication_numero-" + str + "_" + seed);
-					ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), param.getN(), strict, param.getAhp(), useNoBuild, param.isMean(), exp, seed, false, false);
-					project.performScenarioAuto(scenario);
-					scenario.extractEvalAnal(dir, project);
-					// delete of the saved layer to unload the heap space
-					project.getMSGrid().removeLayer(titre + "-morpho");
-					project.getMSGrid().removeLayer(titre + "-eval_anal");
-					project.getMSGrid().removeLayer(titre + "-analyse");
-					project.getMSGrid().removeLayer(titre + "-eval");
-
-				}
+				String titre = new String("replication_numero-" + seed);
+				ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titre, res.first(), res.last(), param.getN(), param.isStrict(), param.getAhp(), useNoBuild, param.isMean(), exp, seed, false, false);
+	
+				project.performScenarioAuto(scenario);
+				
+				// save the project
+				scenario.save(dir, project);
+				scenario.extractEvalAnal(dir, project);
+				project.getMSGrid().save(dir);
+				project.getMSGrid().saveRaster(titre + "-eval", dir);
+				
+				// delete of the saved layer to unload the heap space
+				project.getMSGrid().removeLayer(titre + "-morpho");
+				project.getMSGrid().removeLayer(titre + "-eval_anal");
+				project.getMSGrid().removeLayer(titre + "-analyse");
+				project.getMSGrid().removeLayer(titre + "-eval");
 			}
 		}
 	}
