@@ -14,12 +14,12 @@ public class DecompTask {
 		double maxSize = 25273;
 		double seuilDensBuild = 0;
 
-		File f = run(projFile, name, minSize, maxSize, seuilDensBuild);
+		run(projFile, name, minSize, maxSize, seuilDensBuild);
 
 	}
 
-	public static File run(File projFile, String name, double minSize, double maxSize, double seuilDensBuild) {
-		try {
+	public static File run(File projFile, String name, double minSize, double maxSize, double seuilDensBuild) throws Exception {
+
 			TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 
 			Project project = Project.load(new File(projFile, "/" + name + ".xml"));
@@ -30,10 +30,7 @@ public class DecompTask {
 			project.save(decompFile);
 
 			return decompFile;
-		} catch (Exception e) {
-			// return null; // option
-			throw new AssertionError("Cage cannot be created");
-		}
+	
 	}
 
 }

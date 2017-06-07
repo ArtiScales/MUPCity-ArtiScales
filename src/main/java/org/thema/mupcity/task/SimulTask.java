@@ -30,26 +30,22 @@ public class SimulTask {
 
 		boolean mean = true;
 
-		String titreScenario = "Titre";
 		long seed = 42L;
 
 		run(projFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
 
 	}
 
-	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) {
+	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) throws Exception {
 
-		try {
+
 			return run(decompFile, name, nMax, strict, prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8), mean, seed);
-		} catch (Exception e) {
-			// return null; // option
-			throw new AssertionError("Cage cannot be created");
-		}
+	
 
 	}
 
 	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed) throws Exception {
-		try {
+		
 			Project project = Project.load(new File(decompFile, "/" + name + ".xml"));
 			String nBa = "Ba";
 			if (strict) {
@@ -75,10 +71,7 @@ public class SimulTask {
 			//project.getMSGrid().saveRaster(titreScenario + "-eval", projOut);
 
 			return projOut;
-		} catch (Exception e) {
-			// return null; // option
-			throw new AssertionError("Cage cannot be created");
-		}
+	
 	}
 
 	private static AHP prepareAHP(double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8) {
