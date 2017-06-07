@@ -31,7 +31,7 @@ public class ProjectCreationTask {
 
 	public static String NAME_BUILD_FILE = "BATI_AU.shp";
 	public static String NAME_FILE_ROAD = "route_sans_chemin.shp";
-	public static String NAME_FILE_FACILITY ="CS_au_besac_sirene_2012.shp";
+	public static String NAME_FILE_FACILITY ="CS_au_besac_sirene_20122.shp";
 	public static String NAME_FILE_LEISURE ="loisirs.shp";
 	public static String NAME_FILE_BUS_STATION = "stations_besac_tram_2015.shp";
 	public static String NAME_FILE_TRAIN = "gare_train_ICONE_docs_2015.shp";
@@ -50,26 +50,18 @@ public class ProjectCreationTask {
 		double shiftY = 50;
 		
 	 ProjectCreationTask.run(name, new File(folderIn), xmin, ymin, width, height,shiftX,shiftY);
-
-		
-
-		
 	}
 
-	public static File run(String name, File folderIn, double xmin, double ymin, double width, double height, double shiftX, double shiftY)
-			throws Exception {
+	public static File run(String name, File folderIn, double xmin, double ymin, double width, double height, double shiftX, double shiftY) {
+		
+		try{
+System.out.println("were here");
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
-		
-
-		
 		//Dossier intermédiaire avec les fichiers transformées
 		File folderTemp = new File(folderIn+"/tmp/");
 		if(! folderTemp.exists()){
 			folderTemp.mkdir();
 		}
-		
-		
-		
 		File buildFile = new File(folderTemp, NAME_BUILD_FILE);		
 		File roadFile = new File(folderTemp, NAME_FILE_ROAD);
 		File facilityFile = new File(folderTemp, NAME_FILE_FACILITY);
@@ -77,9 +69,8 @@ public class ProjectCreationTask {
 		File busFile = new File(folderTemp, NAME_FILE_BUS_STATION);
 		File trainFile = new File(folderTemp, NAME_FILE_TRAIN);
 		File restrictFile = new File(folderTemp,NAME_FILE_NON_BUILDABLE);
-		
-		
-
+		//Translation des différentes couches
+		if(!(shiftX ==0 && shiftY==0)){
 		translateSHP( new File(folderIn, NAME_BUILD_FILE), buildFile,shiftX,shiftY);
 		translateSHP( new File(folderIn, NAME_FILE_ROAD), roadFile,shiftX,shiftY);
 		translateSHP( new File(folderIn, NAME_FILE_FACILITY), facilityFile,shiftX,shiftY);
@@ -87,21 +78,14 @@ public class ProjectCreationTask {
 		translateSHP( new File(folderIn, NAME_FILE_BUS_STATION), busFile,shiftX,shiftY);
 		translateSHP( new File(folderIn, NAME_FILE_TRAIN), trainFile,shiftX,shiftY);
 		translateSHP( new File(folderIn, NAME_FILE_NON_BUILDABLE), restrictFile,shiftX,shiftY);
-		
-		
-		
-		
-		//Transformation des bâtiments		
+		}
+System.out.println("and there");
+		//Creation du projet dans le dossier de données translaté
 		Project project = Project.createProject(name, folderTemp, buildFile, xmin, ymin, width, height, mon);
 		project.setNetPrecision(0);
 
-
-		
-		
+		//Définition des layers du projet
 		boolean network = true;
-		
-		// Le réseau routier apparait peut être un peu moins déformé avec cette contrainte, mais ce n'est pas pour ça qu'il n'y a plus detache =0 dans fac3
-		// set layers and attributes for the decomposition
 		List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
 		List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL(numeric),TYPE (any)
@@ -113,18 +97,17 @@ public class ProjectCreationTask {
 		project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
 		project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs); //provoque un GC limit overhead
 		project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
-		
+System.out.println("and everywhere");
 		project.save();
-
-
-		
+		System.out.println("project saved");
 		return folderTemp;
+		}
+	
+	catch (Exception e) {
+		// return null; // option
+		throw new AssertionError("problem");
+		}
 	}
-	
-	
-	
-	
-	
 	private static void translateSHP(File fileIn, File fileOut, double shiftX, double shiftY ) throws Exception{
 		ShapefileDataStore dataStore = new ShapefileDataStore(fileIn.toURI().toURL());
 

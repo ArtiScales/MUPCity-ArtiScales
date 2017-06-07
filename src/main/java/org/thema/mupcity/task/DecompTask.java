@@ -18,18 +18,22 @@ public class DecompTask {
 
 	}
 
-	public static File run(File projFile, String name, double minSize, double maxSize, double seuilDensBuild)
-			throws Exception {
+	public static File run(File projFile, String name, double minSize, double maxSize, double seuilDensBuild) {
+		try {
+			TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 
-		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
+			Project project = Project.load(new File(projFile, "/" + name + ".xml"));
 
-		Project project = Project.load(new File(projFile, "/" + name + ".xml"));
+			System.out.println("Decomposing");
+			project.decomp(3, maxSize, minSize, seuilDensBuild, mon, false);
+			File decompFile = new File(projFile, String.valueOf(minSize) + "cell_" + String.valueOf(seuilDensBuild));
+			project.save(decompFile);
 
-		System.out.println("Decomposing");
-		project.decomp(3, maxSize, minSize, seuilDensBuild, mon, false);
-		project.save();
-
-		return new File(projFile, name);
+			return decompFile;
+		} catch (Exception e) {
+			// return null; // option
+			throw new AssertionError("Cage cannot be created");
+		}
 	}
 
 }

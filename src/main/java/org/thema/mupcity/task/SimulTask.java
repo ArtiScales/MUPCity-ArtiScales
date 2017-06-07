@@ -14,7 +14,6 @@ public class SimulTask {
 	public static void main(String[] args) throws Exception {
 
 		File projFile = new File("/home/mickael/data/mbrasebin/donnees/Maxime/1m/data0/data/tmp/Project/");
-		File projOut = new File("/home/mickael/temp/");
 		String name = "Project";
 
 		int nMax = 5;
@@ -34,21 +33,55 @@ public class SimulTask {
 		String titreScenario = "Titre";
 		long seed = 42L;
 
-		run(projFile, projOut, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean,
-				titreScenario, seed);
+		run(projFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
 
 	}
 
-	public static File run(File projFile, File projOut, String name, int nMax, boolean strict, double ahp0, double ahp1,
-			double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean,
-			String titreScenario, long seed) throws Exception {
+	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) {
 
-		return run(projFile, projOut, name, nMax, strict,
-				prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8), mean, titreScenario, seed);
+		try {
+			return run(decompFile, name, nMax, strict, prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8), mean, seed);
+		} catch (Exception e) {
+			// return null; // option
+			throw new AssertionError("Cage cannot be created");
+		}
+
 	}
 
-	private static AHP prepareAHP(double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5,
-			double ahp6, double ahp7, double ahp8) {
+	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed) throws Exception {
+		try {
+			Project project = Project.load(new File(decompFile, "/" + name + ".xml"));
+			String nBa = "Ba";
+			if (strict) {
+				nBa = "St";
+			}
+			String nYag = "Yag";
+			if (mean) {
+				nYag = "Moy";
+			}
+			String scenarName = "_N" + String.valueOf(nMax) + "_" + nBa + "_" + nYag + "_ahp" + ahp.toString() + "_seed" + String.valueOf(seed);
+			File projOut = new File(decompFile, scenarName);
+			projOut.mkdir();
+
+			NavigableSet<Double> res = project.getMSGrid().getResolutions();
+			ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(scenarName, res.first(), res.last(), nMax, strict, ahp, true, mean, 3, seed, false, false);
+			project.performScenarioAuto(scenario);
+
+			// save the project
+			scenario.save(projOut, project);
+			scenario.extractEvalAnal(projOut, project);
+			//project.getMSGrid().save(projOut);
+			System.out.println("layers : " + project.getMSGrid().getLayers());
+			//project.getMSGrid().saveRaster(titreScenario + "-eval", projOut);
+
+			return projOut;
+		} catch (Exception e) {
+			// return null; // option
+			throw new AssertionError("Cage cannot be created");
+		}
+	}
+
+	private static AHP prepareAHP(double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8) {
 		List<String> items = new ArrayList<>();
 		items.add("morpho");
 		items.add("road");
@@ -71,24 +104,5 @@ public class SimulTask {
 		ahpE_Moy.setCoef(items.get(0), ahp0);
 
 		return ahpE_Moy;
-	}
-
-	public static File run(File projFile, File projOut, String name, int nMax, boolean strict, AHP ahp, boolean mean,
-			String titreScenario, long seed) throws Exception {
-
-		Project project = Project.load(new File(projFile, "/" + name + ".xml"));
-
-		NavigableSet<Double> res = project.getMSGrid().getResolutions();
-		ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(titreScenario, res.first(), res.last(), nMax,
-				strict, ahp, false, mean, 3, seed, false, false);
-		project.performScenarioAuto(scenario);
-		// save the project
-		scenario.save(projOut, project);
-		scenario.extractEvalAnal(projOut, project);
-		project.getMSGrid().save(projOut);
-		System.out.println("layers : " + project.getMSGrid().getLayers());
-		project.getMSGrid().saveRaster(titreScenario + "-eval", projOut);
-
-		return projOut;
 	}
 }
