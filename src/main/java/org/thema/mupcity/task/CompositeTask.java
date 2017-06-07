@@ -41,7 +41,7 @@ public class CompositeTask {
 		System.out.println("----------Project creation----------");
 		File projectFile = ProjectCreationTask.run(name, folderIn, xmin, ymin, width, height, shiftX, shiftY);
 		System.out.println("----------Decomp task----------");
-		File decompFile = DecompTask.run(projectFile, name, minSize, maxSize, seuilDensBuild);
+		DecompTask.run(projectFile, name, minSize, maxSize, seuilDensBuild);
 		System.out.println("----------Simulation task----------");
 		File scenarFile = SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
 		System.out.println("----------End task----------");
