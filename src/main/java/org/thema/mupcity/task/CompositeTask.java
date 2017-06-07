@@ -5,7 +5,7 @@ import java.io.File;
 public class CompositeTask {
 	public static void main(String[] args) throws Exception {
 		String name = "test";
-		File folderIn = new File("/media/mcolomb/Data_2/resultExplo/exDistrib/");
+		File folderIn = new File("/home/mickael/data/mbrasebin/donnees/Maxime/1m/data0/data/");
 		double width = 28303;
 		double height = 21019;
 		double xmin = 914760;

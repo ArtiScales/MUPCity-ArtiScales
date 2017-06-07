@@ -29,7 +29,7 @@ public class ProjectCreationTask {
 
 	public static String NAME_BUILD_FILE = "BATI_AU.shp";
 	public static String NAME_FILE_ROAD = "route_sans_chemin.shp";
-	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_20122.shp";
+	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_2012.shp";
 	public static String NAME_FILE_LEISURE = "loisirs.shp";
 	public static String NAME_FILE_BUS_STATION = "stations_besac_tram_2015.shp";
 	public static String NAME_FILE_TRAIN = "gare_train_ICONE_docs_2015.shp";
