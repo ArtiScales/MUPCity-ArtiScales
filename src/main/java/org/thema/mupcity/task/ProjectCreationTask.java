@@ -29,7 +29,7 @@ public class ProjectCreationTask {
 
 	public static String NAME_BUILD_FILE = "BATI_AU.shp";
 	public static String NAME_FILE_ROAD = "route_sans_chemin.shp";
-	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_2012.shp";
+	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_20122.shp";
 	public static String NAME_FILE_LEISURE = "loisirs.shp";
 	public static String NAME_FILE_BUS_STATION = "stations_besac_tram_2015.shp";
 	public static String NAME_FILE_TRAIN = "gare_train_ICONE_docs_2015.shp";
@@ -48,10 +48,8 @@ public class ProjectCreationTask {
 		ProjectCreationTask.run(name, new File(folderIn), xmin, ymin, width, height, shiftX, shiftY);
 	}
 
-	public static File run(String name, File folderIn, double xmin, double ymin, double width, double height,
-			double shiftX, double shiftY) throws Exception {
+	public static File run(String name, File folderIn, double xmin, double ymin, double width, double height, double shiftX, double shiftY) throws Exception {
 
-		System.out.println("were here");
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 		// Dossier intermédiaire avec les fichiers transformées
 		File folderTemp = new File(folderIn + "/tmp/");
@@ -65,17 +63,16 @@ public class ProjectCreationTask {
 		File busFile = new File(folderTemp, NAME_FILE_BUS_STATION);
 		File trainFile = new File(folderTemp, NAME_FILE_TRAIN);
 		File restrictFile = new File(folderTemp, NAME_FILE_NON_BUILDABLE);
+
 		// Translation des différentes couches
-		if (!(shiftX == 0 && shiftY == 0)) {
-			translateSHP(new File(folderIn, NAME_BUILD_FILE), buildFile, shiftX, shiftY);
-			translateSHP(new File(folderIn, NAME_FILE_ROAD), roadFile, shiftX, shiftY);
-			translateSHP(new File(folderIn, NAME_FILE_FACILITY), facilityFile, shiftX, shiftY);
-			translateSHP(new File(folderIn, NAME_FILE_LEISURE), leisureFile, shiftX, shiftY);
-			translateSHP(new File(folderIn, NAME_FILE_BUS_STATION), busFile, shiftX, shiftY);
-			translateSHP(new File(folderIn, NAME_FILE_TRAIN), trainFile, shiftX, shiftY);
-			translateSHP(new File(folderIn, NAME_FILE_NON_BUILDABLE), restrictFile, shiftX, shiftY);
-		}
-		System.out.println("and there");
+		translateSHP(new File(folderIn, NAME_BUILD_FILE), buildFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, NAME_FILE_ROAD), roadFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, NAME_FILE_FACILITY), facilityFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, NAME_FILE_LEISURE), leisureFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, NAME_FILE_BUS_STATION), busFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, NAME_FILE_TRAIN), trainFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, NAME_FILE_NON_BUILDABLE), restrictFile, shiftX, shiftY);
+
 		// Creation du projet dans le dossier de données translaté
 		Project project = Project.createProject(name, folderTemp, buildFile, xmin, ymin, width, height, mon);
 		project.setNetPrecision(0);
@@ -99,10 +96,8 @@ public class ProjectCreationTask {
 																											// limit
 																											// overhead
 		project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
-		System.out.println("and everywhere");
 		project.save();
-		System.out.println("project saved");
-		return new File(folderTemp, "/"+name+"/");
+		return new File(folderTemp, "/" + name + "/");
 
 	}
 

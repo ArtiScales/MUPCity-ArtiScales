@@ -1135,7 +1135,6 @@ public class Project extends AbstractTreeNode {
 			mon.setNote("Loading data...");
 		}
 		List<DefaultFeature> buildFeatures = DefaultFeature.loadFeatures(buildFile, false);
-		System.out.println("srid : "+buildFeatures.get(1).getGeometry().getSRID());
 		CoordinateReferenceSystem crs = new ShapefileDataStore(buildFile.toURI().toURL()).getSchema().getCoordinateReferenceSystem();
 		//CoordinateReferenceSystem crs = CRS.decode("EPSG:3035");
 		if (mon != null) {

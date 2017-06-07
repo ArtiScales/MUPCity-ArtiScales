@@ -13,8 +13,8 @@ public class SimulTask {
 
 	public static void main(String[] args) throws Exception {
 
-		File projFile = new File("/home/mickael/data/mbrasebin/donnees/Maxime/1m/data0/data/tmp/Project/");
-		String name = "Project";
+		File projFile = new File("/media/mcolomb/Data_2/resultExplo/exDistrib/tmp/test/20.0cell_0.0/");
+		String name = "test";
 
 		int nMax = 5;
 		boolean strict = true;
@@ -37,11 +37,7 @@ public class SimulTask {
 	}
 
 	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) throws Exception {
-
-
 			return run(decompFile, name, nMax, strict, prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8), mean, seed);
-	
-
 	}
 
 	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed) throws Exception {
@@ -55,7 +51,7 @@ public class SimulTask {
 			if (mean) {
 				nYag = "Moy";
 			}
-			String scenarName = "_N" + String.valueOf(nMax) + "_" + nBa + "_" + nYag + "_ahp" + ahp.toString() + "_seed" + String.valueOf(seed);
+			String scenarName = "N" + String.valueOf(nMax) + "_" + nBa + "_" + nYag + "_ahpx" + "_seed" + String.valueOf(seed);
 			File projOut = new File(decompFile, scenarName);
 			projOut.mkdir();
 
@@ -68,10 +64,9 @@ public class SimulTask {
 			scenario.extractEvalAnal(projOut, project);
 			//project.getMSGrid().save(projOut);
 			System.out.println("layers : " + project.getMSGrid().getLayers());
-			//project.getMSGrid().saveRaster(titreScenario + "-eval", projOut);
+			project.getMSGrid().saveRaster(scenarName + "-eval", projOut);
 
 			return projOut;
-	
 	}
 
 	private static AHP prepareAHP(double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8) {

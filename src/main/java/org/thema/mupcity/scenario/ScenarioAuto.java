@@ -508,7 +508,10 @@ public class ScenarioAuto extends Scenario {
     public void extractEvalAnal(int seuil, File dir, Project project) throws IOException{
     	MSGridBuilder msGrid = project.getMSGrid();
     	Collection<MSGrid> grids = msGrid.getGrids();
-    	Rectangle2D env = project.getBoundsOriginal();
+    	//Rectangle2D env = project.getBoundsOriginal();
+    	Rectangle2D env =project.getBounds();
+    	System.out.println(env.getWidth());
+    	System.out.println(env.getHeight());
 		msGrid.addLayer(this.getAnalEvalName(),DataBuffer.TYPE_FLOAT, Float.NaN);
     	for (MSGrid grid : grids){	
 	    	List<MSCell> cells = ((SquareGrid) grid).getCellIn(env);
