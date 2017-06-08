@@ -40,21 +40,12 @@ public class CompositeTask {
 	public static File run(String name, File folderIn, double xmin, double ymin, double width, double height, double shiftX, double shiftY, double minSize, double maxSize, double seuilDensBuild, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) throws Exception {
 		System.out.println("----------Project creation----------");
 		File projectFile = ProjectCreationTask.run(name, folderIn, xmin, ymin, width, height, shiftX, shiftY);
-		System.out.println("projectfile : "+projectFile);
 		System.out.println("----------Decomp task----------");
-		File decompFile = DecompTask.run(projectFile, name, minSize, maxSize, seuilDensBuild);
+		DecompTask.run(projectFile, name, minSize, maxSize, seuilDensBuild);
 		System.out.println("----------Simulation task----------");
-		for (int n = 3; n<=7 ;n++ ){
-			nMax=n;
-			System.out.println(nMax);
-			File scenarFile = SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
-			RasterAnalyseTask.run(scenarFile, name);
-			strict = false;
-			scenarFile = SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
-			RasterAnalyseTask.run(scenarFile, name);
-		}
+		SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
+		//RasterAnalyseTask.run(scenarFile, name);
 		System.out.println("----------End task----------");
-System.out.println(projectFile);
 		return projectFile;
 	}
 }
