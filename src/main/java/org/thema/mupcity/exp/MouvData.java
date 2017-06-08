@@ -61,7 +61,7 @@ public class MouvData {
 
 				Project project = Project.createProject(name, dir, buildFile, minX, minY, width, height, mon);
 				int y=0;
-					if(y==0 && ii==0){
+					if( y==0 && ii==0){
 						project.setNetPrecision(0.1);
 					}
 					else{

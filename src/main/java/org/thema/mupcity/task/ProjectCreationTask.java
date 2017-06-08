@@ -29,7 +29,7 @@ public class ProjectCreationTask {
 
 	public static String NAME_BUILD_FILE = "BATI_AU.shp";
 	public static String NAME_FILE_ROAD = "route_sans_chemin.shp";
-	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_20122.shp";
+	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_2012.shp";
 	public static String NAME_FILE_LEISURE = "loisirs.shp";
 	public static String NAME_FILE_BUS_STATION = "stations_besac_tram_2015.shp";
 	public static String NAME_FILE_TRAIN = "gare_train_ICONE_docs_2015.shp";
@@ -75,10 +75,11 @@ public class ProjectCreationTask {
 
 		// Creation du projet dans le dossier de données translaté
 		Project project = Project.createProject(name, folderTemp, buildFile, xmin, ymin, width, height, mon);
-		project.setNetPrecision(0);
+		project.setNetPrecision(0.1);
 
 		// Définition des layers du projet
 		boolean network = true;
+
 		List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
 		List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL(numeric),TYPE
@@ -90,11 +91,7 @@ public class ProjectCreationTask {
 		List<String> emptyAttrs = Arrays.asList("");
 		project.setLayer(Project.LAYERS.get(Project.Layers.BUS_STATION.ordinal()), busFile, emptyAttrs);
 		project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
-		project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs); // provoque
-																											// un
-																											// GC
-																											// limit
-																											// overhead
+		project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs);
 		project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
 		project.save();
 		return new File(folderTemp, "/" + name + "/");
@@ -104,24 +101,7 @@ public class ProjectCreationTask {
 	private static void translateSHP(File fileIn, File fileOut, double shiftX, double shiftY) throws Exception {
 		ShapefileDataStore dataStore = new ShapefileDataStore(fileIn.toURI().toURL());
 
-		AffineTransform2D translate = new AffineTransform2D(1, 0, 0, 1, shiftX, shiftY); // AffineTransform2D.getTranslateInstance(Xmouve,
-																							// Ymouve);
-																							// //j'aimerais
-																							// mettre
-																							// direct
-																							// une
-																							// saloperie
-																							// de
-																							// shape
-																							// dans
-																							// translate.createTransformedShape(shape)
-																							// mais
-																							// je
-																							// ne
-																							// vois
-																							// pas
-																							// comment
-																							// faire
+		AffineTransform2D translate = new AffineTransform2D(1, 0, 0, 1, shiftX, shiftY);
 
 		ContentFeatureCollection shpFeatures = dataStore.getFeatureSource().getFeatures();
 		DefaultFeatureCollection newFeatures = new DefaultFeatureCollection();

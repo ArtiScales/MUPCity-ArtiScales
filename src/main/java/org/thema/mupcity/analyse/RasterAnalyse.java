@@ -508,7 +508,7 @@ public class RasterAnalyse {
 	 * @return array of statistics results
 	 * @throws Exception
 	 */
-	public static void mergeRasters(ArrayList<File> listRepliFile, String nameScenar) throws Exception {
+	public static File mergeRasters(ArrayList<File> listRepliFile, String nameScenar) throws Exception {
 
 		//creating different folders
 		File rasterFile = new File(rootFile + "/raster/");
@@ -689,15 +689,16 @@ public class RasterAnalyse {
 				}
 			}
 		}
-
+File statFile = new File("");
 		//création de statistiques pour une analyse discrétisé
 		if ((discrete == true || cutBorder == true) && (compare20_180 == false || compare20_60 == false)) {
-			splitMergedTypo(nameScenar, cellRepetCentroid, cellEvalCentroid);
+			statFile = splitMergedTypo(nameScenar, cellRepetCentroid, cellEvalCentroid);
 		}
 		//création de statistiques pour une analyse normale 
 		else if (discrete == false && (compare20_180 == false || compare20_60 == false)) {
-			createStats(nameScenar, histo, statNb, cellRepet, cellEval);
+			statFile = createStats(nameScenar, histo, statNb, cellRepet, cellEval);
 		}
+		return statFile;
 	}
 
 	/**
@@ -711,7 +712,7 @@ public class RasterAnalyse {
 	 *            : Collection of the cell's evaluation
 	 * @throws IOException
 	 */
-	private static void splitMergedTypo(String nameScenar, Hashtable<DirectPosition2D, Integer> cellRepet, Hashtable<DirectPosition2D, Float> cellEval) throws IOException {
+	private static File splitMergedTypo(String nameScenar, Hashtable<DirectPosition2D, Integer> cellRepet, Hashtable<DirectPosition2D, Float> cellEval) throws IOException {
 		Hashtable<DirectPosition2D, Integer> cellRepetPeriCentre = new Hashtable<DirectPosition2D, Integer>();
 		Hashtable<DirectPosition2D, Integer> cellRepetBanlieue = new Hashtable<DirectPosition2D, Integer>();
 		Hashtable<DirectPosition2D, Integer> cellRepetPeriUrbain = new Hashtable<DirectPosition2D, Integer>();
@@ -938,9 +939,10 @@ public class RasterAnalyse {
 			compteur++;
 
 		}
+		return statFile;
 	}
 
-	private static void createStats(String nameScenar, double[] histo, DescriptiveStatistics statNb, Hashtable<GridCoordinates2D, Integer> cellRepet, Hashtable<GridCoordinates2D, ArrayList<Float>> cellEval) throws IOException {
+	private static File createStats(String nameScenar, double[] histo, DescriptiveStatistics statNb, Hashtable<GridCoordinates2D, Integer> cellRepet, Hashtable<GridCoordinates2D, ArrayList<Float>> cellEval) throws IOException {
 
 		File statFile = new File(rootFile + "/stats");
 		if (compareAHP == true) {
@@ -1181,6 +1183,8 @@ public class RasterAnalyse {
 		StatTab tableauStat = new StatTab("descriptive_statistics", nameScenar, tableauFinal, premiereCol);
 		tableauStat.toCsv(statFile, firstline);
 		firstline = false;
+		
+		return statFile;
 	}
 
 	private static void generateCsvFile(Hashtable<String, Double> cellRepet, File file, String name) throws IOException {

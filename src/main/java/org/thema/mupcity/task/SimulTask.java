@@ -13,10 +13,8 @@ public class SimulTask {
 
 	public static void main(String[] args) throws Exception {
 
-		File projFile = new File("/media/mcolomb/Data_2/resultExplo/exDistrib/tmp/test/20.0cell_0.0/");
-		String name = "test";
-
-		int nMax = 5;
+		File projFile = new File("/media/mcolomb/Data_2/resultExplo/dimFract/tmp/dimFract");
+		String name = "dimFract";
 		boolean strict = true;
 		double ahp0 = 0.111;
 		double ahp1 = 0.111;
@@ -31,9 +29,9 @@ public class SimulTask {
 		boolean mean = true;
 
 		long seed = 42L;
-
+for (int nMax = 4; nMax<=7;nMax++){
 		run(projFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
-
+}
 	}
 
 	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) throws Exception {
@@ -62,8 +60,6 @@ public class SimulTask {
 			// save the project
 			scenario.save(projOut, project);
 			scenario.extractEvalAnal(projOut, project);
-			//project.getMSGrid().save(projOut);
-			System.out.println("layers : " + project.getMSGrid().getLayers());
 			project.getMSGrid().saveRaster(scenarName + "-eval", projOut);
 
 			return projOut;
