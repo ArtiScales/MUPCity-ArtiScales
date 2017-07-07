@@ -40,7 +40,7 @@ for (int nMax = 4; nMax<=7;nMax++){
 
 	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed) throws Exception {
 		
-			Project project = Project.load(new File(decompFile, "/" + name + ".xml"));
+			Project project = Project.load(new File(decompFile, name + ".xml"));
 			String nBa = "Ba";
 			if (strict) {
 				nBa = "St";
@@ -49,7 +49,7 @@ for (int nMax = 4; nMax<=7;nMax++){
 			if (mean) {
 				nYag = "Moy";
 			}
-			String scenarName = "N" + String.valueOf(nMax) + "_" + nBa + "_" + nYag + "_ahpx" + "_seed" + String.valueOf(seed);
+			String scenarName = "N" + String.valueOf(nMax) + "_" + String.valueOf(strict) + "_" + String.valueOf(mean) + "_" + nBa + "_" + nYag + "_ahpx" + "_seed_" + String.valueOf(seed);
 			File projOut = new File(decompFile, scenarName);
 			projOut.mkdir();
 
