@@ -12,60 +12,76 @@ import org.thema.mupcity.scenario.ScenarioAuto;
 public class SimulTask {
 
 	public static void main(String[] args) throws Exception {
+		File projFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/N6Yag/");
 
-		File projFile = new File("/media/mcolomb/Data_2/resultExplo/dimFract/tmp/dimFract");
-		String name = "dimFract";
-		boolean strict = true;
-		double ahp0 = 0.111;
-		double ahp1 = 0.111;
-		double ahp2 = 0.111;
-		double ahp3 = 0.111;
-		double ahp4 = 0.111;
-		double ahp5 = 0.111;
-		double ahp6 = 0.111;
-		double ahp7 = 0.111;
-		double ahp8 = 0.111;
+		for (File ff : projFile.listFiles()) {
+			for (File f : ff.listFiles()) {
+				if (f.getName().startsWith("G")) {
+					
+					String name = "testMouvGrid";
+					File fileProjet = new File (f,name);
+					boolean strict = true;
+					double ahp0 = 0.111;
+					double ahp1 = 0.111;
+					double ahp2 = 0.111;
+					double ahp3 = 0.111;
+					double ahp4 = 0.111;
+					double ahp5 = 0.111;
+					double ahp6 = 0.111;
+					double ahp7 = 0.111;
+					double ahp8 = 0.111;
 
-		boolean mean = true;
-
-		long seed = 42L;
-for (int nMax = 4; nMax<=7;nMax++){
-		run(projFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed);
-}
-	}
-
-	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed) throws Exception {
-			return run(decompFile, name, nMax, strict, prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8), mean, seed);
-	}
-
-	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed) throws Exception {
-		
-			Project project = Project.load(new File(decompFile, name + ".xml"));
-			String nBa = "Ba";
-			if (strict) {
-				nBa = "St";
+					boolean mean = true;
+System.out.println(fileProjet);
+					long seed = 42;
+					int nMax = 5;
+						run(fileProjet, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean,
+								seed);
+					
+				}
 			}
-			String nYag = "Yag";
-			if (mean) {
-				nYag = "Moy";
-			}
-			String scenarName = "N" + String.valueOf(nMax) + "_" + String.valueOf(strict) + "_" + String.valueOf(mean) + "_" + nBa + "_" + nYag + "_ahpx" + "_seed_" + String.valueOf(seed);
-			File projOut = new File(decompFile, scenarName);
-			projOut.mkdir();
+		}
 
-			NavigableSet<Double> res = project.getMSGrid().getResolutions();
-			ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(scenarName, res.first(), res.last(), nMax, strict, ahp, true, mean, 3, seed, false, false);
-			project.performScenarioAuto(scenario);
-
-			// save the project
-			scenario.save(projOut, project);
-			scenario.extractEvalAnal(projOut, project);
-			project.getMSGrid().saveRaster(scenarName + "-eval", projOut);
-
-			return projOut;
 	}
 
-	private static AHP prepareAHP(double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8) {
+	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1,
+			double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean,
+			long seed) throws Exception {
+		return run(decompFile, name, nMax, strict, prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8),
+				mean, seed);
+	}
+
+	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed)
+			throws Exception {
+
+		Project project = Project.load(new File(decompFile, name + ".xml"));
+		String nBa = "Ba";
+		if (strict) {
+			nBa = "St";
+		}
+		String nYag = "Yag";
+		if (mean) {
+			nYag = "Moy";
+		}
+		String scenarName = "N" + String.valueOf(nMax) + "_" + nBa + "_" + nYag + "_ahpx" + "_seed_" + String.valueOf(seed);
+		File projOut = new File(decompFile, scenarName);
+		projOut.mkdir();
+
+		NavigableSet<Double> res = project.getMSGrid().getResolutions();
+		ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(scenarName, res.first(), res.last(), nMax, strict,
+				ahp, true, mean, 3, seed, false, false);
+		project.performScenarioAuto(scenario);
+
+		// save the project
+		scenario.save(projOut, project);
+		scenario.extractEvalAnal(projOut, project);
+		project.getMSGrid().saveRaster(scenarName + "-eval", projOut);
+
+		return projOut;
+
+	}
+	private static AHP prepareAHP(double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5,
+			double ahp6, double ahp7, double ahp8) {
 		List<String> items = new ArrayList<>();
 		items.add("morpho");
 		items.add("road");
