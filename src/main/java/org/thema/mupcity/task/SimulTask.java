@@ -32,11 +32,12 @@ public class SimulTask {
 					double ahp8 = 0.111;
 
 					boolean mean = true;
+					boolean useNU = true;
 System.out.println(fileProjet);
 					long seed = 42;
 					int nMax = 5;
 						run(fileProjet, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean,
-								seed);
+								seed, useNU);
 					
 				}
 			}
@@ -46,12 +47,12 @@ System.out.println(fileProjet);
 
 	public static File run(File decompFile, String name, int nMax, boolean strict, double ahp0, double ahp1,
 			double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean,
-			long seed) throws Exception {
+			long seed, boolean useNU) throws Exception {
 		return run(decompFile, name, nMax, strict, prepareAHP(ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8),
-				mean, seed);
+				mean, seed, useNU);
 	}
 
-	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed)
+	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed,boolean useNU)
 			throws Exception {
 
 		Project project = Project.load(new File(decompFile, name + ".xml"));
@@ -69,7 +70,7 @@ System.out.println(fileProjet);
 
 		NavigableSet<Double> res = project.getMSGrid().getResolutions();
 		ScenarioAuto scenario = ScenarioAuto.createMultiScaleScenario(scenarName, res.first(), res.last(), nMax, strict,
-				ahp, true, mean, 3, seed, false, false);
+				ahp, useNU, mean, 3, seed, false, false);
 		project.performScenarioAuto(scenario);
 
 		// save the project

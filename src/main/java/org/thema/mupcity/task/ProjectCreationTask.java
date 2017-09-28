@@ -23,17 +23,18 @@ import org.thema.common.swing.TaskMonitor;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.rule.OriginDistance;
 
+import com.google.common.io.Files;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class ProjectCreationTask {
 
-	public static String NAME_BUILD_FILE = "BATI_AU.shp";
-	public static String NAME_FILE_ROAD = "route_sans_chemin.shp";
+	public static String NAME_BUILD_FILE = "batiment.shp";
+	public static String NAME_FILE_ROAD = "route.shp";
 	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_2012.shp";
 	public static String NAME_FILE_LEISURE = "loisirs.shp";
 	public static String NAME_FILE_BUS_STATION = "stations_besac_tram_2015.shp";
 	public static String NAME_FILE_TRAIN = "gare_train_ICONE_docs_2015.shp";
-	public static String NAME_FILE_NON_BUILDABLE = "non_urba.shp";
+	public static String NAME_FILE_NON_BUILDABLE = "non-urba-zonedetude.shp";
 
 	public static void main(String[] args) throws Exception {
 		String name = "Project";
@@ -45,13 +46,16 @@ public class ProjectCreationTask {
 		double ymin = 6680157;
 		double shiftX = 50;
 		double shiftY = 50;
-		ProjectCreationTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY);
+		boolean useNU = true;
+
+		ProjectCreationTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, useNU);
 	}
 
-	public static File run(String name, File folderIn, File folderOut, double xmin, double ymin, double width, double height, double shiftX, double shiftY) throws Exception {
+	public static File run(String name, File folderIn, File folderOut, double xmin, double ymin, double width,
+			double height, double shiftX, double shiftY, boolean useNU) throws Exception {
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 		// Dossier intermédiaire avec les fichiers transformées
-//		File folderTemp = new File(folderIn + "/tmp/");
+		// File folderTemp = new File(folderIn + "/tmp/");
 		folderOut.mkdirs();
 		File buildFile = new File(folderOut, NAME_BUILD_FILE);
 		File roadFile = new File(folderOut, NAME_FILE_ROAD);
@@ -61,6 +65,7 @@ public class ProjectCreationTask {
 		File trainFile = new File(folderOut, NAME_FILE_TRAIN);
 		File restrictFile = new File(folderOut, NAME_FILE_NON_BUILDABLE);
 		// Translation des différentes couches
+		
 		translateSHP(new File(folderIn, NAME_BUILD_FILE), buildFile, shiftX, shiftY);
 		translateSHP(new File(folderIn, NAME_FILE_ROAD), roadFile, shiftX, shiftY);
 		translateSHP(new File(folderIn, NAME_FILE_FACILITY), facilityFile, shiftX, shiftY);
@@ -68,11 +73,12 @@ public class ProjectCreationTask {
 		translateSHP(new File(folderIn, NAME_FILE_BUS_STATION), busFile, shiftX, shiftY);
 		translateSHP(new File(folderIn, NAME_FILE_TRAIN), trainFile, shiftX, shiftY);
 		translateSHP(new File(folderIn, NAME_FILE_NON_BUILDABLE), restrictFile, shiftX, shiftY);
+
 		// Creation du projet dans le dossier de données translaté
 		Project project = Project.createProject(name, folderOut, buildFile, xmin, ymin, width, height, mon);
 		project.setNetPrecision(0.1);
 		// Définition des layers du projet
-		boolean network = true;//always true?
+		boolean network = true;
 		List<String> roadAttrs = Arrays.asList("Speed");// SPEED(numeric)
 		project.setLayer(Project.LAYERS.get(Project.Layers.ROAD.ordinal()), roadFile, roadAttrs);
 		List<String> facilityAttrs = Arrays.asList("LEVEL", "TYPE");// LEVEL(numeric),TYPE(any)
@@ -82,7 +88,9 @@ public class ProjectCreationTask {
 		List<String> emptyAttrs = Arrays.asList("");
 		project.setLayer(Project.LAYERS.get(Project.Layers.BUS_STATION.ordinal()), busFile, emptyAttrs);
 		project.setLayer(Project.LAYERS.get(Project.Layers.TRAIN_STATION.ordinal()), trainFile, emptyAttrs);
-		project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs);
+		if (useNU) {
+			project.setLayer(Project.LAYERS.get(Project.Layers.RESTRICT.ordinal()), restrictFile, emptyAttrs);
+		}
 		project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
 		project.save();
 		return new File(folderOut, name);

@@ -18,6 +18,8 @@ public class DecompTask {
 
 	public static File run(File projFile, String name, double minSize, double maxSize, double seuilDensBuild) throws Exception {
 			TaskMonitor mon = new TaskMonitor.EmptyMonitor();
+			System.out.println(projFile);
+			System.out.println(new File(projFile, name + ".xml"));
 			Project project = Project.load(new File(projFile, name + ".xml"));
 			project.decomp(3, maxSize, minSize, seuilDensBuild, mon, false);
 			//File decompFile = new File(projFile, String.valueOf(minSize) + "_" + String.valueOf(maxSize) + "_cell_" + String.valueOf(seuilDensBuild));
