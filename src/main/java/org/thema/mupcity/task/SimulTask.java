@@ -52,10 +52,10 @@ System.out.println(fileProjet);
 				mean, seed, useNU);
 	}
 
-	public static File run(File decompFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed,boolean useNU)
+	public static File run(File projectFile, String name, int nMax, boolean strict, AHP ahp, boolean mean, long seed,boolean useNU)
 			throws Exception {
 
-		Project project = Project.load(new File(decompFile, name + ".xml"));
+		Project project = Project.load(new File(projectFile, name + ".xml"));
 		String nBa = "Ba";
 		if (strict) {
 			nBa = "St";
@@ -65,7 +65,7 @@ System.out.println(fileProjet);
 			nYag = "Moy";
 		}
 		String scenarName = "N" + String.valueOf(nMax) + "_" + nBa + "_" + nYag + "_ahpx" + "_seed_" + String.valueOf(seed);
-		File projOut = new File(decompFile, scenarName);
+		File projOut = new File(projectFile, scenarName);
 		projOut.mkdir();
 
 		NavigableSet<Double> res = project.getMSGrid().getResolutions();
@@ -105,5 +105,10 @@ System.out.println(fileProjet);
 		ahpE_Moy.setCoef(items.get(0), ahp0);
 
 		return ahpE_Moy;
+	}
+	
+	private static void cleanProject(Project project){
+		System.out.println(project.getDirectory());
+		
 	}
 }

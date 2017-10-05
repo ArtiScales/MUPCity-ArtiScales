@@ -64,6 +64,10 @@ public class ProjectCreationTask {
 		File busFile = new File(folderOut, NAME_FILE_BUS_STATION);
 		File trainFile = new File(folderOut, NAME_FILE_TRAIN);
 		File restrictFile = new File(folderOut, NAME_FILE_NON_BUILDABLE);
+		
+		//put in line for the massacre
+		File[] listMassacre = {buildFile,roadFile,facilityFile,leisureFile,busFile,trainFile,restrictFile};
+		
 		// Translation des différentes couches
 		
 		translateSHP(new File(folderIn, NAME_BUILD_FILE), buildFile, shiftX, shiftY);
@@ -93,6 +97,18 @@ public class ProjectCreationTask {
 		}
 		project.setDistType((network) ? OriginDistance.NetworkDistance.class : OriginDistance.EuclideanDistance.class);
 		project.save();
+		
+		//MASSACRE
+		for (File f : listMassacre){
+			CharSequence target = f.getName().subSequence(0, f.getName().length()-4);
+			for (File fDelete : f.getParentFile().listFiles()){
+				if (fDelete.toString().contains(target)){
+				System.out.println(fDelete);
+				fDelete.delete();
+				}
+			}
+
+		}
 		return new File(folderOut, name);
 	}
 
@@ -146,5 +162,6 @@ public class ProjectCreationTask {
 			System.out.println(typeName + " does not support read/write access");
 			System.exit(1);
 		}
+		
 	}
 }
