@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -28,15 +29,98 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ProjectCreationTask {
 
-	public static String NAME_BUILD_FILE = "batiment.shp";
-	public static String NAME_FILE_ROAD = "route.shp";
-	public static String NAME_FILE_FACILITY = "CS_au_besac_sirene_2012.shp";
-	public static String NAME_FILE_LEISURE = "loisirs.shp";
-	public static String NAME_FILE_BUS_STATION = "stations_besac_tram_2015.shp";
-	public static String NAME_FILE_TRAIN = "gare_train_ICONE_docs_2015.shp";
-	public static String NAME_FILE_NON_BUILDABLE = "non-urba-zonedetude.shp";
-
 	public static void main(String[] args) throws Exception {
+		
+		Map<String,String> dataHT = new Hashtable<String,String>() ;
+		
+		//Data1.1
+		dataHT.put("name", "Data1");
+		dataHT.put("build", "batimentPro.shp");
+		dataHT.put("road", "routePro.shp");
+		dataHT.put("fac", "servicePro.shp");
+		dataHT.put("lei", "loisirsPro.shp");
+		dataHT.put("ptTram", "tramPro.shp");
+		dataHT.put("ptTrain", "trainPro.shp");
+		dataHT.put("nU", "nonUrbaPro.shp");
+	
+		//Data1.1
+		dataHT.put("name", "Data1.1");
+		dataHT.put("build", "batimentPro.shp");
+		dataHT.put("road", "routePro.shp");
+		dataHT.put("fac", "servicePro.shp");
+		dataHT.put("lei", "loisirsPro.shp");
+		dataHT.put("ptTram", "tramPro.shp");
+		dataHT.put("ptTrain", "trainPro.shp");
+		dataHT.put("nU", "nonUrbaPhyPro.shp");
+		
+		//Data1.2
+		dataHT.put("name", "Data1.2");
+		dataHT.put("build", "batimentPro.shp");
+		dataHT.put("road", "routePro.shp");
+		dataHT.put("fac", "servicePro.shp");
+		dataHT.put("lei", "loisirsPro.shp");
+		dataHT.put("ptTram", "tramPro.shp");
+		dataHT.put("ptTrain", "trainPro.shp");	
+		
+		//Data2
+		dataHT.put("name", "Data2");
+		dataHT.put("build", "batimentSys.shp");
+		dataHT.put("road", "routeSys.shp");
+		dataHT.put("fac", "serviceSys.shp");
+		dataHT.put("lei", "loisirsSys.shp");
+		dataHT.put("ptTram", "tramSys.shp");
+		dataHT.put("ptTrain", "trainSys.shp");
+		dataHT.put("nU", "nonUrbaSys.shp");
+	
+		//Data2.1
+		dataHT.put("name", "Data2.1");
+		dataHT.put("build", "batimentSys.shp");
+		dataHT.put("road", "routeSys.shp");
+		dataHT.put("fac", "serviceSys.shp");
+		dataHT.put("lei", "loisirsSys.shp");
+		dataHT.put("ptTram", "tramSys.shp");
+		dataHT.put("ptTrain", "trainSys.shp");
+		dataHT.put("nU", "nonUrbaPhySys.shp");
+		
+		//Data2.2
+		dataHT.put("name", "Data2.2");
+		dataHT.put("build", "batimentSys.shp");
+		dataHT.put("road", "routeSys.shp");
+		dataHT.put("fac", "serviceSys.shp");
+		dataHT.put("lei", "loisirsSys.shp");
+		dataHT.put("ptTram", "tramSys.shp");
+		dataHT.put("ptTrain", "trainSys.shp");
+		
+		//Data3
+		dataHT.put("name", "Data3");
+		dataHT.put("build", "batimentPro.shp");
+		dataHT.put("road", "routeSys.shp");
+		dataHT.put("fac", "servicePro.shp");
+		dataHT.put("lei", "loisirsPro.shp");
+		dataHT.put("ptTram", "tramPro.shp");
+		dataHT.put("ptTrain", "trainPro.shp");
+		dataHT.put("nU", "nonUrbaPro.shp");
+		
+		//Data4
+		dataHT.put("name", "Data4");
+		dataHT.put("build", "batimentPro.shp");
+		dataHT.put("road", "routePro.shp");
+		dataHT.put("fac", "servicePro.shp");
+		dataHT.put("lei", "loisirsSys.shp");
+		dataHT.put("ptTram", "tramPro.shp");
+		dataHT.put("ptTrain", "trainPro.shp");
+		dataHT.put("nU", "nonUrbaPro.shp");
+		
+		//Data5
+		dataHT.put("name", "Data5");
+		dataHT.put("build", "batimentPro.shp");
+		dataHT.put("road", "routePro.shp");
+		dataHT.put("fac", "serviceSys.shp");
+		dataHT.put("lei", "loisirsPro.shp");
+		dataHT.put("ptTram", "tramPro.shp");
+		dataHT.put("ptTrain", "trainPro.shp");
+		dataHT.put("nU", "nonUrbaPro.shp");
+		
 		String name = "Project";
 		File folderIn = new File("./data/");
 		File folderOut = new File("./result/");
@@ -46,37 +130,38 @@ public class ProjectCreationTask {
 		double ymin = 6680157;
 		double shiftX = 50;
 		double shiftY = 50;
+		
 		boolean useNU = true;
 
-		ProjectCreationTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, useNU);
+		ProjectCreationTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, useNU,dataHT);
 	}
 
 	public static File run(String name, File folderIn, File folderOut, double xmin, double ymin, double width,
-			double height, double shiftX, double shiftY, boolean useNU) throws Exception {
+			double height, double shiftX, double shiftY, boolean useNU, Map<String, String> dataHT) throws Exception {
 		TaskMonitor mon = new TaskMonitor.EmptyMonitor();
 		// Dossier intermédiaire avec les fichiers transformées
 		// File folderTemp = new File(folderIn + "/tmp/");
 		folderOut.mkdirs();
-		File buildFile = new File(folderOut, NAME_BUILD_FILE);
-		File roadFile = new File(folderOut, NAME_FILE_ROAD);
-		File facilityFile = new File(folderOut, NAME_FILE_FACILITY);
-		File leisureFile = new File(folderOut, NAME_FILE_LEISURE);
-		File busFile = new File(folderOut, NAME_FILE_BUS_STATION);
-		File trainFile = new File(folderOut, NAME_FILE_TRAIN);
-		File restrictFile = new File(folderOut, NAME_FILE_NON_BUILDABLE);
+		File buildFile = new File(folderOut, dataHT.get("build"));
+		File roadFile = new File(folderOut, dataHT.get("road"));
+		File facilityFile = new File(folderOut, dataHT.get("fac"));
+		File leisureFile = new File(folderOut, dataHT.get("lei"));
+		File busFile = new File(folderOut, dataHT.get("ptTram"));
+		File trainFile = new File(folderOut, dataHT.get("ptTrain"));
+		File restrictFile = new File(folderOut, dataHT.get("nU"));
 		
 		//put in line for the massacre
 		File[] listMassacre = {buildFile,roadFile,facilityFile,leisureFile,busFile,trainFile,restrictFile};
 		
 		// Translation des différentes couches
 		
-		translateSHP(new File(folderIn, NAME_BUILD_FILE), buildFile, shiftX, shiftY);
-		translateSHP(new File(folderIn, NAME_FILE_ROAD), roadFile, shiftX, shiftY);
-		translateSHP(new File(folderIn, NAME_FILE_FACILITY), facilityFile, shiftX, shiftY);
-		translateSHP(new File(folderIn, NAME_FILE_LEISURE), leisureFile, shiftX, shiftY);
-		translateSHP(new File(folderIn, NAME_FILE_BUS_STATION), busFile, shiftX, shiftY);
-		translateSHP(new File(folderIn, NAME_FILE_TRAIN), trainFile, shiftX, shiftY);
-		translateSHP(new File(folderIn, NAME_FILE_NON_BUILDABLE), restrictFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("build")), buildFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("road")), roadFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("fac")), facilityFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("lei")), leisureFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("ptTram")), busFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("ptTrain")), trainFile, shiftX, shiftY);
+		translateSHP(new File(folderIn, dataHT.get("nU")), restrictFile, shiftX, shiftY);
 
 		// Creation du projet dans le dossier de données translaté
 		Project project = Project.createProject(name, folderOut, buildFile, xmin, ymin, width, height, mon);

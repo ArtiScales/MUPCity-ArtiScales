@@ -1,12 +1,105 @@
 package org.thema.mupcity.task;
 
 import java.io.File;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class CompositeTask {
 	public static void main(String[] args) throws Exception {
-		String name = "dimFract";
+
+		Map<String, String> dataHT = new Hashtable<String, String>();
+
+		// //Data1.1
+		// dataHT.put("name", "Data1");
+		// dataHT.put("build", "batimentPro.shp");
+		// dataHT.put("road", "routePro.shp");
+		// dataHT.put("fac", "servicePro.shp");
+		// dataHT.put("lei", "loisirPro.shp");
+		// dataHT.put("ptTram", "tramPro.shp");
+		// dataHT.put("ptTrain", "trainPro.shp");
+		// dataHT.put("nU", "nonUrbaPro.shp");
+
+		// //Data1.1
+		// dataHT.put("name", "Data1.1");
+		// dataHT.put("build", "batimentPro.shp");
+		// dataHT.put("road", "routePro.shp");
+		// dataHT.put("fac", "servicePro.shp");
+		// dataHT.put("lei", "loisirPro.shp");
+		// dataHT.put("ptTram", "tramPro.shp");
+		// dataHT.put("ptTrain", "trainPro.shp");
+		// dataHT.put("nU", "nonUrbaPhyPro.shp");
+		//
+		// //Data1.2
+		// dataHT.put("name", "Data1.2");
+		// dataHT.put("build", "batimentPro.shp");
+		// dataHT.put("road", "routePro.shp");
+		// dataHT.put("fac", "servicePro.shp");
+		// dataHT.put("lei", "loisirPro.shp");
+		// dataHT.put("ptTram", "tramPro.shp");
+		// dataHT.put("ptTrain", "trainPro.shp");
+		//
+		// Data2
+		dataHT.put("name", "Data2");
+		dataHT.put("build", "batimentSys.shp");
+		dataHT.put("road", "routeSys.shp");
+		dataHT.put("fac", "serviceSys.shp");
+		dataHT.put("lei", "loisirSys.shp");
+		dataHT.put("ptTram", "tramSys.shp");
+		dataHT.put("ptTrain", "trainSys.shp");
+		dataHT.put("nU", "nonUrbaSys.shp");
+
+		// //Data2.1
+		// dataHT.put("name", "Data2.1");
+		// dataHT.put("build", "batimentSys.shp");
+		// dataHT.put("road", "routeSys.shp");
+		// dataHT.put("fac", "serviceSys.shp");
+		// dataHT.put("lei", "loisirSys.shp");
+		// dataHT.put("ptTram", "tramSys.shp");
+		// dataHT.put("ptTrain", "trainSys.shp");
+		// dataHT.put("nU", "nonUrbaPhySys.shp");
+		//
+		// //Data2.2
+		// dataHT.put("name", "Data2.2");
+		// dataHT.put("build", "batimentSys.shp");
+		// dataHT.put("road", "routeSys.shp");
+		// dataHT.put("fac", "serviceSys.shp");
+		// dataHT.put("lei", "loisirSys.shp");
+		// dataHT.put("ptTram", "tramSys.shp");
+		// dataHT.put("ptTrain", "trainSys.shp");
+		//
+//		 //Data3
+//		 dataHT.put("name", "Data3");
+//		 dataHT.put("build", "batimentPro.shp");
+//		 dataHT.put("road", "routeSys.shp");
+//		 dataHT.put("fac", "servicePro.shp");
+//		 dataHT.put("lei", "loisirPro.shp");
+//		 dataHT.put("ptTram", "tramPro.shp");
+//		 dataHT.put("ptTrain", "trainPro.shp");
+//		 dataHT.put("nU", "nonUrbaPro.shp");
+		//
+		// //Data4
+		// dataHT.put("name", "Data4");
+		// dataHT.put("build", "batimentPro.shp");
+		// dataHT.put("road", "routePro.shp");
+		// dataHT.put("fac", "servicePro.shp");
+		// dataHT.put("lei", "loisirSys.shp");
+		// dataHT.put("ptTram", "tramPro.shp");
+		// dataHT.put("ptTrain", "trainPro.shp");
+		// dataHT.put("nU", "nonUrbaPro.shp");
+		//
+		// //Data5
+		// dataHT.put("name", "Data5");
+		// dataHT.put("build", "batimentPro.shp");
+		// dataHT.put("road", "routePro.shp");
+		// dataHT.put("fac", "serviceSys.shp");
+		// dataHT.put("lei", "loisirPro.shp");
+		// dataHT.put("ptTram", "tramPro.shp");
+		// dataHT.put("ptTrain", "trainPro.shp");
+		// dataHT.put("nU", "nonUrbaPro.shp");
+
+		String name = "exOct";
 		File folderIn = new File("/home/mcolomb/informatique/MUP/explo/data");
-		File folderOut = new File("/media/mcolomb/Data_2/resultExplo/dimFract/ex");
+		File folderOut = new File("/media/mcolomb/Data_2/resultExplo/testOctData3");
 		double width = 28303;
 		double height = 21019;
 		double xmin = 914760;
@@ -32,22 +125,30 @@ public class CompositeTask {
 
 		boolean mean = true;
 		boolean useNU = true;
- 		long seed = 42;
+		if (dataHT.get("nU").isEmpty()) {
+			System.out.println("no NU zone");
+			useNU = false;
+		}
 
-		File filout = CompositeTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, minSize, maxSize, seuilDensBuild, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed, useNU);
+		long seed = 42;
+		File filout = CompositeTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, minSize, maxSize, seuilDensBuild, nMax, strict, ahp0, ahp1, ahp2,
+				ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed, useNU, dataHT);
 		System.out.println(filout);
+
 	}
 
-	public static File run(String name, File folderIn, File folderOut, double xmin, double ymin, double width, double height, double shiftX, double shiftY, double minSize, double maxSize, double seuilDensBuild, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7, double ahp8, boolean mean, long seed, boolean useNU) throws Exception {
+	public static File run(String name, File folderIn, File folderOut, double xmin, double ymin, double width, double height, double shiftX, double shiftY, double minSize,
+			double maxSize, double seuilDensBuild, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7,
+			double ahp8, boolean mean, long seed, boolean useNU, Map<String, String> dataHT) throws Exception {
 		System.out.println("----------Project creation----------");
-		ProjectCreationTask.NAME_BUILD_FILE = "BATI_AU.shp";
-		ProjectCreationTask.NAME_FILE_ROAD = "route_sans_chemin.shp";
-		File projectFile = ProjectCreationTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, useNU);
+		File projectFile = ProjectCreationTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, useNU, dataHT);
 		System.out.println("----------Decomp task----------");
 		DecompTask.run(projectFile, name, minSize, maxSize, seuilDensBuild);
 		System.out.println("----------Simulation task----------");
-		SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed,useNU);
-		//RasterAnalyseTask.run(scenarFile, name);
+		for (seed = 42; seed < 1042; seed = seed + 1) {
+			SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed, useNU);
+		}
+		RasterAnalyseTask.run(projectFile, name);
 		System.out.println("----------End task----------");
 		return projectFile;
 	}

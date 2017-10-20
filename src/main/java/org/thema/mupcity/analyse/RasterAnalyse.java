@@ -1,16 +1,12 @@
 package org.thema.mupcity.analyse;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.math3.stat.correlation.Covariance;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -32,7 +28,6 @@ import org.opengis.coverage.grid.GridEnvelope;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.thema.mupcity.exp.TotalTests;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -41,9 +36,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class RasterAnalyse {
 
 	/**
-	 * This class contains several methods used for the analysis of the MUP-City outputs during the sensibility and stability tests raster outputs must contains the selected to urbanize cells mixed with the evaluation layer (output of the extract-eval-anal method) The raster
-	 * selected with the selectWith method are compared within the mergeRaster method There is two ways to compare rasters : if they are composed of the exact same grid, we will use the relative position of the cells within this grid. The "discrete" variable will be "false" and
-	 * CreateStats method will be used to calculate statistics if the rasters to compare are different, we use the DirectPosition object to locate the cells. The "discrete" variable will be "true" and SplitMergedTypo method will be used to calculate statistics
+	 * This class contains several methods used for the analysis of the MUP-City outputs during the sensibility and stability tests raster outputs must contains the selected to
+	 * urbanize cells mixed with the evaluation layer (output of the extract-eval-anal method) The raster selected with the selectWith method are compared within the mergeRaster
+	 * method There is two ways to compare rasters : if they are composed of the exact same grid, we will use the relative position of the cells within this grid. The "discrete"
+	 * variable will be "false" and CreateStats method will be used to calculate statistics if the rasters to compare are different, we use the DirectPosition object to locate the
+	 * cells. The "discrete" variable will be "true" and SplitMergedTypo method will be used to calculate statistics
 	 * 
 	 */
 
@@ -128,7 +125,8 @@ public class RasterAnalyse {
 	}
 
 	/**
-	 * method which analyse the small replication of a lot of parameters described into the experimental tests about the sensibility of MUP-City All the arguments are taken in the class variable it creates a tab sheet on the /stats folder from the rootFile and merged rasters
+	 * method which analyse the small replication of a lot of parameters described into the experimental tests about the sensibility of MUP-City All the arguments are taken in the
+	 * class variable it creates a tab sheet on the /stats folder from the rootFile and merged rasters
 	 * 
 	 * @author Maxime Colomb
 	 * @throws Exception
@@ -164,7 +162,7 @@ public class RasterAnalyse {
 		}
 	}
 
-	//test de réplications discrètisé
+	// test de réplications discrètisé
 	public static void replicationCompareScale() throws Exception {
 
 		compare20_60 = true;
@@ -317,7 +315,8 @@ public class RasterAnalyse {
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	public static void compare180(Hashtable<DirectPosition2D, Integer> cellRepetCentroid, Hashtable<DirectPosition2D, Float> cellEvalCentroid, String namescenar) throws IOException {
+	public static void compare180(Hashtable<DirectPosition2D, Integer> cellRepetCentroid, Hashtable<DirectPosition2D, Float> cellEvalCentroid, String namescenar)
+			throws IOException {
 		Hashtable<DirectPosition2D, Integer> cellRepet180 = new Hashtable<DirectPosition2D, Integer>();
 		Hashtable<DirectPosition2D, Float> cellEval180 = new Hashtable<DirectPosition2D, Float>();
 
@@ -382,7 +381,8 @@ public class RasterAnalyse {
 		}
 	}
 
-	public static void compare60(Hashtable<DirectPosition2D, Integer> cellRepetCentroid, Hashtable<DirectPosition2D, Float> cellEvalCentroid, String namescenar) throws IOException {
+	public static void compare60(Hashtable<DirectPosition2D, Integer> cellRepetCentroid, Hashtable<DirectPosition2D, Float> cellEvalCentroid, String namescenar)
+			throws IOException {
 		Hashtable<DirectPosition2D, Integer> cellRepet60 = new Hashtable<DirectPosition2D, Integer>();
 		Hashtable<DirectPosition2D, Float> cellEval60 = new Hashtable<DirectPosition2D, Float>();
 
@@ -495,13 +495,13 @@ public class RasterAnalyse {
 			listEachCity.add(file);
 			mergeRasters(listEachCity, "cityGen" + i);
 		}
-		//mergeRasters(listRepliGen, "gridCompare");
+		// mergeRasters(listRepliGen, "gridCompare");
 
 	}
 
 	/**
-	 * mergeRaster Merge the given Array of Files. Return an array of statistic values. Will also return a merged tif (in construction) ======= Merge the given Array of Files. Return an array of statistic values. Will also return a merged tif (in construction) >>>>>>> f7654ed maj
-	 * workflow et comm rasteranalyse
+	 * mergeRaster Merge the given Array of Files. Return an array of statistic values. Will also return a merged tif (in construction) ======= Merge the given Array of Files.
+	 * Return an array of statistic values. Will also return a merged tif (in construction) >>>>>>> f7654ed maj workflow et comm rasteranalyse
 	 * 
 	 * @param listRepliFile
 	 *            : ArrayList of File pointing to the raster layer to merge
@@ -510,13 +510,13 @@ public class RasterAnalyse {
 	 */
 	public static File mergeRasters(ArrayList<File> listRepliFile, String nameScenar) throws Exception {
 
-		//creating different folders
+		// creating different folders
 		File rasterFile = new File(rootFile + "/raster/");
 		File raster = new File(rasterFile + "/" + nameScenar + "_rasterMerged_ech_" + echelle + ".tif");
 		File rasterStable = new File(rasterFile + "/" + nameScenar + "_rasterMerged-Stable-_ech_" + echelle + ".tif");
 		rasterFile.mkdirs();
 
-		//variables to create statistics
+		// variables to create statistics
 
 		DescriptiveStatistics statNb = new DescriptiveStatistics();
 		Hashtable<GridCoordinates2D, Integer> cellRepet = new Hashtable<GridCoordinates2D, Integer>();
@@ -525,23 +525,23 @@ public class RasterAnalyse {
 		Hashtable<GridCoordinates2D, ArrayList<Float>> cellEval = new Hashtable<GridCoordinates2D, ArrayList<Float>>();
 		Hashtable<GridCoordinates2D, ArrayList<Float>> cellEvalSt = new Hashtable<GridCoordinates2D, ArrayList<Float>>();
 
-		double nbScSt = 0;//nb de cellules dans une simulation stricte lors de la comparaison
+		double nbScSt = 0;// nb de cellules dans une simulation stricte lors de la comparaison
 
-		int nbDeScenar = 0; //le nombre total de scénarios analysés dans la fonction
+		int nbDeScenar = 0; // le nombre total de scénarios analysés dans la fonction
 
 		double[] histo = new double[listRepliFile.size()];
 		int iter = 0;
 
-		//variables for merged raster
-		//not cool coz i cannot know the number of column and lines of the enveloppe yet and the type need it
-		//change the type to a collection or an arraylist? 
+		// variables for merged raster
+		// not cool coz i cannot know the number of column and lines of the enveloppe yet and the type need it
+		// change the type to a collection or an arraylist?
 
 		float[][] imagePixelData = new float[1467][1467];
 		float[][] imagePixelDataStable = new float[1467][1467];
 
 		Envelope2D env = null;
 
-		//loop on the different cells
+		// loop on the different cells
 		for (File f : listRepliFile) {
 			// setting of useless parameters
 			ParameterValue<OverviewPolicy> policy = AbstractGridFormat.OVERVIEW_POLICY.createValue();
@@ -566,16 +566,16 @@ public class RasterAnalyse {
 			int compteurNombre = 0;
 			nbDeScenar = nbDeScenar + 1;
 
-			// beginning of the all cells loop			
+			// beginning of the all cells loop
 			int debI = 0;
 			int debJ = 0;
 
 			// in case of a move of the grid, we have to delete the border cells because they will be moved
 
-			//			double Xmin = 914760;
-			//			double Xmax = 943200;
-			//			double Ymin = 6680157;
-			//			double Ymax = 6701217;
+			// double Xmin = 914760;
+			// double Xmax = 943200;
+			// double Ymin = 6680157;
+			// double Ymax = 6701217;
 			double Xmin = 914568;
 			double Xmax = 943255;
 			double Ymin = 6679887;
@@ -589,9 +589,10 @@ public class RasterAnalyse {
 
 			}
 
-			//developpement pour les cas ou l'on veut une analyse discrétisée ou si les bordures doivent être coupées
+			// developpement pour les cas ou l'on veut une analyse discrétisée ou si les bordures doivent être coupées
 			if (((discrete == true && Double.parseDouble(echelle) <= 180)) || cutBorder == true) {
-				for (double r = Xmin; r <= Xmax; r = r + Double.parseDouble(echelle)) {//those values are the bounds from project (and upped to correspond to a multiple of 180 to analyse all the cells in the project) 
+				for (double r = Xmin; r <= Xmax; r = r + Double.parseDouble(echelle)) {// those values are the bounds from project (and upped to correspond to a multiple of 180 to
+																						// analyse all the cells in the project)
 					for (double t = Ymin; t <= Ymax; t = t + Double.parseDouble(echelle)) {
 						DirectPosition2D coordCentre = new DirectPosition2D(r, t);
 						float[] yo = (float[]) coverage.evaluate(coordCentre);
@@ -599,7 +600,7 @@ public class RasterAnalyse {
 							compteurNombre = compteurNombre + 1;
 							if (cellRepetCentroid.containsKey(coordCentre)) { // si la cellule a déja été sélectionné lors de réplications
 								cellRepetCentroid.put(coordCentre, cellRepetCentroid.get(coordCentre) + 1);
-								//on mets les valeurs d'évaluation dans un tableau
+								// on mets les valeurs d'évaluation dans un tableau
 
 							} else { // si la cellule est sélectionné pour la première fois
 								cellRepetCentroid.put(coordCentre, 1);
@@ -609,7 +610,7 @@ public class RasterAnalyse {
 					}
 				}
 			}
-			//analyse normale de la réplication des cellules
+			// analyse normale de la réplication des cellules
 			else {
 				for (int i = debI; i < w; i++) {
 					for (int j = debJ; j < h; j++) {
@@ -618,7 +619,7 @@ public class RasterAnalyse {
 							compteurNombre = compteurNombre + 1;
 							if (cellRepet.containsKey(coord)) { // si la cellule a déja été sélectionné lors de réplications
 								cellRepet.put(coord, cellRepet.get(coord) + 1);
-								ArrayList<Float> temp = cellEval.get(coord); //on mets les valeurs d'évaluation dans un tableau
+								ArrayList<Float> temp = cellEval.get(coord); // on mets les valeurs d'évaluation dans un tableau
 								temp.add((float) coverage.evaluate(coord, vals)[0]);
 								cellEval.put(coord, temp);
 								imagePixelData[j][i] = imagePixelData[j][i] + 1;
@@ -627,7 +628,7 @@ public class RasterAnalyse {
 								ArrayList<Float> firstList = new ArrayList<Float>();
 								firstList.add((float) coverage.evaluate(coord, vals)[0]);
 								cellEval.put(coord, firstList);
-								//bricolage pour avoir l'eval des cellules qui sont présente dans les simulations St et non dans Ba
+								// bricolage pour avoir l'eval des cellules qui sont présente dans les simulations St et non dans Ba
 								if (compareBaSt == true && f.toString().contains("--St--")) {
 									cellEvalSt.put(coord, firstList);
 								}
@@ -640,23 +641,23 @@ public class RasterAnalyse {
 
 			System.out.println("il y a " + compteurNombre + " cellules dans " + nameScenar + " de réplication " + nbDeScenar);
 
-			//Historique de l'évolution du nombre de cellules sélectionnées dans toutes les simulations
+			// Historique de l'évolution du nombre de cellules sélectionnées dans toutes les simulations
 			statNb.addValue(compteurNombre);
 			histo[iter] = (double) cellRepet.size();
 			iter = iter + 1;
 			System.out.println(cellRepet.size());
 
-			//lors de la comparaison des scénarios strictes et basiques, inscrit le nombre de cellule dans le scénario stricte
+			// lors de la comparaison des scénarios strictes et basiques, inscrit le nombre de cellule dans le scénario stricte
 			if (compareBaSt == true && f.toString().contains("--St--")) {
 				nbScSt = (double) compteurNombre;
 			}
 		}
 
-		//create a merged raster and a stable merged raster
+		// create a merged raster and a stable merged raster
 		if (discrete == false && compareAHP == false && cutBorder == false && nbDeScenar != 0) {
 			int lgt = imagePixelData.length;
 			System.out.println("lgt: " + lgt);
-			//reverse the pixels coz the raster was turned bad
+			// reverse the pixels coz the raster was turned bad
 			for (int p = 1; p < lgt; p++) {
 				for (int q = 1; q < lgt; q++) {
 					if (imagePixelData[p][q] == nbDeScenar) {
@@ -668,7 +669,7 @@ public class RasterAnalyse {
 			writeGeotiffStabled(rasterStable.getAbsolutePath(), imagePixelDataStable, env);
 		}
 
-		//compare different scales of cells
+		// compare different scales of cells
 		if (compare20_180 == true) {
 			compare180(cellRepetCentroid, cellEvalCentroid, nameScenar);
 
@@ -678,7 +679,7 @@ public class RasterAnalyse {
 
 		}
 
-		//truandage pour faire passer dans la methode createStat le nombre de cellule dans une simulation stricte et leurs évaluations
+		// truandage pour faire passer dans la methode createStat le nombre de cellule dans une simulation stricte et leurs évaluations
 		if (compareBaSt == true) {
 			histo = new double[1];
 			histo[0] = nbScSt;
@@ -689,12 +690,12 @@ public class RasterAnalyse {
 				}
 			}
 		}
-File statFile = new File("");
-		//création de statistiques pour une analyse discrétisé
+		File statFile = new File("");
+		// création de statistiques pour une analyse discrétisé
 		if ((discrete == true || cutBorder == true) && (compare20_180 == false || compare20_60 == false)) {
 			statFile = splitMergedTypo(nameScenar, cellRepetCentroid, cellEvalCentroid);
 		}
-		//création de statistiques pour une analyse normale 
+		// création de statistiques pour une analyse normale
 		else if (discrete == false && (compare20_180 == false || compare20_60 == false)) {
 			statFile = createStats(nameScenar, histo, statNb, cellRepet, cellEval);
 		}
@@ -742,22 +743,22 @@ File statFile = new File("");
 
 		for (DirectPosition2D coord : cellRepet.keySet()) {
 			for (Object eachFeature : features.toArray()) {
-				//geotool way of create feature
+				// geotool way of create feature
 				SimpleFeatureImpl feature = (SimpleFeatureImpl) eachFeature;
 				Geometry geom = (Geometry) feature.getDefaultGeometry();
 				String city = feature.getAttribute("NOM_COM").toString();
 				String typopo = feature.getAttribute("typo").toString();
 				Coordinate coordo = new Coordinate(coord.getX(), coord.getY());
-				//point representing the tested cell
+				// point representing the tested cell
 				GeometryFactory geometryFactory = new GeometryFactory();
 				Geometry pt = geometryFactory.createPoint(coordo);
 
-				//creating the city statistics and typology
+				// creating the city statistics and typology
 				if (geom.contains(pt)) {
 					double[] nbByCity = new double[5];
 					if (cellByCity.containsKey(city)) {
 						nbByCity[0] = cellByCity.get(city)[0] + 1;
-						//class if cells are varaible or not
+						// class if cells are varaible or not
 						if (cellRepet.get(coord) == repl) {
 							nbByCity[1] = cellByCity.get(city)[1] + 1;
 							nbByCity[2] = cellByCity.get(city)[2];
@@ -765,7 +766,7 @@ File statFile = new File("");
 							nbByCity[2] = cellByCity.get(city)[2] + 1;
 							nbByCity[1] = cellByCity.get(city)[1];
 						}
-						//aggregation of the different evaluations
+						// aggregation of the different evaluations
 						ArrayList<Float> temp = evalByCity.get(city);
 						temp.add(cellEval.get(coord));
 						evalByCity.put(city, temp);
@@ -776,11 +777,11 @@ File statFile = new File("");
 						nbByCity[3] = (double) valeval / evalByCity.get(city).size();
 						cellByCity.put(city, nbByCity);
 					} else {
-						//new cell in the city game
+						// new cell in the city game
 						nbByCity[0] = (double) 1;
 						ArrayList<Float> temp = new ArrayList<Float>();
 						temp.add(cellEval.get(coord));
-						//evaluation and average of the evaluation by city 
+						// evaluation and average of the evaluation by city
 						nbByCity[3] = cellEval.get(coord);
 						evalByCity.put(city, temp);
 						if (cellRepet.get(coord) == repl) {
@@ -942,7 +943,8 @@ File statFile = new File("");
 		return statFile;
 	}
 
-	private static File createStats(String nameScenar, double[] histo, DescriptiveStatistics statNb, Hashtable<GridCoordinates2D, Integer> cellRepet, Hashtable<GridCoordinates2D, ArrayList<Float>> cellEval) throws IOException {
+	private static File createStats(String nameScenar, double[] histo, DescriptiveStatistics statNb, Hashtable<GridCoordinates2D, Integer> cellRepet,
+			Hashtable<GridCoordinates2D, ArrayList<Float>> cellEval) throws IOException {
 
 		File statFile = new File(rootFile + "/stats");
 		if (compareAHP == true) {
@@ -963,7 +965,7 @@ File statFile = new File("");
 		// des statistiques du merge des rasters
 		Hashtable<GridCoordinates2D, Float> cellEvalFinal = new Hashtable<GridCoordinates2D, Float>();
 
-		//historique du nombre de cellules sélectionné par scénarios
+		// historique du nombre de cellules sélectionné par scénarios
 		Hashtable<String, double[]> enForme = new Hashtable<String, double[]>();
 		enForme.put("histo", histo);
 		generateCsvFileCol(enForme, statFile, "selected_cells_all_simu");
@@ -1025,19 +1027,20 @@ File statFile = new File("");
 			tableauRepl[i] = repli;
 			i = i + 1;
 		}
-		// cet indicateur ne sert pas à grand chose 
-		//		if (tableauMoy.length > 1 && stabilite == false && compareBaSt == false) { // si il n'y a pas de cellules, la covariance fait planter
-		//			double correlationCoefficient = new Covariance().covariance(tableauMoy, tableauRepl);
-		//			tableauFinal[14] = correlationCoefficient;
-		//			premiereCol[14] = ("coefficient de correlation entre le nombre de réplication et les évaluations des cellules");
-		//		}
-		//		if (tableauMoy.length > 1 && stabilite == true && compareBaSt == false) { // si il n'y a pas de cellules, la covariance fait planter
-		//			double covariance = new Covariance().covariance(tableauMoy, tableauRepl);
-		//			double correlationCoefficient = covariance /(statStable.getStandardDeviation()*ecartTypeEval);
-		//			tableauFinal[21] = correlationCoefficient;
-		//			System.out.println("correlationCoefficient iz : "+correlationCoefficient +  " and covariance " + covariance + "and produit des ecart types " + ecartTypeEval +" et " + tableauFinal[2] );
-		//			premiereCol[21] = ("coefficient de correlation entre le nombre de réplication et les évaluations des cellules");
-		//		}
+		// cet indicateur ne sert pas à grand chose
+		// if (tableauMoy.length > 1 && stabilite == false && compareBaSt == false) { // si il n'y a pas de cellules, la covariance fait planter
+		// double correlationCoefficient = new Covariance().covariance(tableauMoy, tableauRepl);
+		// tableauFinal[14] = correlationCoefficient;
+		// premiereCol[14] = ("coefficient de correlation entre le nombre de réplication et les évaluations des cellules");
+		// }
+		// if (tableauMoy.length > 1 && stabilite == true && compareBaSt == false) { // si il n'y a pas de cellules, la covariance fait planter
+		// double covariance = new Covariance().covariance(tableauMoy, tableauRepl);
+		// double correlationCoefficient = covariance /(statStable.getStandardDeviation()*ecartTypeEval);
+		// tableauFinal[21] = correlationCoefficient;
+		// System.out.println("correlationCoefficient iz : "+correlationCoefficient + " and covariance " + covariance + "and produit des ecart types " + ecartTypeEval +" et " +
+		// tableauFinal[2] );
+		// premiereCol[21] = ("coefficient de correlation entre le nombre de réplication et les évaluations des cellules");
+		// }
 		premiereCol[15] = ("moyenne evaluation des cellules instables");
 		premiereCol[16] = ("ecart type des cellules instables");
 		premiereCol[17] = ("coefficient de variation des cellules instables");
@@ -1183,7 +1186,7 @@ File statFile = new File("");
 		StatTab tableauStat = new StatTab("descriptive_statistics", nameScenar, tableauFinal, premiereCol);
 		tableauStat.toCsv(statFile, firstline);
 		firstline = false;
-		
+
 		return statFile;
 	}
 
@@ -1270,166 +1273,146 @@ File statFile = new File("");
 
 	public static void main(String[] args) throws Exception {
 		/*
-				//oneSIm
-				echelle = "20";
-				ArrayList<File> atest = new ArrayList<File>();
-				File dir1 = new File("/media/mcolomb/Data_2/resultTest/OneTest/LAEA/N5--St--org.thema.mupcity.AHP@610455d6--Moy--1-analyse-20.0.tif");
-				atest.add(dir1);
-				File dir2 = new File("/media/mcolomb/Data_2/resultTest/OneTest/Lambert/N5--St--org.thema.mupcity.AHP@610455d6--Moy--1-analyse-20.0.tif");
-				atest.add(dir2);
-				
-				mergeRasters(atest, "analyseProjection");
-				*/
+		 * //oneSIm echelle = "20"; ArrayList<File> atest = new ArrayList<File>(); File dir1 = new
+		 * File("/media/mcolomb/Data_2/resultTest/OneTest/LAEA/N5--St--org.thema.mupcity.AHP@610455d6--Moy--1-analyse-20.0.tif"); atest.add(dir1); File dir2 = new
+		 * File("/media/mcolomb/Data_2/resultTest/OneTest/Lambert/N5--St--org.thema.mupcity.AHP@610455d6--Moy--1-analyse-20.0.tif"); atest.add(dir2);
+		 * 
+		 * mergeRasters(atest, "analyseProjection");
+		 */
 
-		//changement de la grille 
-		//				sensibility=true;
-		//				for (int yo = 0; yo <= 2; yo++) {
-		//				
-		//					if (yo == 0) {
-		//						rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-20/");
-		//					} else if ( yo == 1){
-		//						rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-60/");
-		//					}
-		//					else {
-		//						rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-180/");
-		//					}
-		//					
-		////					ArrayList<String> echelles = new ArrayList<String>();
-		////					for (Integer i = 20; i <= 180; i = i * 3) {
-		////					String nombre = i.toString();
-		////					echelles.add(nombre);
-		////					}
-		////					for (String scale : echelles) {
-		//					echelle = "20";
-		//					discrete = true;
-		//					cutBorder = true;
-		//					sensibility = true;
-		//					gridChange();
-		//					}
-		//				
-		//				}
+		// changement de la grille
+		// sensibility=true;
+		// for (int yo = 0; yo <= 2; yo++) {
+		//
+		// if (yo == 0) {
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-20/");
+		// } else if ( yo == 1){
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-60/");
+		// }
+		// else {
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/MouvGrid/decal-180/");
+		// }
+		//
+		//// ArrayList<String> echelles = new ArrayList<String>();
+		//// for (Integer i = 20; i <= 180; i = i * 3) {
+		//// String nombre = i.toString();
+		//// echelles.add(nombre);
+		//// }
+		//// for (String scale : echelles) {
+		// echelle = "20";
+		// discrete = true;
+		// cutBorder = true;
+		// sensibility = true;
+		// gridChange();
+		// }
+		//
+		// }
 		discrete = true;
 		compare20_180 = true;
 		compare20_60 = true;
-		//for(Integer tc=22;tc<=22;tc=tc+1){
+		// for(Integer tc=22;tc<=22;tc=tc+1){
 		rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5YagBa");
-		//echelle = tc.toString();
+		// echelle = tc.toString();
 		for (Integer ech = 20; ech <= 180; ech = ech * 3) {
 			echelle = ech.toString();
 			String echStr = echelle + "m";
 			System.out.println("echelle :" + echStr);
-			//rootFile = new File(rootFile, echStr);
+			// rootFile = new File(rootFile, echStr);
 			ArrayList<File> fileToTest = new ArrayList<File>();
 			fileToTest = selectWith("", null);
 			mergeRasters(fileToTest, echStr + "analyse");
 		}
 
-		//}
+		// }
 
 		/*
-		//test_seuil pour la diff entre les tests avec et sans seuils
-		
-		rootFile = new File("/media/mcolomb/Data_2/resultTest/test_seuil/St/N6/results/");
-		ArrayList<String> echelles = new ArrayList<String>();
-		
-		for (Integer i = 20; i <= 180; i = i * 3) {
-		String nombre = i.toString();
-		echelles.add(nombre);
-		}
-		for (String scale : echelles) {
-		echelle = scale;
-		
-		for (int i = 2; i <= 6; i++) {
-		ArrayList<File> listFile = new ArrayList<File>();
-		for (int j = 0; j < 10; j++) {
-			File fileCool = new File(rootFile, ("seuil_10-" + i + "/replication_numero-" + j + "-eval_anal-" + echelle + ".0.tif"));
-			listFile.add(fileCool);
-		}
-		System.out.println(listFile);
-		mergeRasters(listFile, "test-seuil_10-" + i);
-		}
-		}
-		
-		
-		*/
-		//sensibilité de la grille
+		 * //test_seuil pour la diff entre les tests avec et sans seuils
+		 * 
+		 * rootFile = new File("/media/mcolomb/Data_2/resultTest/test_seuil/St/N6/results/"); ArrayList<String> echelles = new ArrayList<String>();
+		 * 
+		 * for (Integer i = 20; i <= 180; i = i * 3) { String nombre = i.toString(); echelles.add(nombre); } for (String scale : echelles) { echelle = scale;
+		 * 
+		 * for (int i = 2; i <= 6; i++) { ArrayList<File> listFile = new ArrayList<File>(); for (int j = 0; j < 10; j++) { File fileCool = new File(rootFile, ("seuil_10-" + i +
+		 * "/replication_numero-" + j + "-eval_anal-" + echelle + ".0.tif")); listFile.add(fileCool); } System.out.println(listFile); mergeRasters(listFile, "test-seuil_10-" + i);
+		 * } }
+		 * 
+		 * 
+		 */
+		// sensibilité de la grille
 
-		//				File root = rootFile;
-		//				discrete = false;
-		//				for (int decalage = 1; decalage <= 9; decalage = decalage * 3) {
-		//					rootFile = root;
-		//					rootFile = new File(rootFile + "/MouvData/" + decalage + "m");
-		//					sensibility = true;
-		//					switch (decalage) {
-		//					case 1:
-		//						echelle = "20";
-		//						break;
-		//					case 3:
-		//						echelle = "60";
-		//						break;
-		//					case 9:
-		//						echelle = "180";
-		//						break;
-		//					}
-		//		
-		//					gridSensibility();
-		//		
-		//		
-		//				}
+		// File root = rootFile;
+		// discrete = false;
+		// for (int decalage = 1; decalage <= 9; decalage = decalage * 3) {
+		// rootFile = root;
+		// rootFile = new File(rootFile + "/MouvData/" + decalage + "m");
+		// sensibility = true;
+		// switch (decalage) {
+		// case 1:
+		// echelle = "20";
+		// break;
+		// case 3:
+		// echelle = "60";
+		// break;
+		// case 9:
+		// echelle = "180";
+		// break;
+		// }
+		//
+		// gridSensibility();
+		//
+		//
+		// }
 		/*
-		//test de réplications discrètisé
-		
-		rootFile = new File(rootFile, "/tests_param/results/G0/");
-		compareBaSt();
-		*/
+		 * //test de réplications discrètisé
+		 * 
+		 * rootFile = new File(rootFile, "/tests_param/results/G0/"); compareBaSt();
+		 */
 
-		// etude des stabilités 
+		// etude des stabilités
 
-		//		discrete = false;
+		// discrete = false;
 		//
-		//		echelle = "20";
-		//		for (int i = 0 ; i<=2 ; i++){
-		//		
-		//			rootFile = new File(rootFile, "/Stability/N6MoySt");
-		//			rootFile = new File("/media/mcolomb/Data_2/resultTest/sensibility/5St/results");
-		//		
-		//			switch(i){
-		//			case 1 :
-		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoySt");
-		//				break;
-		//			case 2:
-		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoyBa");
-		//				break;
-		//			}
-		//		replicationStab();
-		//		
-		//		}
-		//		discrete = false;
-		//		echelle = "20";
-		//		for (int i = 0; i <= 3; i++) {
+		// echelle = "20";
+		// for (int i = 0 ; i<=2 ; i++){
 		//
-		//			rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N6MoySt");
-		//			switch (i) {
-		//			case 1:
-		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoySt");
-		//				break;
-		//			case 2:
-		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoyBa");
-		//				break;
-		//			case 3:
-		//				rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5YagBa");
-		//				break;
-		//			}
-		//			replicationStab();
-		//		}
+		// rootFile = new File(rootFile, "/Stability/N6MoySt");
+		// rootFile = new File("/media/mcolomb/Data_2/resultTest/sensibility/5St/results");
+		//
+		// switch(i){
+		// case 1 :
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoySt");
+		// break;
+		// case 2:
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoyBa");
+		// break;
+		// }
+		// replicationStab();
+		//
+		// }
+		// discrete = false;
+		// echelle = "20";
+		// for (int i = 0; i <= 3; i++) {
+		//
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N6MoySt");
+		// switch (i) {
+		// case 1:
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoySt");
+		// break;
+		// case 2:
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5MoyBa");
+		// break;
+		// case 3:
+		// rootFile = new File("/media/mcolomb/Data_2/resultExplo/Stability/N5YagBa");
+		// break;
+		// }
+		// replicationStab();
+		// }
 
-		/*ArrayList<File> listFil = new ArrayList<File>();
-		for (int i = 0; i <= 8; i++) {
-			File file = new File("/media/mcolomb/Data_2/resultTest/changement_grille/decal-180/stats-discrete/cellByCitydiscreteSensibility_case-" + i + ".csv");
-			listFil.add(file);
-		}
-		
-		File statest = new File("/media/mcolomb/Data_2/resultTest/changement_grille/decal-180/stats-discrete/");
-		compareCities(listFil, statest); */
+		/*
+		 * ArrayList<File> listFil = new ArrayList<File>(); for (int i = 0; i <= 8; i++) { File file = new
+		 * File("/media/mcolomb/Data_2/resultTest/changement_grille/decal-180/stats-discrete/cellByCitydiscreteSensibility_case-" + i + ".csv"); listFil.add(file); }
+		 * 
+		 * File statest = new File("/media/mcolomb/Data_2/resultTest/changement_grille/decal-180/stats-discrete/"); compareCities(listFil, statest);
+		 */
 	}
 }
