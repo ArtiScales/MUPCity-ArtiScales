@@ -483,6 +483,8 @@ public class ScenarioAuto extends Scenario {
     public void save( File chosenFile, Project project) throws IOException {
     	chosenFile.mkdirs();
         project.getMSGrid().saveLayer(chosenFile,this.getResultLayerName());
+        System.out.println("eval layer name in scenarioauto.save : "+this.getEvalLayerName());
+        project.getMSGrid().saveLayer(chosenFile,this.getEvalLayerName());
     }
     /**
      * Overload the coming method to set an automatic 0 threshold
@@ -506,7 +508,8 @@ public class ScenarioAuto extends Scenario {
     public void extractEvalAnal(int seuil, File dir, Project project) throws IOException{
     	MSGridBuilder msGrid = project.getMSGrid();
     	Collection<MSGrid> grids = msGrid.getGrids();
-    	Rectangle2D env = project.getBoundsOriginal();
+    	//Rectangle2D env = project.getBoundsOriginal();
+    	Rectangle2D env =project.getBounds();
 		msGrid.addLayer(this.getAnalEvalName(),DataBuffer.TYPE_FLOAT, Float.NaN);
     	for (MSGrid grid : grids) {
 	    	List<MSCell> cells = ((SquareGrid) grid).getCellIn(env);

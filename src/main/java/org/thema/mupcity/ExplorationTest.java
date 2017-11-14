@@ -25,8 +25,8 @@ import org.thema.mupcity.scenario.ScenarioAuto;
  */
 public class ExplorationTest {
 	public static void main(String[] args) throws IOException, SchemaException {
-		String folderData = "/home/julien/mupcity/data-true/";
-		String folderOut =  folderData + "out2/";
+		String folderData = "./data";
+		String folderOut =  folderData + "/out/";
 //		String folderData = "/home/mcolomb/informatique/MUP/explo/data/";
 //		String folderOut =  "/media/mcolomb/Data_2/resultTest";
 		// définition des variables fixes
@@ -211,9 +211,9 @@ public class ExplorationTest {
 
 			// list of AHP to loop in
 			List<AHP> ahpList = new ArrayList<AHP>();
-			ahpList.add(ahpE_Yag);
-			ahpList.add(ahpT_Yag);
-			ahpList.add(ahpS_Yag);
+			//ahpList.add(ahpE_Yag);
+			//ahpList.add(ahpT_Yag);
+			//ahpList.add(ahpS_Yag);
 			ahpList.add(ahpE_Moy);
 			ahpList.add(ahpT_Moy);
 			ahpList.add(ahpS_Moy);
@@ -244,7 +244,8 @@ public class ExplorationTest {
 							project.performScenarioAuto(scenario);
 							// save the project
 							// scenario.save(testFile,project);
-							// project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile); pas besoin de ces couches
+							project.getMSGrid().saveRaster(scenario.getResultLayerName(), testFile);
+							project.getMSGrid().saveRaster(scenario.getEvalLayerName(), testFile);
 							scenario.extractEvalAnal(testFile, project);
 							// delete of the saved layer to unload the heap space
 							project.getMSGrid().removeLayer(titre + "-morpho");

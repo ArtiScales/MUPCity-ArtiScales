@@ -48,11 +48,11 @@ public class RoadRule extends AbstractRule {
     public RoadRule() {
         super(Arrays.asList(Layers.ROAD));
         cellDistance = new TreeMap<>();
-        cellDistance.put(500.0, new DiscreteFunction(new double[]{0.0, 1.0}, new double[]{1.0, 0.0}));
-        cellDistance.put(200.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0}, new double[]{1.0, 0.5, 0.0}));
-        cellDistance.put(50.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0, 3.0}, new double[]{1.0, 0.666, 0.333, 0.0}));
-        cellDistance.put(20.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0, 3.0, 4.0}, new double[]{1.0, 0.75, 0.5, 0.25, 0.0}));
-        cellDistance.put(0.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0, 3.0, 4.0, 5.0}, new double[]{1.0, 0.8, 0.6, 0.4, 0.2, 0.0}));
+        cellDistance.put(500.0, new DiscreteFunction(new double[]{0.0, 1.0}, new double[]{1.0, 0.001}));
+        cellDistance.put(200.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0}, new double[]{1.0, 0.5, 0.001}));
+        cellDistance.put(50.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0, 3.0}, new double[]{1.0, 0.666, 0.333, 0.001}));
+        cellDistance.put(20.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0, 3.0, 4.0}, new double[]{1.0, 0.75, 0.5, 0.25, 0.001}));
+        cellDistance.put(0.0, new DiscreteFunction(new double[]{0.0, 1.0, 2.0, 3.0, 4.0, 5.0}, new double[]{1.0, 0.8, 0.6, 0.4, 0.2, 0.001}));
     }
     
     @Override
