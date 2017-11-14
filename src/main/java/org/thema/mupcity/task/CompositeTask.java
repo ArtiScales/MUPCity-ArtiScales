@@ -77,8 +77,8 @@ public class CompositeTask {
 //		 dataHT.put("ptTrain", "trainPro.shp");
 //		 dataHT.put("nU", "nonUrbaPro.shp");
 		//
-		// //Data4
-		// dataHT.put("name", "Data4");
+		// //Data3.1
+		// dataHT.put("name", "Data3.1");
 		// dataHT.put("build", "batimentPro.shp");
 		// dataHT.put("road", "routePro.shp");
 		// dataHT.put("fac", "servicePro.shp");
@@ -87,8 +87,8 @@ public class CompositeTask {
 		// dataHT.put("ptTrain", "trainPro.shp");
 		// dataHT.put("nU", "nonUrbaPro.shp");
 		//
-		// //Data5
-		// dataHT.put("name", "Data5");
+		// //Data3.2
+		// dataHT.put("name", "Data3.2");
 		// dataHT.put("build", "batimentPro.shp");
 		// dataHT.put("road", "routePro.shp");
 		// dataHT.put("fac", "serviceSys.shp");
@@ -99,7 +99,9 @@ public class CompositeTask {
 
 		String name = "exOct";
 		File folderIn = new File("/home/mcolomb/informatique/MUP/explo/data");
-		File folderOut = new File("/media/mcolomb/Data_2/resultExplo/testOctData3");
+		File folderOut = new File("/media/mcolomb/Data_2/resultExplo/testNov");
+		File discreteFile = new File("/home/mcolomb/informatique/MUP/explo/dataExtra/admin_typo.shp");
+		
 		double width = 28303;
 		double height = 21019;
 		double xmin = 914760;
@@ -113,16 +115,27 @@ public class CompositeTask {
 
 		int nMax = 5;
 		boolean strict = true;
-		double ahp8 = 0.083;
-		double ahp7 = 0.083;
-		double ahp6 = 0.083;
-		double ahp5 = 0.04;
-		double ahp4 = 0.218;
-		double ahp3 = 0.218;
-		double ahp2 = 0.218;
-		double ahp1 = 0.03;
-		double ahp0 = 0.027;
+		
+//		double ahp8 = 0.083;
+//		double ahp7 = 0.083;
+//		double ahp6 = 0.083;
+//		double ahp5 = 0.04;
+//		double ahp4 = 0.218;
+//		double ahp3 = 0.218;
+//		double ahp2 = 0.218;
+//		double ahp1 = 0.03;
+//		double ahp0 = 0.027;
 
+		double ahp8 = 0.111;
+		double ahp7 = 0.111;
+		double ahp6 = 0.111;
+		double ahp5 = 0.111;
+		double ahp4 = 0.111;
+		double ahp3 = 0.111;
+		double ahp2 = 0.111;
+		double ahp1 = 0.111;
+		double ahp0 = 0.111;
+		
 		boolean mean = true;
 		boolean useNU = true;
 		if (dataHT.get("nU").isEmpty()) {
@@ -131,13 +144,13 @@ public class CompositeTask {
 		}
 
 		long seed = 42;
-		File filout = CompositeTask.run(name, folderIn, folderOut, xmin, ymin, width, height, shiftX, shiftY, minSize, maxSize, seuilDensBuild, nMax, strict, ahp0, ahp1, ahp2,
+		File filout = CompositeTask.run(name, folderIn, folderOut, discreteFile, xmin, ymin, width, height, shiftX, shiftY, minSize, maxSize, seuilDensBuild, nMax, strict, ahp0, ahp1, ahp2,
 				ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed, useNU, dataHT);
 		System.out.println(filout);
 
 	}
 
-	public static File run(String name, File folderIn, File folderOut, double xmin, double ymin, double width, double height, double shiftX, double shiftY, double minSize,
+	public static File run(String name, File folderIn, File folderOut,File discreteFile, double xmin, double ymin, double width, double height, double shiftX, double shiftY, double minSize,
 			double maxSize, double seuilDensBuild, int nMax, boolean strict, double ahp0, double ahp1, double ahp2, double ahp3, double ahp4, double ahp5, double ahp6, double ahp7,
 			double ahp8, boolean mean, long seed, boolean useNU, Map<String, String> dataHT) throws Exception {
 		System.out.println("----------Project creation----------");
@@ -145,10 +158,10 @@ public class CompositeTask {
 		System.out.println("----------Decomp task----------");
 		DecompTask.run(projectFile, name, minSize, maxSize, seuilDensBuild);
 		System.out.println("----------Simulation task----------");
-		for (seed = 42; seed < 1042; seed = seed + 1) {
+		for (seed = 42; seed < 62; seed = seed + 1) {
 			SimulTask.run(projectFile, name, nMax, strict, ahp0, ahp1, ahp2, ahp3, ahp4, ahp5, ahp6, ahp7, ahp8, mean, seed, useNU);
 		}
-		RasterAnalyseTask.run(projectFile, name);
+		RasterAnalyseTask.run(projectFile,discreteFile, name);
 		System.out.println("----------End task----------");
 		return projectFile;
 	}

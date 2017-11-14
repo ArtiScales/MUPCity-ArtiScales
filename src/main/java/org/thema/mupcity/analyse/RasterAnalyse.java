@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -508,13 +509,8 @@ public class RasterAnalyse {
 	 * @return array of statistics results
 	 * @throws Exception
 	 */
-	public static File mergeRasters(ArrayList<File> listRepliFile, String nameScenar) throws Exception {
+	public static File mergeRasters(List<File> listRepliFile, String nameScenar) throws Exception {
 
-		// creating different folders
-		File rasterFile = new File(rootFile + "/raster/");
-		File raster = new File(rasterFile + "/" + nameScenar + "_rasterMerged_ech_" + echelle + ".tif");
-		File rasterStable = new File(rasterFile + "/" + nameScenar + "_rasterMerged-Stable-_ech_" + echelle + ".tif");
-		rasterFile.mkdirs();
 
 		// variables to create statistics
 
@@ -535,9 +531,6 @@ public class RasterAnalyse {
 		// variables for merged raster
 		// not cool coz i cannot know the number of column and lines of the enveloppe yet and the type need it
 		// change the type to a collection or an arraylist?
-
-		float[][] imagePixelData = new float[1467][1467];
-		float[][] imagePixelDataStable = new float[1467][1467];
 
 		Envelope2D env = null;
 
@@ -576,24 +569,23 @@ public class RasterAnalyse {
 			// double Xmax = 943200;
 			// double Ymin = 6680157;
 			// double Ymax = 6701217;
-			double Xmin = 914568;
-			double Xmax = 943255;
-			double Ymin = 6679887;
-			double Ymax = 6701446;
+			double Xmin = env.getMinX();
+			double Xmax = env.getMaxX();
+			double Ymin = env.getMinY();
+			double Ymax = env.getMaxY();
 			if (cutBorder == true) {
 				int ecart = Integer.parseInt(echelle);
 				Xmin = Xmin + ecart;
 				Xmax = Xmax - ecart;
 				Ymin = Ymin + ecart;
 				Ymax = Ymax - ecart;
-
 			}
 
 			// developpement pour les cas ou l'on veut une analyse discrétisée ou si les bordures doivent être coupées
 			if (((discrete == true && Double.parseDouble(echelle) <= 180)) || cutBorder == true) {
-				for (double r = Xmin; r <= Xmax; r = r + Double.parseDouble(echelle)) {// those values are the bounds from project (and upped to correspond to a multiple of 180 to
-																						// analyse all the cells in the project)
-					for (double t = Ymin; t <= Ymax; t = t + Double.parseDouble(echelle)) {
+				for (double r = Xmin + Double.parseDouble(echelle)/2; r <= Xmax; r = r + Double.parseDouble(echelle)) {
+					// those values are the bounds from project (and upped to correspond to a multiple of 180 to	analyse all the cells in the project)
+					for (double t = Ymin+ Double.parseDouble(echelle)/2; t <= Ymax; t = t + Double.parseDouble(echelle)) {
 						DirectPosition2D coordCentre = new DirectPosition2D(r, t);
 						float[] yo = (float[]) coverage.evaluate(coordCentre);
 						if (yo[0] > 0) {
@@ -622,7 +614,6 @@ public class RasterAnalyse {
 								ArrayList<Float> temp = cellEval.get(coord); // on mets les valeurs d'évaluation dans un tableau
 								temp.add((float) coverage.evaluate(coord, vals)[0]);
 								cellEval.put(coord, temp);
-								imagePixelData[j][i] = imagePixelData[j][i] + 1;
 							} else {// si la cellule est sélectionné pour la première fois
 								cellRepet.put(coord, 1);
 								ArrayList<Float> firstList = new ArrayList<Float>();
@@ -632,7 +623,6 @@ public class RasterAnalyse {
 								if (compareBaSt == true && f.toString().contains("--St--")) {
 									cellEvalSt.put(coord, firstList);
 								}
-								imagePixelData[j][i] = imagePixelData[j][i] + 1;
 							}
 						}
 					}
@@ -651,22 +641,6 @@ public class RasterAnalyse {
 			if (compareBaSt == true && f.toString().contains("--St--")) {
 				nbScSt = (double) compteurNombre;
 			}
-		}
-
-		// create a merged raster and a stable merged raster
-		if (discrete == false && compareAHP == false && cutBorder == false && nbDeScenar != 0) {
-			int lgt = imagePixelData.length;
-			System.out.println("lgt: " + lgt);
-			// reverse the pixels coz the raster was turned bad
-			for (int p = 1; p < lgt; p++) {
-				for (int q = 1; q < lgt; q++) {
-					if (imagePixelData[p][q] == nbDeScenar) {
-						imagePixelDataStable[p][q] = imagePixelData[p][q];
-					}
-				}
-			}
-			writeGeotiff(raster.getAbsolutePath(), imagePixelData, env);
-			writeGeotiffStabled(rasterStable.getAbsolutePath(), imagePixelDataStable, env);
 		}
 
 		// compare different scales of cells
@@ -737,7 +711,7 @@ public class RasterAnalyse {
 
 		String[] premiereCol = new String[12];
 
-		ShapefileDataStore typo = new ShapefileDataStore(discreteFile.toURL());
+		ShapefileDataStore typo = new ShapefileDataStore(discreteFile.toURI().toURL());
 
 		ContentFeatureCollection features = typo.getFeatureSource().getFeatures();
 
@@ -1237,23 +1211,6 @@ public class RasterAnalyse {
 		writer.close();
 	}
 
-	public static void writeGeotiff(String fileName, float[][] imagePixelData, Envelope2D env) {
-
-		GridCoverage2D coverage = new GridCoverageFactory().create("OTPAnalyst", imagePixelData, env);
-		try {
-			GeoTiffWriteParams wp = new GeoTiffWriteParams();
-			wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
-			wp.setCompressionType("LZW");
-			ParameterValueGroup params = new GeoTiffFormat().getWriteParameters();
-			params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
-			GeoTiffWriter writer = new GeoTiffWriter(new File(fileName));
-			writer.write(coverage, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
-		} catch (Exception e) {
-			e.printStackTrace();
-
-		}
-	}
-
 	public static void writeGeotiffStabled(String fileName, float[][] imagePixelData, Envelope2D env) {
 
 		GridCoverage2D coverage = new GridCoverageFactory().create("OTPAnalyst", imagePixelData, env);
@@ -1318,7 +1275,7 @@ public class RasterAnalyse {
 			String echStr = echelle + "m";
 			System.out.println("echelle :" + echStr);
 			// rootFile = new File(rootFile, echStr);
-			ArrayList<File> fileToTest = new ArrayList<File>();
+			List<File> fileToTest = new ArrayList<File>();
 			fileToTest = selectWith("", null);
 			mergeRasters(fileToTest, echStr + "analyse");
 		}

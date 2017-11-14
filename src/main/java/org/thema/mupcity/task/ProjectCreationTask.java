@@ -154,7 +154,7 @@ public class ProjectCreationTask {
 		File[] listMassacre = {buildFile,roadFile,facilityFile,leisureFile,busFile,trainFile,restrictFile};
 		
 		// Translation des différentes couches
-		
+
 		translateSHP(new File(folderIn, dataHT.get("build")), buildFile, shiftX, shiftY);
 		translateSHP(new File(folderIn, dataHT.get("road")), roadFile, shiftX, shiftY);
 		translateSHP(new File(folderIn, dataHT.get("fac")), facilityFile, shiftX, shiftY);
@@ -188,7 +188,6 @@ public class ProjectCreationTask {
 			CharSequence target = f.getName().subSequence(0, f.getName().length()-4);
 			for (File fDelete : f.getParentFile().listFiles()){
 				if (fDelete.toString().contains(target)){
-				System.out.println(fDelete);
 				fDelete.delete();
 				}
 			}
