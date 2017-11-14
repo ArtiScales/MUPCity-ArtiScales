@@ -98,13 +98,6 @@ public class RasterMerge {
 		double xMin = env.getMinX();
 		double yMin = env.getMinY();
 
-		if (xMinIni == 0) {
-			xMinIni = env.getMinX();
-			yMinIni = env.getMinY();
-			xMaxIni = env.getMaxX();
-			yMaxIni = env.getMaxX();
-		}
-
 		for (int fInd = 0; fInd < (folderIn.size()); fInd++) {
 
 			System.out.println("Image n° " + fInd + "  sur " + (folderIn.size() - 1));
