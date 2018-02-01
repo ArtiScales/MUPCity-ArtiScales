@@ -359,6 +359,7 @@ public class Project extends AbstractTreeNode {
 			getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), true);
 		}
 		long t = System.currentTimeMillis();
+		
 		for (Rule rule : rules.values()) {
 			if (rule.isUsable(this)) {
 				monitor.incProgress(1);
@@ -929,31 +930,17 @@ public class Project extends AbstractTreeNode {
 	}
 
 	/**
-	 * Saves the project. Saves the xml project file and the multiscale grid if the decomposition is already done.
+	 * Overload to save on the default folder
 	 * 
 	 * @throws IOException
 	 */
 	public void save() throws IOException {
-		XStream xml = new XStream(new JDomDriver());
-		if (isDecomp()) {
-			getGridDir().mkdir();
-			msGrid.save(getGridDir());
-		}
-		file = file.getAbsoluteFile();
-		for (ShapeFileLayer l : infoLayers) {
-			if (file.getParentFile().equals(l.getShapeFile().getParentFile())) {
-				l.setShapeFile(new File(l.getShapeFile().getName()));
-			}
-		}
-
-		try (FileWriter fw = new FileWriter(file)) {
-			xml.toXML(this, fw);
-		}
+		save(getGridDir());
 	}
 
 	/**
-	 * Overload to save on a chosen folder
 	 * 
+	 * Saves the project. Saves the xml project file and the multiscale grid if the decomposition is already done.
 	 * @param Folder
 	 *            the chosen folder
 	 * @throws IOException
