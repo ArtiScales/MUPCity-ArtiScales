@@ -78,10 +78,8 @@ public class AHP {
         if(coefs != null) {
             return coefs;
         }
-        
- 
                 
-       int size= matrix.getKeys1().size();
+        int size= matrix.getKeys1().size();
  
         if(size == 0) {
             return Collections.EMPTY_MAP;
@@ -126,7 +124,7 @@ public class AHP {
         for(i = 0; i < size; i++) {
             finalVector[i] = size * vector[i] / sum;
             if(finalVector[i] < 0) {
-                Logger.getLogger(AHP.class.getName()).log(Level.WARNING, "Vecteur nÃ©gatif !!"
+                Logger.getLogger(AHP.class.getName()).log(Level.WARNING, "Vecteur négatif !!"
                         + "\nMatrice : \n" + new Matrix(mat)
                         + "\nVector : \n" + Arrays.toString(vector)
                         + "\nValues" + Arrays.toString(new Matrix(mat).eig().getRealEigenvalues()));
@@ -136,7 +134,6 @@ public class AHP {
         coefs = new HashMap<>();
         for(i = 0; i < size; i++) {
             coefs.put(items.get(i), finalVector[i]);
-            System.out.println("Added in AHP : " + items.get(i) + "  " + finalVector[i]);
         }
         return coefs;        
     }

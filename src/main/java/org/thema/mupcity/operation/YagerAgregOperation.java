@@ -49,4 +49,5 @@ public class YagerAgregOperation extends AbstractOperation {
         }
         return min;
     }
+    
 }

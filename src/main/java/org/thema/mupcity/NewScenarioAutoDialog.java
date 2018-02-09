@@ -24,8 +24,7 @@ import javax.swing.JOptionPane;
 
 /**
  * Dialog form for creating new automatic multiscale scenario.
- * 
- * @author Gilles Vuidel
+ * @author  Gilles Vuidel
  */
 public class NewScenarioAutoDialog extends javax.swing.JDialog {
 
