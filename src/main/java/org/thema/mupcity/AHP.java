@@ -43,7 +43,7 @@ public class AHP {
     public AHP(List<String> items) {
         matrix = new HashMap2D<>(items, items, "1");
     }
-
+    
     /**
      * This matrix must not be modified !!!
      * If you modify it, call {@link #setMatrix(org.thema.common.collection.HashMap2D) } after.
@@ -77,7 +77,7 @@ public class AHP {
         if(coefs != null) {
             return coefs;
         }
-        
+                
         int size = matrix.getKeys1().size();
         if(size == 0) {
             return Collections.EMPTY_MAP;

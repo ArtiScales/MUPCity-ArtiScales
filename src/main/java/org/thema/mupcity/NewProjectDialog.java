@@ -176,11 +176,11 @@ public class NewProjectDialog extends javax.swing.JDialog {
         }
 
         try {
-            project = Project.createProject(nameTextField.getText(), dirSelectFilePanel.getSelectedFile(), buildSelectFilePane.getSelectedFile(), new TaskMonitor.EmptyMonitor());
+            project = Project.createProject(nameTextField.getText(), dirSelectFilePanel.getSelectedFile(), buildSelectFilePane.getSelectedFile(), null);
             if(zonePrj != null) {
                 project.setBounds(zonePrj);
             }
-        } catch(IOException | SchemaException ex) {
+        } catch(IOException ex) {
             Logger.getLogger(NewProjectDialog.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "An error occured while creating project :\n" + ex.getLocalizedMessage());
             return;

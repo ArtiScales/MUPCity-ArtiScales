@@ -1,5 +1,8 @@
 ## Changelog
 
+##### version 1.2.2 (19/02/2018)
+- Merge with CLI branch for using MupCity with OpenMole
+
 ##### version 1.2.1 (19/02/2018)
 - Le paramétrage des règles pour la décomposition n'était pas pris en compte 
 - Optimisation du calcul de l'accessibilité aux commerces de niveau 3

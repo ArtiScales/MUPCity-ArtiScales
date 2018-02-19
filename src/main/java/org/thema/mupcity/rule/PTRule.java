@@ -44,10 +44,10 @@ public class PTRule extends AbstractRule {
     private double maxDistBus = 400;
     
     @ReflectObject.Name("Bus station count function")
-    private DiscreteFunction stationCount = new DiscreteFunction(new double[]{0.0, 4.0}, new double []{0.0, 1.0});
+    private DiscreteFunction stationCount = new DiscreteFunction(new double[]{0.0, 4.0}, new double []{0.001, 1.0});
     
     @ReflectObject.Name("Distance train station function")
-    private DiscreteFunction distanceStation = new DiscreteFunction(new double[]{0.0, 3000.0}, new double []{1.0, 0.0});
+    private DiscreteFunction distanceStation = new DiscreteFunction(new double[]{0.0, 3000.0}, new double []{1.0, 0.001});
     
     /**
      * Creates a new public transport rule with default parameters.
@@ -89,9 +89,7 @@ public class PTRule extends AbstractRule {
                     }
                 }
                 cell.setLayerValue(getName(), Math.max(stationCount.getValue(nbStation), distanceStation.getValue(distMinTrain)));
-              
             }
         }, true);
     }
-    
 }

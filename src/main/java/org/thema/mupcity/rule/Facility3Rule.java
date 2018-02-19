@@ -43,7 +43,7 @@ import org.thema.msca.operation.AbstractLayerOperation;
 public class Facility3Rule extends AbstractRule {
     
     @ReflectObject.Name("Distance function")
-    DiscreteFunction distance = new DiscreteFunction(new double[]{15.0, 30.0}, new double []{1.0, 0.0});
+    DiscreteFunction distance = new DiscreteFunction(new double[]{15.0, 30.0}, new double []{1.0, 0.001});
     
     /**
      * Creates new facility rule level 3 with default parameters.

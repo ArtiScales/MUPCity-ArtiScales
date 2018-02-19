@@ -92,6 +92,10 @@ public abstract class Scenario {
     public String getName() {
         return name;
     }
+
+    public boolean isMean() {
+        return mean;
+    }
     
     /**
      * @return the name of the scenario

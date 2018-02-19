@@ -15,19 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 package org.thema.mupcity.scenario;
 
+import java.awt.geom.Rectangle2D;
+import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.TreeMap;
+
 import javax.media.jai.Histogram;
 import javax.media.jai.ROI;
 import javax.media.jai.operator.SubtractFromConstDescriptor;
-import javax.swing.ProgressMonitor;
-import org.thema.mupcity.AHP;
-import org.thema.mupcity.Project;
+
 import org.thema.common.swing.TaskMonitor;
 import org.thema.drawshape.image.RasterShape;
 import org.thema.drawshape.layer.DefaultGroupLayer;
@@ -42,13 +49,18 @@ import org.thema.msca.Grid;
 import org.thema.msca.MSCell;
 import org.thema.msca.MSGrid;
 import org.thema.msca.MSGridBuilder;
+import org.thema.msca.SquareGrid;
+import org.thema.msca.operation.AbstractAgregateOperation;
 import org.thema.msca.operation.AbstractLayerOperation;
-import org.thema.msca.*;
-import org.thema.msca.operation.*;
+import org.thema.msca.operation.AcceptableCell;
+import org.thema.msca.operation.SimpleAgregateOperation;
+import org.thema.mupcity.AHP;
+import org.thema.mupcity.Project;
+
 
 /**
  * Base implementation for automatic scenario.
- * 
+ *
  * @author Gilles Vuidel
  */
 public class ScenarioAuto extends Scenario {
@@ -66,16 +78,28 @@ public class ScenarioAuto extends Scenario {
     // monoscale attributes
     private int nbCell;
 
+    // random number generator for the shuffling (see perform)
+    private Random rnd;
+    private boolean threaded;
+    private boolean createMonitors;
+
     /**
      * Creates a new scenario.
-     * 
+     *
      * @param name name of the scenario
      * @param ahp the ahp matrix for rule weight
      * @param nMax the max number of cell which can be built between 1 and 9
      * @param mean true for average aggregation, yager agregation otherwise
      */
-    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean) {
+    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed) {
+        this(name, ahp, nMax, mean, seed, true, true);
+    }
+
+    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed, boolean monitors, boolean threaded) {
         super(name, ahp, nMax, mean);
+        this.rnd = new Random(seed);
+        this.createMonitors = monitors;
+        this.threaded = threaded;
     }
 
     /**
@@ -100,16 +124,17 @@ public class ScenarioAuto extends Scenario {
     }
 
     /**
-     * @return true if the scenario respect stricty the number of cells (nmax) and so unbuild cells
+     * @return true if the scenario respect stricty the number of cells (nmax)
+     * and so unbuild cells
      */
     public boolean isStrict() {
         return strict;
     }
 
     /**
-     * Retourne vrai si la cellule est construite réellement
-     * c à d si il y a du bati à l'intérieur
-     * Code -1 ou 1
+     * Retourne vrai si la cellule est construite réellement c à d si il y a du
+     * bati à l'intérieur Code -1 ou 1
+     *
      * @param c the cell
      * @return true if the cell is built initially
      */
@@ -118,9 +143,9 @@ public class ScenarioAuto extends Scenario {
     }
 
     /**
-     * Retourne vrai si la cellule est noire (ou grise)
-     * c à d si il y a du bati à l'intérieur ou bien va être construite
-     * Code 1 ou 2
+     * Retourne vrai si la cellule est noire (ou grise) c à d si il y a du bati
+     * à l'intérieur ou bien va être construite Code 1 ou 2
+     *
      * @param c the cell
      * @return true if the cell is built (initially or newly)
      */
@@ -131,17 +156,17 @@ public class ScenarioAuto extends Scenario {
     public final boolean isRemoved(Cell c) {
         return c.getLayerValue(getResultLayerName()) == REM_BUILD;
     }
-    
+
     /**
-     * Retourne vrai si la cellule n'est pas construite
-     * et peut être construite (contrainte des zones non constructible)
+     * Retourne vrai si la cellule n'est pas construite et peut être construite
+     * (contrainte des zones non constructible) 
      * Code 0
      * @param c the cell
-     * @return true if the cell is not built initially and does not intersect "too much" the no build area 
+     * @return true if the cell is not built initially and does not intersect "too much" the no build area
      */
     public final boolean canBeBuild(Cell c) {
-        return !isBlack(c) &&
-                (!useNoBuild || c.getLayerValue(Project.NOBUILD_DENS)
+        return !isBlack(c) && 
+                (!useNoBuild || c.getLayerValue(Project.NOBUILD_DENS) 
                     <= (1 - (monoScale ?  0.5 : getNMax() / Math.pow(coefDecomp, 2))));
     }
 
@@ -151,7 +176,7 @@ public class ScenarioAuto extends Scenario {
      */
     public void perform(MSGridBuilder msGrid) {
         initLayers(msGrid);
-        
+
         if(monoScale) {
             if(isRandom()) {
                 performMonoRandom(msGrid);
@@ -168,7 +193,7 @@ public class ScenarioAuto extends Scenario {
      * @param msGrid the multi scale grid
      */
     private void performSim(MSGridBuilder msGrid) {
-         AbstractLayerOperation op = new AbstractLayerOperation(4) {
+        AbstractLayerOperation op = new AbstractLayerOperation(4) {
             final int NBCELL = getNMax();
 
             @Override
@@ -176,18 +201,18 @@ public class ScenarioAuto extends Scenario {
                 String simLayer = getResultLayerName();
                 List<MSCell> lstCell = ((MSCell)cell).getChildren();
                 if(isRemoved(cell)) {
-                   for(MSCell c : lstCell) {
-                       if(isBuild(c)) {
-                           c.setLayerValue(simLayer, REM_BUILD);
-                       }
-                    } 
-                   return;
+                    for(MSCell c : lstCell) {
+                        if(isBuild(c)) {
+                            c.setLayerValue(simLayer, REM_BUILD);
+                        }
+                    }
+                    return;
                 }
-                
+
                 if(!isBlack(cell) || lstCell.isEmpty()) {
                     return;
                 }
-                
+
                 byte nb = 0;
                 for(MSCell c : lstCell) {
                     if(isBlack(c)) {
@@ -195,7 +220,7 @@ public class ScenarioAuto extends Scenario {
                     }
                 }
 
-                Collections.shuffle(lstCell);
+                Collections.shuffle(lstCell, rnd);
                 TreeMap<Double, List<Cell>> map = new TreeMap<>();
                 // on enlève du bati
                 if(strict && nb > NBCELL) {
@@ -246,17 +271,18 @@ public class ScenarioAuto extends Scenario {
                 }
             }
         };
-
-        TaskMonitor monitor = new TaskMonitor(null, "Initialize...", "", 0, 100);
+        TaskMonitor monitor = this.createMonitors ? new TaskMonitor(null, "Initialize...", "", 0, 100)
+                : new TaskMonitor.EmptyMonitor();
         op.setMonitor(monitor);
-        msGrid.execute(op);
+        // TODO pass the random generator to the execute method
+        msGrid.execute(op, this.threaded);
         monitor.close();
         nbCell = ((Number)msGrid.agregate(new SimpleAgregateOperation.COUNT(4, new AcceptableCell() {
-                @Override
-                public boolean accept(Cell c) {
-                    return c.getLayerValue(getResultLayerName()) == NEW_BUILD;
-                }
-            })).firstEntry().getValue()).intValue();
+            @Override
+            public boolean accept(Cell c) {
+                return c.getLayerValue(getResultLayerName()) == NEW_BUILD;
+            }
+        })).firstEntry().getValue()).intValue();
     }
 
     /**
@@ -277,6 +303,11 @@ public class ScenarioAuto extends Scenario {
         if(useNoBuild) {
             info += "Prends en compte les zones non-constructibles.\n";
         }
+        if(isMean()) {
+            info += "evaluation selon des moyennes agrégées.\n";
+        } else {
+            info += "evaluation selon l'aggrégation de Yager.\n";
+        }
         return info;
     }
 
@@ -285,27 +316,22 @@ public class ScenarioAuto extends Scenario {
      * @param msGrid the multi scale grid
      */
     private void performMonoRandom(MSGridBuilder msGrid) {
-
         final String simLayer = getResultLayerName();
-
         AbstractGrid grid = (AbstractGrid) msGrid.getGrid(startScale);
-
-        ProgressMonitor monitor = new ProgressMonitor(null, "Random MonoScale Scenario", "", 0, nbCell);
+        TaskMonitor monitor = this.createMonitors ? new TaskMonitor(null, "Random MonoScale Scenario", "", 0, nbCell)
+                : new TaskMonitor.EmptyMonitor();
         int size = grid.getLayer(simLayer).getSampleModel().getWidth()
-                    * grid.getLayer(simLayer).getSampleModel().getHeight();
+                * grid.getLayer(simLayer).getSampleModel().getHeight();
         int nb = 0;
         while(nb < nbCell) {
             monitor.setNote(nb + "/" + nbCell);
             monitor.setProgress(nb);
-
             DefaultCell cell = new DefaultCell((int)(Math.random() * size), grid);
             if(canBeBuild(cell) && cell.getDistBorder() >= 4) {
                 cell.setLayerValue(simLayer, NEW_BUILD);
                 nb++;
             }
-
         }
-
         monitor.close();
     }
 
@@ -327,15 +353,15 @@ public class ScenarioAuto extends Scenario {
             public int compareTo(CellEval c) {
                 return eval == c.eval ? 0 : (eval < c.eval ? 1 : -1);
             }
-                    
+
         }
 
         // initialise la couche SIMUL
         final String simLayer = getResultLayerName();
         final String evalLayer = getEvalLayerName();
-       
+
         Grid grid = msGrid.getGrid(startScale);
-       
+
         class BestCellQueue extends AbstractAgregateOperation<PriorityQueue<CellEval>> {
             double min;
 
@@ -356,9 +382,9 @@ public class ScenarioAuto extends Scenario {
                 }
             }
         }
-            
-        ProgressMonitor monitor = new ProgressMonitor(null, "MonoScale Scenario", "", 0, nbCell);
 
+        TaskMonitor monitor = this.createMonitors ? new TaskMonitor(null, "MonoScale Scenario", "", 0, nbCell)
+                : new TaskMonitor.EmptyMonitor();
         PriorityQueue<CellEval> queue = new PriorityQueue<>();
         double min = Double.NaN;
         for(int i = 0; i < nbCell; i++) {
@@ -368,36 +394,37 @@ public class ScenarioAuto extends Scenario {
                 monitor.setNote("Queue empty -> report");
                 Raster r = grid.getRaster(evalLayer);
 
-                RenderedImage mask = SubtractFromConstDescriptor.create(grid.getLayer(simLayer).getImage(), new double[] {1}, null);
-// solution propre pour gérer nobuild mais plante putain de JAI !!
-//                if(useNoBuild)
-//                    mask = SubtractDescriptor.create(mask,
-//                            BinarizeDescriptor.create(grid.getLayer(Project.NOBUILD).getImage(), 0.5, null), null);
-                
+                RenderedImage mask = SubtractFromConstDescriptor.create(grid.getLayer(simLayer).getImage(),
+                        new double[]{1}, null);
+                // solution propre pour gérer nobuild mais plante putain de JAI
+                // !!
+                // if(useNoBuild)
+                // mask = SubtractDescriptor.create(mask,
+                // BinarizeDescriptor.create(grid.getLayer(Project.NOBUILD).getImage(),
+                // 0.5, null), null);
+
                 ROI roi = new ROI(mask, 1);
                 Histogram histo = new Histogram(101, 0.0, 1.01, 1);
-                
+
                 histo.countPixels(r, roi, 0, 0, 1, 1);
-                int [] bins = histo.getBins(0);
+                int[] bins = histo.getBins(0);
                 int nb = 0;
                 int j = 100;
                 while(j >= 0 && nb < nbCell) {
                     nb += bins[j--];
                 }
                 // solution à la con pour le nobuild
-                min = ((j+1) / 100.0 >= min) ? min-0.1 : ((j+1) / 100.0);
-                
+                min = ((j + 1) / 100.0 >= min) ? min - 0.1 : ((j + 1) / 100.0);
+
                 BestCellQueue rOp = new BestCellQueue(nb, min);
                 queue = grid.agregate(rOp);
                 System.out.println("Queue size : " + queue.size());
             }
 
-
             CellEval cEval = queue.poll();
             Cell cell = new DefaultCell(cEval.id, (AbstractGrid)grid);
             if(cell.getLayerValue(evalLayer) == cEval.eval && canBeBuild(cell)) {
                 cell.setLayerValue(simLayer, NEW_BUILD);
-                //System.out.println(i + " - " + cell.getId() + " : " + cEval.eval);
                 // on réinsère les cellules modifiées
                 List<Cell> cells = cell.getNeighbors(2);
                 for(Cell c : cells) {
@@ -419,36 +446,91 @@ public class ScenarioAuto extends Scenario {
     protected void createLayers(MSGridBuilder<? extends SquareGrid> msGrid) {
         layers = new DefaultGroupLayer(getName());
 
-        if(monoScale) {
+        if (monoScale) {
             MSGrid grid = msGrid.getGrid(startScale);
             RasterStyle style = new RasterStyle(new UniqueColorTable(Project.COLOR_MAP));
             style.setDrawGrid(false);
-            RasterLayer l = new RasterLayer(String.format("%s-%g", Project.SIMUL, startScale),
-                new RasterShape(grid.getRaster(getResultLayerName()),
-                    org.geotools.geometry.jts.JTS.getEnvelope2D(grid.getEnvelope(),
-                        msGrid.getCrs()).getBounds2D()));
+            RasterLayer l = new RasterLayer(String.format("%s-%g", Project.SIMUL, startScale), new RasterShape(
+                    grid.getRaster(getResultLayerName()),
+                    org.geotools.geometry.jts.JTS.getEnvelope2D(grid.getEnvelope(), msGrid.getCrs()).getBounds2D()));
             l.setVisible(false);
             l.setCRS(msGrid.getCrs());
             l.setStyle(style);
 
             layers.addLayerLast(l);
-            if(!isRandom()) {
+            if (!isRandom()) {
                 l = new RasterLayer(String.format("%s-%g", Project.EVAL, startScale),
-                    new RasterShape(grid.getRaster(getEvalLayerName()),
-                        org.geotools.geometry.jts.JTS.getEnvelope2D(grid.getEnvelope(),
-                            msGrid.getCrs()).getBounds2D()));
+                        new RasterShape(grid.getRaster(getEvalLayerName()), org.geotools.geometry.jts.JTS
+                                .getEnvelope2D(grid.getEnvelope(), msGrid.getCrs()).getBounds2D()));
                 l.setVisible(false);
                 l.setStyle(new RasterStyle(ColorRamp.RAMP_INVGRAY));
                 l.setCRS(msGrid.getCrs());
                 layers.addLayerLast(l);
             }
         } else {
-            layers.addLayerFirst(Project.createMultiscaleLayers(getResultLayerName(), new UniqueColorTable(Project.COLOR_MAP),
-                    getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario"), msGrid));
-            layers.addLayerLast(Project.createMultiscaleLayers(getEvalLayerName(), null,  
-                    getName() + "-" + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest"), msGrid));
+            layers.addLayerFirst(Project.createMultiscaleLayers(getResultLayerName(),
+                    new UniqueColorTable(Project.COLOR_MAP),
+                    getName() + "-"
+                    + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("scenario"),
+                    msGrid));
+            layers.addLayerLast(Project.createMultiscaleLayers(getEvalLayerName(), null,
+                    getName() + "-"
+                    + java.util.ResourceBundle.getBundle("org/thema/mupcity/Bundle").getString("interest"),
+                    msGrid));
         }
+    }
 
+    /**
+     * Overload to save on a chosen folder
+     *
+     * @param Folder the chosen folder
+     * @throws IOException
+     */
+    public void save(File chosenFile, Project project) throws IOException {
+        chosenFile.mkdirs();
+        project.getMSGrid().saveLayer(chosenFile, this.getResultLayerName());
+        System.out.println("eval layer name in scenarioauto.save : " + this.getEvalLayerName());
+        project.getMSGrid().saveLayer(chosenFile, this.getEvalLayerName());
+    }
+
+    /**
+     * Overload the coming method to set an automatic 0 threshold
+     *
+     * @param project name of the concerned project
+     * @param dir where to save those layers
+     */
+    public void extractEvalAnal(File dir, Project project) throws IOException {
+        int seuil = 0;
+        this.extractEvalAnal(seuil, dir, project);
+    }
+
+    /**
+     * export a layer where are stored the "to-urbanise" cells with a positive
+     * evaluation. For the needs of our analysis, we're doing so for the three
+     * lower scales, but it can easily be changer
+     *
+     * @param seuil the value of the lowest evaluation accepted
+     * @param project name of the concerned project
+     * @param dir where to save those layers
+     * @throws IOException
+     */
+    public void extractEvalAnal(int seuil, File dir, Project project) throws IOException {
+        MSGridBuilder msGrid = project.getMSGrid();
+        Collection<MSGrid> grids = msGrid.getGrids();
+        // Rectangle2D env = project.getBoundsOriginal();
+        Rectangle2D env = project.getBounds();
+        msGrid.addLayer(this.getAnalEvalName(), DataBuffer.TYPE_FLOAT, Float.NaN);
+        for (MSGrid grid : grids) {
+            List<MSCell> cells = ((SquareGrid) grid).getCellIn(env);
+            for (Cell cell : cells) {
+                double result = cell.getLayerValue(this.getResultLayerName());
+                double eval = cell.getLayerValue(this.getEvalLayerName());
+                if (/* eval > seuil && */result == NEW_BUILD) {
+                    cell.setLayerValue(this.getAnalEvalName(), eval);
+                }
+            }
+        }
+        msGrid.saveLayer(dir, this.getAnalEvalName());
     }
 
     @Override
@@ -466,49 +548,53 @@ public class ScenarioAuto extends Scenario {
         return getName() + "-" + Project.MORPHO_RULE;
     }
 
+    public final String getAnalEvalName() {
+        return getName() + "-" + Project.EVAL_ANAL;
+    }
 
     /**
-     * Creates a new monoscale scenario.
-     * The method {@link #perform} must be called after to compute the result
+     * Creates a new monoscale scenario. The method {@link #perform} must be
+     * called after to compute the result
+     *
      * @param name the name of the scenario
      * @param scale the scale (cell size)
      * @param nbCell the number cell to build
-     * @param ahp the ahp matrix 
+     * @param ahp the ahp matrix
      * @param useNoBuild use no build restriction layer ?
      * @param mean if true use average agregation, yager otherwise
      * @return the new scenario
      */
-    public static ScenarioAuto createMonoScaleScenario(String name, double scale,
-            int nbCell, AHP ahp, boolean useNoBuild, boolean mean) {
-        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean);
-
+    public static ScenarioAuto createMonoScaleScenario(String name, double scale, int nbCell, AHP ahp,
+            boolean useNoBuild, boolean mean, long seed) {
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean, seed);
         scenario.monoScale = true;
         scenario.startScale = scenario.endScale = scale;
         scenario.nbCell = nbCell;
         scenario.useNoBuild = useNoBuild;
-
         return scenario;
     }
 
     /**
-     * Creates a new multiscale scenario.
-     * The method {@link #perform} must be called after to compute the result
+     * Creates a new multiscale scenario. The method {@link #perform} must be
+     * called after to compute the result
+     *
      * @param name the name of the scenario
-     * @param startScale the first scale 
+     * @param startScale the first scale
      * @param endScale the last scale
      * @param nMax the max number of cell which can be built between 1 and 9
-     * @param strict true if the scenario must respect stricty the number of cells (nmax) and so unbuild some cells
-     * @param ahp the ahp matrix 
+     * @param strict true if the scenario must respect stricty the number of
+     * cells (nmax) and so unbuild some cells
+     * @param ahp the ahp matrix
      * @param useNoBuild use no build restriction layer ?
      * @param mean if true use average agregation, yager otherwise
-     * @param coefDecomp factor between scale of the multiscale grid decomposition
+     * @param coefDecomp factor between scale of the multiscale grid
+     * decomposition
      * @return the new scenario
      */
-    public static ScenarioAuto createMultiScaleScenario(String name,
-            double startScale, double endScale, int nMax, boolean strict, 
-            AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp) {
-        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean);
-
+    public static ScenarioAuto createMultiScaleScenario(String name, double startScale, double endScale, int nMax,
+            boolean strict, AHP ahp, boolean useNoBuild, boolean mean, int coefDecomp, long seed, boolean monitor,
+            boolean threaded) {
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, nMax, mean, seed, monitor, threaded);
         scenario.monoScale = false;
         scenario.startScale = startScale;
         scenario.endScale = endScale;
@@ -516,9 +602,6 @@ public class ScenarioAuto extends Scenario {
         scenario.useNoBuild = useNoBuild;
         scenario.nbCell = 0;
         scenario.coefDecomp = coefDecomp;
-
         return scenario;
     }
-
-   
 }

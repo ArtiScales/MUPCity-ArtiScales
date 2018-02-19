@@ -59,11 +59,11 @@ public class LeisureRule extends AbstractRule {
         super(Arrays.asList(Project.Layers.LEISURE));
         this.level = level;
         if(level == 1) {
-            distance = new DiscreteFunction(new double[]{0.0, 300.0}, new double []{1.0, 0.0});
+            distance = new DiscreteFunction(new double[]{0.0, 300.0}, new double []{1.0, 0.001});
         } else if(level == 2) { // level 
-            distance = new DiscreteFunction(new double[]{0.0, 2000.0}, new double []{1.0, 0.0});
+            distance = new DiscreteFunction(new double[]{0.0, 2000.0}, new double []{1.0, 0.001});
         } else {
-            distance = new DiscreteFunction(new double[]{0.0, 5000.0}, new double []{1.0, 0.0});
+            distance = new DiscreteFunction(new double[]{0.0, 5000.0}, new double []{1.0, 0.001});
         }
     }
     
@@ -74,7 +74,7 @@ public class LeisureRule extends AbstractRule {
 
     @Override
     public void createRule(final Project project) {
-        final DefaultFeatureCoverage<DefaultFeature> leiCov = project.getCoverageLevel(Layers.LEISURE, level);
+    	final DefaultFeatureCoverage<DefaultFeature> leiCov = project.getCoverageLevel(Layers.LEISURE, level);
         final HashSet types = new HashSet();
         for(Feature f : leiCov.getFeatures()) {
             types.add(f.getAttribute(Project.TYPE_FIELD));

@@ -70,14 +70,14 @@ public class Facility12Rule extends AbstractRule {
         this.level = level;
         if(level == 1) {
             maxDistClust = 1000;
-            diversity = new DiscreteFunction(new double[]{0.0, 2.0}, new double []{0.0, 1.0});
+            diversity = new DiscreteFunction(new double[]{0.0, 2.0}, new double []{0.001, 1.0});
             count = new DiscreteFunction(new double[]{0.0, 3.0}, new double []{0.0001, 1.0});
-            distance = new DiscreteFunction(new double[]{0.0, 200.0, 600.0}, new double []{1.0, 0.5, 0.0});
+            distance = new DiscreteFunction(new double[]{0.0, 200.0, 600.0}, new double []{1.0, 0.5, 0.001});
         } else { // level 2
             maxDistClust = 3000;
-            diversity = new DiscreteFunction(new double[]{0.0, 12.0}, new double []{0.0, 1.0});
+            diversity = new DiscreteFunction(new double[]{0.0, 12.0}, new double []{0.001, 1.0});
             count = new DiscreteFunction(new double[]{0.0, 15.0}, new double []{0.0001, 1.0});
-            distance = new DiscreteFunction(new double[]{0.0, 2000.0}, new double []{1.0, 0.0});
+            distance = new DiscreteFunction(new double[]{0.0, 2000.0}, new double []{1.0, 0.001});
         }
     }
 
