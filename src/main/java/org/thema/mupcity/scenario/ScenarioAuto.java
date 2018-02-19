@@ -79,9 +79,9 @@ public class ScenarioAuto extends Scenario {
     private int nbCell;
 
     // random number generator for the shuffling (see perform)
-    private Random rnd;
-    private boolean threaded;
-    private boolean createMonitors;
+    private transient Random rnd;
+    private transient boolean threaded;
+    private transient boolean createMonitors;
 
     /**
      * Creates a new scenario.
@@ -91,10 +91,6 @@ public class ScenarioAuto extends Scenario {
      * @param nMax the max number of cell which can be built between 1 and 9
      * @param mean true for average aggregation, yager agregation otherwise
      */
-    private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed) {
-        this(name, ahp, nMax, mean, seed, true, true);
-    }
-
     private ScenarioAuto(String name, AHP ahp, int nMax, boolean mean, long seed, boolean monitors, boolean threaded) {
         super(name, ahp, nMax, mean);
         this.rnd = new Random(seed);
@@ -566,7 +562,7 @@ public class ScenarioAuto extends Scenario {
      */
     public static ScenarioAuto createMonoScaleScenario(String name, double scale, int nbCell, AHP ahp,
             boolean useNoBuild, boolean mean, long seed) {
-        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean, seed);
+        ScenarioAuto scenario = new ScenarioAuto(name, ahp, 0, mean, seed, true, true);
         scenario.monoScale = true;
         scenario.startScale = scenario.endScale = scale;
         scenario.nbCell = nbCell;
