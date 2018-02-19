@@ -22,6 +22,7 @@ package org.thema.mupcity.rule;
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.util.Arrays;
+import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextArea;
 import org.thema.mupcity.Project;
@@ -136,6 +137,7 @@ public class RuleParamDialog extends javax.swing.JDialog {
     private void ruleListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_ruleListValueChanged
         if(currentEditor != null) {
             currentEditor.validateValue();
+            project.setRule(currentEditor.getValue());
         }
         paramPanel.removeAll();
         if(ruleList.getSelectedIndex() < 0) {
@@ -143,7 +145,7 @@ public class RuleParamDialog extends javax.swing.JDialog {
         }
         Rule rule = (Rule) ruleList.getSelectedValue();
         if(rule.isUsable(project)) {
-            currentEditor = new DefaultParamEditor<>(rule);
+            currentEditor = new DefaultParamEditor<>(project.getRule(rule.getName()));
             paramPanel.add(currentEditor, BorderLayout.CENTER);
         } else {
             paramPanel.add(new JTextArea("This rule is not enabled.\nIt needs layers : \n" + Arrays.deepToString(rule.getUsedLayers().toArray())), BorderLayout.CENTER);

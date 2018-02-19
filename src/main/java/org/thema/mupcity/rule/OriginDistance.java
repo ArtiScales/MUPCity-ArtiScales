@@ -42,17 +42,17 @@ public interface OriginDistance {
     
     /**
      * Return distance in meter
-     * @param dest the destination point
+     * @param dest the destination point or polygon
      * @return the distance between the origin and dest or Double.MAX_VALUE
      */
-    double getDistance(Point dest);
+    double getDistance(Geometry dest);
+    
     /**
      * Return time distance in minutes
-     * @param dest the destination point
+     * @param dest the destination point or polygon
      * @return the time distance between the origin and dest or Double.MAX_VALUE
      */
-    double getTimeDistance(Point dest);
-    
+    double getTimeDistance(Geometry dest);
     
     /**
      * OriginDistance implementation for euclidean distance.
@@ -75,12 +75,12 @@ public interface OriginDistance {
         }
 
         @Override
-        public double getDistance(Point dest) {
+        public double getDistance(Geometry dest) {
             return origin.distance(dest);
         }
         
         @Override
-        public double getTimeDistance(Point dest) {
+        public double getTimeDistance(Geometry dest) {
             return 60 * ((origin.distance(dest) / 1000) / speed);
         }
 
@@ -100,53 +100,60 @@ public interface OriginDistance {
         /**
          * Attention le polygone est supposé rectangle -> est égal à son enveloppe
          * @param graph the network graph
-         * @param origin the origin as a Polygon, must be rectangular
+         * @param origin the origin as a Point or Polygon, if it is a Polygon, must be rectangular
          * @param maxCost max distance in meter or in minutes for speeding up execution, or NaN to calculate on the whole network
          */
-        public NetworkDistance(SpatialGraph graph, Polygon origin, double maxCost) {
+        public NetworkDistance(SpatialGraph graph, Geometry origin, double maxCost) {
             this.graph = graph;
             this.origin = origin;
             this.maxCost = maxCost;
         }
         
-        /**
-         * Creates a new NetworkDistance.
-         * @param graph the network graph
-         * @param origin the point origin
-         * @param maxCost max distance in meter or in minutes for speeding up execution, or NaN to calculate on the whole network
-         */
-        public NetworkDistance(SpatialGraph graph, Point origin, double maxCost) {
-            this.graph = graph;
-            this.origin = origin;
-            this.maxCost = maxCost;
-        }
-
         @Override
-        public double getDistance(Point dest) {
-            if(origin.getEnvelopeInternal().contains(dest.getCoordinate())) {
-                return 0;
-            }
-            Double cost = graph.getCost(getDistPathFinder(), dest);
-            if(cost == null) {
-                return Double.MAX_VALUE;
-            } else {
-                return cost;
-            }
+        public double getDistance(Geometry dest) {
+            return getCost(getDistPathFinder(), dest);
         }
         
         @Override
-        public double getTimeDistance(Point dest) {
-            if(origin.getEnvelopeInternal().contains(dest.getCoordinate())) {
-                return 0;
-            }
-            Double cost = graph.getCost(getTimePathFinder(), dest);
-            if(cost == null) {
-                return Double.MAX_VALUE;
-            } else {
-                return cost;
+        public double getTimeDistance(Geometry dest) {   
+            return getCost(getTimePathFinder(), dest);
+        }
+        
+        private double getCost(DijkstraPathFinder finder, Geometry dest) {
+            if(dest instanceof Point) {
+                if(origin.getEnvelopeInternal().contains(dest.getCoordinate())) {
+                    return 0;
+                }
+                Double cost = graph.getCost(finder, (Point)dest);
+                if(cost == null) {
+                    return Double.MAX_VALUE;
+                } else {
+                    return cost;
+                }
+            } else if(dest instanceof Polygon) {
+                if(dest.getEnvelopeInternal().contains(origin.getCoordinate())) {
+                    return 0;
+                }
+                double minCost = Double.MAX_VALUE;
+                for(Point p : getPointsOnNetwork((Polygon)dest)) {
+                    Double cost = graph.getCost(finder, p);
+                    if(cost != null && cost < minCost) {
+                        minCost = cost;
+                    }
+                }
+                return minCost;
+            } else { // multipoint
+                double minCost = Double.MAX_VALUE;
+                for(int i = 0; i < dest.getNumGeometries(); i++) {
+                    Double cost = graph.getCost(finder, (Point)dest.getGeometryN(i));
+                    if(cost != null && cost < minCost) {
+                        minCost = cost;
+                    }
+                }
+                return minCost;
             }
         }
-
+        
         /**
          * Sets dijkstra listener for stoping calculation at any time.
          * If a listener is set the maxCost parameter is not used.
@@ -181,27 +188,14 @@ public interface OriginDistance {
                 // on ne tient compte que des arcs qui intersectent le rectangle 
                 // tout ce qui est à l'intérieur est sans intérêt
                 //  si il n'y a pas d'arc qui intersecte l'origine on prend l'arc le plus proche
-                List<Edge> edges = graph.getEdgeSpatialIndex().query(origin.getEnvelopeInternal());
-                List<GraphLocation> edgeLoc = new ArrayList<>();
-                Geometry envelope = origin.getEnvelope();
-                GeometryFactory geomFac = new GeometryFactory();
-                for(Edge edge : edges) { 
-                    if(Util.getGeometry(edge).intersects(envelope)) {
-                        Geometry inter = Util.getGeometry(edge).intersection(envelope);
-                        for(Coordinate coord : inter.getCoordinates()) {
-                            edgeLoc.add(new GraphLocation(coord, geomFac.createPoint(coord), edge));
-                        }
-                    }
+                List<Point> points = getPointsOnNetwork((Polygon)origin);
+                List<GraphLocation> locs = new ArrayList<>(points.size());
+                for(Point p : points) {
+                    locs.add(graph.getLocation(p));
                 }
                 
-                if(edgeLoc.isEmpty()) {
-                    Edge edge = graph.getNearestEdge(origin);
-                    Coordinate coord = new DistanceOp(origin, Util.getGeometry(edge)).nearestPoints()[0];
-                    Point p = geomFac.createPoint(coord);
-                    pathfinder = new DijkstraPathFinder(graph.getGraph(), graph.getLocation(p), weighter);
-                } else {            
-                    pathfinder = new DijkstraPathFinder(graph.getGraph(), edgeLoc, weighter);
-                }
+                pathfinder = new DijkstraPathFinder(graph.getGraph(), locs, weighter);
+                
             }
             if(dijkstraListener != null) {
                 pathfinder.calculate(dijkstraListener);
@@ -211,6 +205,31 @@ public interface OriginDistance {
             return pathfinder;
         }
     
+        /**
+         * @param origin polygone d'origine ou de destination
+         * @return la liste des points du réseau intersectant le polygone ou bien le point le plus proche 
+         */
+        public List<Point> getPointsOnNetwork(Polygon origin) {
+            List<Edge> edges = graph.getEdgeSpatialIndex().query(origin.getEnvelopeInternal());
+            List<Point> points = new ArrayList<>();
+            Geometry envelope = origin.getEnvelope();
+            GeometryFactory geomFac = new GeometryFactory();
+            for(Edge edge : edges) { 
+                if(Util.getGeometry(edge).intersects(envelope)) {
+                    Geometry inter = Util.getGeometry(edge).intersection(envelope);
+                    for(Coordinate coord : inter.getCoordinates()) {
+                        points.add(geomFac.createPoint(coord));
+                    }
+                }
+            }
+
+            if(points.isEmpty()) {
+                Edge edge = graph.getNearestEdge(origin);
+                Coordinate coord = new DistanceOp(origin, Util.getGeometry(edge)).nearestPoints()[0];
+                points.add(geomFac.createPoint(coord));
+            } 
+            return points;
+        }
     
         /**
          * Time network weighter

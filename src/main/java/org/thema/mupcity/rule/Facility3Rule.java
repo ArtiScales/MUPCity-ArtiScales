@@ -19,25 +19,19 @@
 
 package org.thema.mupcity.rule;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import java.awt.image.DataBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.Project.Layers;
 import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
-import org.geotools.graph.structure.Edge;
-import org.geotools.graph.structure.Node;
-import org.thema.common.collection.HashMapList;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.param.ReflectObject;
-import org.thema.data.feature.DefaultFeature;
-import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
-import org.thema.graph.GraphLocation;
-import org.thema.graph.pathfinder.DijkstraPathFinder;
-import org.thema.graph.pathfinder.DijkstraPathFinder.DijkstraNode;
 import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
 
@@ -65,19 +59,9 @@ public class Facility3Rule extends AbstractRule {
 
     @Override
     public void createRule(final Project project) {
-        final DefaultFeatureCoverage<DefaultFeature> facCov = project.getCoverageLevel(Layers.FACILITY, 3);
-        // only for optimize networkdistance
-        final HashMapList<Node, Object> nodeTypes = new HashMapList<>();
-        final HashSet types = new HashSet();
-        for(Feature fac : facCov.getFeatures()) {
-            types.add(fac.getAttribute(Project.TYPE_FIELD));
-            GraphLocation location = project.getSpatialGraph().getLocation((Point)fac.getGeometry());
-            if(location.isSnapToEdge()) {
-                nodeTypes.putValue(((Edge)location.getGraphElem()).getNodeA(), fac.getAttribute(Project.TYPE_FIELD));
-                nodeTypes.putValue(((Edge)location.getGraphElem()).getNodeB(), fac.getAttribute(Project.TYPE_FIELD));
-            } else {
-                nodeTypes.putValue((Node)location.getGraphElem(), fac.getAttribute(Project.TYPE_FIELD));
-            }
+        final Map<Feature, OriginDistance> facDistance = new HashMap<>();
+        for(Feature f : project.getCoverageLevel(Layers.FACILITY, 3).getFeatures()) {
+            facDistance.put(f, project.getDistance(f.getGeometry(), Double.NaN));
         }
         
         project.getMSGrid().addLayer(getName(), DataBuffer.TYPE_FLOAT, Float.NaN);
@@ -85,23 +69,18 @@ public class Facility3Rule extends AbstractRule {
             @Override
             public void perform(Cell cell) {
                 HashMap<Object, Double> minDist = new HashMap<>();
-                final HashSet restTypes = new HashSet(types);
-                OriginDistance origDistance = project.getDistance(cell.getGeometry(), Double.NaN);
+                
+                Geometry destGeom = cell.getGeometry();
+                OriginDistance origDistance = project.getDistance(destGeom, Double.NaN);
                 if(origDistance instanceof NetworkDistance) {
-                    ((NetworkDistance)origDistance).setDijkstraListener(new DijkstraPathFinder.CalculateListener() {
-                        @Override
-                        public boolean currentNode(DijkstraNode node) {
-                            if(nodeTypes.containsKey(node.node)) {
-                                restTypes.removeAll(nodeTypes.get(node.node));
-                            }
-                            return !restTypes.isEmpty();
-                        }
-                    });
+                    List<Point> points = ((NetworkDistance)origDistance).getPointsOnNetwork(cell.getGeometry());
+                    destGeom = destGeom.getFactory().buildGeometry(points);
                 }
-                
-                
-                for(Feature fac : facCov.getFeatures()) {
-                    double dist = origDistance.getTimeDistance((Point)fac.getGeometry());
+                for(Feature fac : facDistance.keySet()) {
+                    double dist = 0;
+                    if(!cell.getGeometry().contains(fac.getGeometry())) {
+                        dist = facDistance.get(fac).getTimeDistance(destGeom);
+                    }
                     Object type = fac.getAttribute(Project.TYPE_FIELD);
                     if(minDist.containsKey(type)) {
                         double min = minDist.get(type);

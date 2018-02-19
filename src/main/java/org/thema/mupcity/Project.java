@@ -31,6 +31,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.JDomDriver;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
@@ -292,11 +294,11 @@ public class Project extends AbstractTreeNode {
     
     /**
      * 
-     * @param origin the starting polygon 
+     * @param origin the starting polygon or point
      * @param maxCost the maximum distance or Double.NaN for no limit
      * @return a NetworkDistance or an EuclideanDistance depending on the projects parameters
      */
-    public OriginDistance getDistance(Polygon origin, double maxCost) {
+    public OriginDistance getDistance(Geometry origin, double maxCost) {
         if(distType.equals(EuclideanDistance.class)) {
             return new EuclideanDistance(origin);
         } else {
@@ -443,6 +445,14 @@ public class Project extends AbstractTreeNode {
         for(Rule rule : rules) {
             this.rules.put(rule.getName(), rule);
         }
+    }
+    
+    public Rule getRule(String name) {
+        return rules.get(name);
+    }
+    
+    public void setRule(Rule rule) {
+        rules.put(rule.getName(), rule);
     }
 
     /**

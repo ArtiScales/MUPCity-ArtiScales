@@ -20,6 +20,7 @@
 package org.thema.mupcity.rule;
 
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.operation.buffer.BufferParameters;
 import java.awt.image.DataBuffer;
 import java.util.*;
 import org.thema.mupcity.Project;
@@ -114,7 +115,7 @@ public class Facility12Rule extends AbstractRule {
         }
         
         // création du buffer pour créer les clusters de services
-        Geometry bufFac = BufferForkJoinTask.buffer(new GeometryFactory().buildGeometry(geoms), distClust/2, 8);
+        Geometry bufFac = BufferForkJoinTask.buffer(new GeometryFactory().buildGeometry(geoms), distClust/2, new BufferParameters(8));
         // Créer les clusters à partir du buffer
         List<ClusterFeature> clusters = new ArrayList<>();
         for(int i = 0; i < bufFac.getNumGeometries(); i++) {
