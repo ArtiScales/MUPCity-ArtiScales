@@ -342,12 +342,12 @@ public class Project extends AbstractTreeNode {
                     }
                 }
             }
-        }, true);
+        }, threaded);
         if(isLayerExist(Layers.RESTRICT)) {
             monitor.incProgress(1);
             monitor.setNote("Create grid... restrict");
             getMSGrid().addLayer(NOBUILD_DENS, DataBuffer.TYPE_FLOAT, Float.NaN);
-            getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), true);
+            getMSGrid().execute(new SimpleCoverageOperation(SimpleCoverageOperation.DENSITY, NOBUILD_DENS, getCoverage(Layers.RESTRICT)), threaded);
         }
 
         long t = System.currentTimeMillis();
