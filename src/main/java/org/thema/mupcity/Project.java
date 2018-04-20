@@ -174,7 +174,7 @@ public class Project extends AbstractTreeNode {
     /**
      * Grid layer name for ready-to-use output
      */
-    public static final String EVAL_ANAL = "eval_anal";
+    public static final String EVAL_ANAL = "evalAnal";
     /**
      * Grid layer name for administrative shape
      */
