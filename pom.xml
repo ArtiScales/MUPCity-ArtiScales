@@ -4,7 +4,7 @@
 
     <groupId>org.thema</groupId>
     <artifactId>mupcity</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <packaging>jar</packaging>
 
     <name>MUP-City</name>
@@ -98,22 +98,27 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>drawshape</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>graph</artifactId>
             <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>data</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>graph</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>msca</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
         </dependency>
     </dependencies>
     <repositories>
