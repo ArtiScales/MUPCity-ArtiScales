@@ -134,6 +134,16 @@
             <id>sourcesup</id>
             <url>dav:https://sourcesup.renater.fr/${project.artifactId}/maven</url>
         </site>
+		<repository>
+			<id>ign-releases</id>
+			<name>Nexus Releases Repository</name>
+			<url>https://forge-cogit.ign.fr/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>ign-snapshots</id>
+			<name>Nexus Snapshots Repository</name>
+			<url>https://forge-cogit.ign.fr/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
     </distributionManagement>
     <organization>
         <name>Laboratoire ThéMA - UMR 6049 - CNRS / Université de Franche-Comté</name>
