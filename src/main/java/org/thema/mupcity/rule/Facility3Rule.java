@@ -19,21 +19,22 @@
 
 package org.thema.mupcity.rule;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import java.awt.image.DataBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.thema.mupcity.Project;
-import org.thema.mupcity.Project.Layers;
-import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
+
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.Feature;
 import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
+import org.thema.mupcity.Project;
+import org.thema.mupcity.Project.Layers;
+import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
 
 /**
  * The facility rule for level 3.

@@ -19,14 +19,13 @@
 
 package org.thema.mupcity.evaluation;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Point;
 import java.io.IOException;
 import java.util.HashSet;
-import org.thema.mupcity.Project;
-import org.thema.mupcity.rule.OriginDistance;
+
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Point;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
@@ -34,6 +33,8 @@ import org.thema.graph.GraphLocation;
 import org.thema.graph.SpatialGraph;
 import org.thema.graph.pathfinder.DijkstraPathFinder;
 import org.thema.msca.Cell;
+import org.thema.mupcity.Project;
+import org.thema.mupcity.rule.OriginDistance;
 import org.thema.mupcity.rule.OriginDistance.NetworkDistance;
 
 /**

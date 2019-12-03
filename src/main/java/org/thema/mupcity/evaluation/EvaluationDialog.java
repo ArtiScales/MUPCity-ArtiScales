@@ -19,10 +19,6 @@
 
 package org.thema.mupcity.evaluation;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 import java.awt.Frame;
 import java.awt.image.DataBuffer;
 import java.beans.PropertyVetoException;
@@ -34,32 +30,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
-import org.thema.data.GlobalDataStore;
+
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.precision.GeometryPrecisionReducer;
 import org.thema.common.parallel.BufferForkJoinTask;
 import org.thema.common.swing.TaskMonitor;
+import org.thema.data.GlobalDataStore;
 import org.thema.data.feature.DefaultFeature;
 import org.thema.data.feature.DefaultFeatureCoverage;
-import org.thema.msca.Cell;
-import org.thema.msca.MSGridBuilder;
-import org.thema.msca.SquareGrid;
-import org.thema.msca.SquareGridExtent;
-import org.thema.msca.operation.AbstractLayerOperation;
-import org.thema.mupcity.Project;
-import org.thema.mupcity.scenario.Scenario;
 import org.thema.data.feature.Feature;
 import org.thema.data.feature.FeatureCoverage;
 import org.thema.data.feature.FeatureFilter;
 import org.thema.drawshape.layer.RasterLayer;
 import org.thema.drawshape.ui.MapInternalFrame;
 import org.thema.graph.SpatialGraph;
+import org.thema.msca.Cell;
 import org.thema.msca.GridFeatureCoverage;
 import org.thema.msca.GridGroupLayer;
+import org.thema.msca.MSGridBuilder;
+import org.thema.msca.SquareGrid;
+import org.thema.msca.SquareGridExtent;
+import org.thema.msca.operation.AbstractLayerOperation;
 import org.thema.msca.operation.MeanOperation;
 import org.thema.msca.operation.SimpleCoverageOperation;
 import org.thema.mupcity.MainFrame;
+import org.thema.mupcity.Project;
 import org.thema.mupcity.operation.YagerAgregOperation;
+import org.thema.mupcity.scenario.Scenario;
 
 /**
  * Dialog form for launching ex post evaluations.

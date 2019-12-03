@@ -19,12 +19,20 @@
 
 package org.thema.mupcity.rule;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
 import java.awt.image.DataBuffer;
-import java.util.*;
-import org.thema.mupcity.Project;
-import org.thema.mupcity.Project.Layers;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.fuzzy.MembershipFunction;
 import org.thema.common.parallel.BufferForkJoinTask;
@@ -35,6 +43,8 @@ import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
 import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
+import org.thema.mupcity.Project;
+import org.thema.mupcity.Project.Layers;
 
 /**
  * Facility rule for level 1 and 2.

@@ -19,26 +19,27 @@
 
 package org.thema.mupcity.evaluation;
 
-import com.vividsolutions.jts.geom.Point;
 import java.util.HashMap;
 import java.util.HashSet;
+
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
+import org.locationtech.jts.geom.Point;
 import org.thema.common.collection.HashMapList;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.param.ReflectObject;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.data.feature.DefaultFeature;
-import org.thema.graph.SpatialGraph;
-import org.thema.mupcity.scenario.Scenario;
 import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
 import org.thema.graph.GraphLocation;
+import org.thema.graph.SpatialGraph;
 import org.thema.graph.pathfinder.DijkstraPathFinder;
 import org.thema.msca.Cell;
 import org.thema.msca.SquareGrid;
 import org.thema.mupcity.Project;
 import org.thema.mupcity.rule.OriginDistance;
+import org.thema.mupcity.scenario.Scenario;
 
 /**
  * Evaluates the average minimum distance to each type of amenities.

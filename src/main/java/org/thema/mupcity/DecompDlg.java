@@ -19,17 +19,18 @@
 
 package org.thema.mupcity;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import org.thema.mupcity.rule.RuleParamDialog;
+
 import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.locationtech.jts.geom.Envelope;
 import org.thema.common.JTS;
 import org.thema.drawshape.GridModShape;
-import org.thema.msca.SquareGridFactory;
 import org.thema.drawshape.RectModShape;
 import org.thema.msca.MSGrid;
 import org.thema.msca.MSGridBuilder;
+import org.thema.msca.SquareGridFactory;
+import org.thema.mupcity.rule.RuleParamDialog;
 
 /**
  * Dialog form for defining the decomposition parameters for the multiscale grid and the rules parameters.

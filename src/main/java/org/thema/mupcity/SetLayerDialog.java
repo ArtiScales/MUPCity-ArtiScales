@@ -19,7 +19,6 @@
 
 package org.thema.mupcity;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -28,8 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.type.AttributeType;
 
 /**

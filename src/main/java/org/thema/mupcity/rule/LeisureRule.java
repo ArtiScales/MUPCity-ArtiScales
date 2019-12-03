@@ -19,16 +19,15 @@
 
 package org.thema.mupcity.rule;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 import java.awt.image.DataBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import org.thema.mupcity.Project;
-import org.thema.mupcity.Project.Layers;
+
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.DefaultFeature;
@@ -36,6 +35,8 @@ import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
 import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
+import org.thema.mupcity.Project;
+import org.thema.mupcity.Project.Layers;
 
 /**
  * Leisure rule for level 1, 2 and 3.

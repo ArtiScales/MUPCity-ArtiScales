@@ -19,10 +19,11 @@
 
 package org.thema.mupcity.evaluation;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.locationtech.jts.geom.Geometry;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.swing.TaskMonitor;
 import org.thema.data.feature.DefaultFeature;
@@ -32,7 +33,6 @@ import org.thema.data.feature.FeatureCoverage;
 import org.thema.msca.Cell;
 import org.thema.msca.SquareGrid;
 import org.thema.msca.operation.SimpleCoverageOperation;
-import org.thema.mupcity.Project;
 import org.thema.mupcity.scenario.Scenario;
 
 /**

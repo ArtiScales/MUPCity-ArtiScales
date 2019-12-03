@@ -19,12 +19,16 @@
 
 package org.thema.mupcity.rule;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
 import java.util.ArrayList;
 import java.util.List;
-import org.thema.mupcity.Project;
+
 import org.geotools.graph.structure.Edge;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.distance.DistanceOp;
 import org.thema.data.feature.Feature;
 import org.thema.graph.GraphLocation;
 import org.thema.graph.SpatialGraph;
@@ -32,6 +36,7 @@ import org.thema.graph.Util;
 import org.thema.graph.pathfinder.DijkstraPathFinder;
 import org.thema.graph.pathfinder.DijkstraPathFinder.CalculateListener;
 import org.thema.graph.pathfinder.EdgeWeighter;
+import org.thema.mupcity.Project;
 
 /**
  * Interface for calculating distances from an origin point.

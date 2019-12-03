@@ -19,8 +19,9 @@
 
 package org.thema.mupcity.operation;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.awt.image.DataBuffer;
+
+import org.locationtech.jts.geom.Envelope;
 import org.thema.msca.Cell;
 import org.thema.msca.DefaultCell;
 import org.thema.msca.SquareGrid;

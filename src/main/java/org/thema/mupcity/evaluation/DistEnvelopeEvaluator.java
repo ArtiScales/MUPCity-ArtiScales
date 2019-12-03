@@ -19,17 +19,18 @@
 
 package org.thema.mupcity.evaluation;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
+
+import org.locationtech.jts.geom.Geometry;
 import org.thema.common.fuzzy.DiscreteFunction;
+import org.thema.common.swing.TaskMonitor;
 import org.thema.data.feature.DefaultFeature;
+import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
 import org.thema.graph.SpatialGraph;
+import org.thema.msca.Cell;
 import org.thema.msca.SquareGrid;
 import org.thema.mupcity.scenario.Scenario;
-import org.thema.common.swing.TaskMonitor;
-import org.thema.data.feature.DefaultFeatureCoverage;
-import org.thema.msca.Cell;
 
 /**
  * Evaluates the network distance to the urban border.

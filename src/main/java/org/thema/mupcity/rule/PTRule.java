@@ -19,12 +19,11 @@
 
 package org.thema.mupcity.rule;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Point;
 import java.awt.image.DataBuffer;
 import java.util.Arrays;
-import org.thema.mupcity.Project;
-import org.thema.mupcity.Project.Layers;
+
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Point;
 import org.thema.common.fuzzy.DiscreteFunction;
 import org.thema.common.param.ReflectObject;
 import org.thema.data.feature.DefaultFeature;
@@ -32,6 +31,8 @@ import org.thema.data.feature.DefaultFeatureCoverage;
 import org.thema.data.feature.Feature;
 import org.thema.msca.Cell;
 import org.thema.msca.operation.AbstractLayerOperation;
+import org.thema.mupcity.Project;
+import org.thema.mupcity.Project.Layers;
 
 /**
  * Public transport rule.
