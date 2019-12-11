@@ -4,7 +4,7 @@
 
     <groupId>org.thema</groupId>
     <artifactId>mupcity</artifactId>
-    <version>1.2.3-ORIGINAL</version>
+    <version>1.2.4-ORIGINAL</version>
     <packaging>jar</packaging>
 
     <name>MUP-City</name>
